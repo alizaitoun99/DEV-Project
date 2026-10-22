@@ -2,6 +2,13 @@
 
 > **Status:** Planning / proposed architecture · **Product:** Developer knowledge hub · **Approach:** Single Next.js application
 
+## Design
+
+Refer to the screenshot below as a base for the dashboard. It does not have to be exact, use it as a reference:
+
+- @context/screenshots/dashboard-ui-drawer.png
+- @context/screenshots/dashboard-ui-main.png
+
 ## 1. Vision and problem
 
 Developers scatter reusable knowledge across editors, chat histories, bookmarks, documents, gists and terminal history. DevStash consolidates snippets, AI prompts, notes, commands, links and uploaded assets into **one fast, searchable workspace** with optional AI assistance.
