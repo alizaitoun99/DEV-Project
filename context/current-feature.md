@@ -1,6 +1,6 @@
-# Current feature: Development demo seed
+# Current feature: Dashboard Collections
 
-Populate development demo data using the [seed specification](features/seed-spec.md).
+Replace dashboard collection mock data with database data using the [Dashboard Collections specification](features/dashboard-collections-spec.md).
 
 ## Status: Completed
 
@@ -9,6 +9,10 @@ Populate development demo data using the [seed specification](features/seed-spec
 ## notes
 
 ## History project
+- 2026-10-25: Completed [Dashboard Collections](features/dashboard-collections-spec.md) on `feature/dashboard-collections`: server-only, owner-scoped Prisma queries power the main collection cards and collection statistics, with item counts, type icons, dominant-type borders, stable tie-breaking, neutral empty-collection borders, and a loading skeleton. Queries temporarily use the seeded demo account until authentication is implemented. Collections are ordered by updatedAt descending and capped at six; sidebar and item sections retain mock data.
+- 2026-10-25: Lint, TypeScript, whitespace checks, and browser verification passed. The five seeded collections displayed correct counts and type indicators at 390px, 768px, and 1440px without horizontal overflow; the final browser reload had no console errors. Production build failed twice, including outside the sandbox, with the recurring Turbopack CSS worker error (`node process exited before we could connect`). The user requested commit, merge, push to main, and feature branch deletion after this limitation was reported.
+
+- 2026-10-25: Set [Dashboard Collections](features/dashboard-collections-spec.md) as the current feature with status "In Progress".
 
 - 2026-10-25: Completed [Development demo seed](features/seed-spec.md) on `feature/demo-seed`. Replaced the mock-data seed with the verified FREE demo account (`demo@devstash.io`), bcryptjs password hashing at 12 rounds, seven system types, five collections, and 18 items (four snippets, three prompts, five commands, six links). Repeatable transactional upserts preserve unrelated development records; two seed runs retained the same counts. Dashboard data remains local mock data.
 - 2026-10-25: Expanded `script/test-db.ts` (`npm run db:check`) to display database-wide counts and the demo profile, system types, collections, and item content previews. Read-only checks passed for credentials/hash cost, plan, email verification, type metadata, collection/type counts, content, URL syntax, and owned memberships. Updated database documentation and added bcryptjs with a synchronized lockfile.

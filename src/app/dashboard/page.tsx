@@ -1,23 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Clock3, FolderOpen, Layers, Pin, Star } from "lucide-react";
 import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemCard } from "@/components/dashboard/ItemCard";
-import { COLLECTIONS, ITEMS } from "@/lib/mock-data";
-import { getRecentCollections, getRecentItems } from "@/lib/dashboard-data";
+import { ITEMS } from "@/lib/mock-data";
+import { getRecentItems } from "@/lib/dashboard-data";
+import { getCollectionStats, getRecentCollections } from "@/lib/db/collections";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Dashboard | DevStash",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await connection();
+  // Temporary demo identity until authentication supplies the signed-in owner.
+  const user = await prisma.user.findUnique({ where: { email: "demo@devstash.io" }, select: { id: true } });
+  const [collections, collectionStats] = user ? await Promise.all([
+    getRecentCollections(user.id),
+    getCollectionStats(user.id),
+  ]) : [[], { total: 0, favorites: 0 }];
   const stats = [
     { label: "Items", count: ITEMS.length, icon: Layers },
-    { label: "Collections", count: COLLECTIONS.length, icon: FolderOpen },
+    { label: "Collections", count: collectionStats.total, icon: FolderOpen },
     { label: "Favorite items", count: ITEMS.filter((item) => item.isFavorite).length, icon: Star },
-    { label: "Favorite collections", count: COLLECTIONS.filter((collection) => collection.isFavorite).length, icon: Star },
+    { label: "Favorite collections", count: collectionStats.favorites, icon: Star },
   ];
-  const collections = getRecentCollections(6);
   const pinned = ITEMS.filter((item) => item.isPinned);
   const recent = getRecentItems(10);
 
@@ -40,7 +49,7 @@ export default function DashboardPage() {
           <h2 id="recent-collections-heading" className="text-xl font-semibold">Recent collections</h2>
           <Link href="/collections" prefetch={false} className="shrink-0 rounded-sm text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">View all<span className="sr-only"> collections</span></Link>
         </div>
-        {collections.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{collections.map((collection) => <CollectionCard key={collection.id} collection={collection} />)}</div> : <p className="text-sm text-muted-foreground">Open an item in a collection to see it here.</p>}
+        {collections.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{collections.map((collection) => <CollectionCard key={collection.id} collection={collection} />)}</div> : <p className="text-sm text-muted-foreground">Your collections will appear here.</p>}
       </section>
       <section aria-labelledby="pinned-items-heading">
         <h2 id="pinned-items-heading" className="mb-5 flex items-center gap-2 text-xl font-semibold"><Pin aria-hidden="true" className="size-5 text-muted-foreground" />Pinned items</h2>
