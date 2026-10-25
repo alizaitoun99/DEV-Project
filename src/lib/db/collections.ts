@@ -48,3 +48,11 @@ export async function getCollectionStats(userId: string) {
   ]);
   return { total, favorites };
 }
+
+export async function getFavoriteCollections(userId: string) {
+  return prisma.collection.findMany({
+    where: { userId, isFavorite: true },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: { id: true, name: true },
+  });
+}

@@ -1,6 +1,6 @@
 # Current feature: null
 
-## Status: Completed
+## Status: null
 
 ## goals
 
@@ -11,6 +11,10 @@ null
 null
 
 ## History project
+- 2026-10-26: Completed [Stats & Sidebar](features/stats-sidebar-spec.md) on `feature/stats-sidebar`. Replaced sidebar mock data with Prisma system types and owner-scoped item counts, favorite collections, three recently updated collections, and the demo profile. Favorite collections retain stars; recent collection circles use their dominant item type with deterministic ties and a neutral empty fallback. Added “View all collections”; preserved the existing database-backed dashboard statistics and layout.
+- 2026-10-26: Resolved the recurring CSS build failure with the [CSS build worker fix](features/build-worker-fix.md): switched development and production to supported Webpack builds, replaced Tailwind's Turbopack loader with the official PostCSS plugin, synchronized the lockfile, and added a sidebar Suspense boundary for Cache Components prerendering. Turbopack's helper process exited before its communication connection; the exact runtime trigger remains unconfirmed.
+- 2026-10-26: Production build (including TypeScript, page generation, and build traces), lint, and whitespace checks passed. Browser verification remains unconfirmed after two browser-tool timeouts. Cleared current feature, status, goals, and notes at the user's request; user authorized commit, merge to main, and push to GitHub.
+
 - 2026-10-26: Completed [Dashboard Items](features/dashboard-items-spec.md) on `feature/dashboard-items`. Added server-only, owner-scoped Prisma queries for pinned items, ten recent items ordered by updatedAt descending with stable ID tie-breaking, and item/favorite statistics. Database type slugs drive card icons and borders; descriptions, tags, dates, favorites, and pins are preserved. Empty pinned sections stay hidden.
 - 2026-10-26: Merged the two development users into John Doe (`demo@devistage.io`, PRO), retaining the demo password hash and original demo ID. Preserved 27 items, 11 collections, 19 tags, 29 collection memberships, and 20 tag memberships. Updated the dashboard identity, sidebar profile fixture, development seed/specification, database verification, and database documentation; recorded the transactional merge script.
 - 2026-10-26: Database checks, lint, TypeScript, and whitespace checks passed. Browser checks at 390px, 768px, and 1440px confirmed responsive layouts; after the account merge, the two database-backed pinned items and tags appeared before Recent items. Screenshot: [desktop](../artifacts/dashboard-items-desktop.png). Production build remains blocked by the recurring Turbopack CSS worker startup error (`node process exited before we could connect`), including attempts outside the sandbox.

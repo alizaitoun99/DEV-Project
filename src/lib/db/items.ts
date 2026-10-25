@@ -51,3 +51,14 @@ export async function getItemStats(userId: string) {
   ]);
   return { total, favorites };
 }
+
+export async function getSystemItemTypes(userId?: string) {
+  return prisma.itemType.findMany({
+    where: { isSystem: true },
+    orderBy: { id: "asc" },
+    select: {
+      id: true, slug: true, name: true,
+      _count: { select: { items: { where: { userId: userId ?? "" } } } },
+    },
+  });
+}
