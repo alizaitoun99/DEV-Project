@@ -4,8 +4,7 @@ import { connection } from "next/server";
 import { Clock3, FolderOpen, Layers, Pin, Star } from "lucide-react";
 import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemCard } from "@/components/dashboard/ItemCard";
-import { ITEMS } from "@/lib/mock-data";
-import { getRecentItems } from "@/lib/dashboard-data";
+import { getItemStats, getPinnedItems, getRecentItems } from "@/lib/db/items";
 import { getCollectionStats, getRecentCollections } from "@/lib/db/collections";
 import { prisma } from "@/lib/prisma";
 
@@ -16,19 +15,20 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   await connection();
   // Temporary demo identity until authentication supplies the signed-in owner.
-  const user = await prisma.user.findUnique({ where: { email: "demo@devstash.io" }, select: { id: true } });
-  const [collections, collectionStats] = user ? await Promise.all([
+  const user = await prisma.user.findUnique({ where: { email: "demo@devistage.io" }, select: { id: true } });
+  const [collections, collectionStats, pinned, recent, itemStats] = user ? await Promise.all([
     getRecentCollections(user.id),
     getCollectionStats(user.id),
-  ]) : [[], { total: 0, favorites: 0 }];
+    getPinnedItems(user.id),
+    getRecentItems(user.id),
+    getItemStats(user.id),
+  ]) : [[], { total: 0, favorites: 0 }, [], [], { total: 0, favorites: 0 }];
   const stats = [
-    { label: "Items", count: ITEMS.length, icon: Layers },
+    { label: "Items", count: itemStats.total, icon: Layers },
     { label: "Collections", count: collectionStats.total, icon: FolderOpen },
-    { label: "Favorite items", count: ITEMS.filter((item) => item.isFavorite).length, icon: Star },
+    { label: "Favorite items", count: itemStats.favorites, icon: Star },
     { label: "Favorite collections", count: collectionStats.favorites, icon: Star },
   ];
-  const pinned = ITEMS.filter((item) => item.isPinned);
-  const recent = getRecentItems(10);
 
   return (
     <div className="mx-auto max-w-7xl space-y-10">
@@ -51,10 +51,10 @@ export default async function DashboardPage() {
         </div>
         {collections.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{collections.map((collection) => <CollectionCard key={collection.id} collection={collection} />)}</div> : <p className="text-sm text-muted-foreground">Your collections will appear here.</p>}
       </section>
-      <section aria-labelledby="pinned-items-heading">
+      {pinned.length > 0 && <section aria-labelledby="pinned-items-heading">
         <h2 id="pinned-items-heading" className="mb-5 flex items-center gap-2 text-xl font-semibold"><Pin aria-hidden="true" className="size-5 text-muted-foreground" />Pinned items</h2>
-        <div className="space-y-3">{pinned.length ? pinned.map((item) => <ItemCard key={item.id} item={item} />) : <p className="text-sm text-muted-foreground">Pin items to keep them close at hand.</p>}</div>
-      </section>
+        <div className="space-y-3">{pinned.map((item) => <ItemCard key={item.id} item={item} />)}</div>
+      </section>}
       <section aria-labelledby="recent-items-heading">
         <h2 id="recent-items-heading" className="flex items-center gap-2 text-xl font-semibold"><Clock3 aria-hidden="true" className="size-5 text-muted-foreground" />Recent items</h2>
         <p className="mt-1 mb-5 text-sm text-muted-foreground">Your {recent.length} most recently updated items</p>

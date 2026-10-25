@@ -134,9 +134,9 @@ async function main(): Promise<void> {
   const passwordHash = await hash("12345678", 12);
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.upsert({
-      where: { email: "demo@devstash.io" },
-      create: { name: "Demo User", email: "demo@devstash.io", passwordHash, plan: "FREE", emailVerified: new Date() },
-      update: { name: "Demo User", passwordHash, plan: "FREE", emailVerified: new Date() },
+      where: { email: "demo@devistage.io" },
+      create: { name: "John Doe", email: "demo@devistage.io", passwordHash, plan: "PRO", emailVerified: new Date() },
+      update: { name: "John Doe", passwordHash, plan: "PRO", emailVerified: new Date() },
     });
     const typeIds = new Map<string, string>();
     for (const type of SYSTEM_TYPES) {

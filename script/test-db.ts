@@ -45,14 +45,16 @@ async function checkTables(): Promise<void> {
 
 async function checkDemoData(): Promise<void> {
   const user = await prisma.user.findUnique({
-    where: { email: "demo@devstash.io" },
+    where: { email: "demo@devistage.io" },
     select: {
       id: true, name: true, email: true, plan: true, emailVerified: true, passwordHash: true,
       collections: {
+        where: { id: { startsWith: "demo-" } },
         orderBy: { name: "asc" },
         select: { id: true, name: true, description: true, items: { select: { itemId: true } } },
       },
       items: {
+        where: { id: { startsWith: "demo-" } },
         orderBy: { title: "asc" },
         select: {
           id: true, title: true, content: true, url: true, language: true,
@@ -63,7 +65,7 @@ async function checkDemoData(): Promise<void> {
     },
   });
   check(user !== null, "Demo user is missing. Run npm run db:seed first.");
-  check(user.name === "Demo User" && user.plan === "FREE" && user.emailVerified !== null, "Demo user profile does not match the seed spec.");
+  check(user.name === "John Doe" && user.plan === "PRO" && user.emailVerified !== null, "Demo user profile does not match the seed spec.");
   check(user.passwordHash !== null, "Demo user password hash is missing.");
   check(getRounds(user.passwordHash) === 12 && await compare("12345678", user.passwordHash), "Demo password or bcrypt cost does not match the seed spec.");
   console.log("Demo user (password verified; hash omitted):");

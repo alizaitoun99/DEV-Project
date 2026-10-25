@@ -8,10 +8,10 @@ Create a seed script (`prisma/seed.ts`) to populate the database with sample dat
 
 ### User
 
-- **Email:** demo@devstash.io
-- **Name:** Demo User
+- **Email:** demo@devistage.io
+- **Name:** John Doe
 - **Password:** 12345678 (hash with bcryptjs, 12 rounds)
-- **isPro:** false
+- **isPro:** true
 - **emailVerified:** current date
 
 ### System Item Types

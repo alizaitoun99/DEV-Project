@@ -47,7 +47,7 @@ export interface Item {
 export const CURRENT_USER: User = {
   id: "user-john",
   name: "John Doe",
-  email: "john@example.com",
+  email: "demo@devistage.io",
   image: null,
   plan: "PRO",
 };

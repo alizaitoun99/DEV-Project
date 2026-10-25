@@ -1,20 +1,19 @@
 import { Pin, Star } from "lucide-react";
-import { ITEM_TYPES } from "@/lib/mock-data";
-import type { Item } from "@/lib/mock-data";
+import type { ItemSummary } from "@/lib/db/items";
 import { getTypeStyle, TypeIcon } from "@/components/dashboard/TypeIcon";
 
 interface ItemCardProps {
-  item: Item;
+  item: ItemSummary;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
 export function ItemCard({ item }: ItemCardProps) {
-  const type = ITEM_TYPES.find((type) => type.id === item.typeId);
+  const updatedAt = item.updatedAt.toISOString();
   return (
-    <article className={`flex min-w-0 items-start gap-4 rounded-xl border border-l-2 bg-card/20 p-4 sm:p-5 ${getTypeStyle(item.typeId).border}`}>
+    <article className={`flex min-w-0 items-start gap-4 rounded-xl border border-l-2 bg-card/20 p-4 sm:p-5 ${getTypeStyle(item.type.slug).border}`}>
       <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted/50">
-        <TypeIcon typeId={item.typeId} label={type?.name ?? item.typeId} />
+        <TypeIcon typeId={item.type.slug} label={item.type.name} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -24,11 +23,11 @@ export function ItemCard({ item }: ItemCardProps) {
         </div>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
         <ul aria-label="Tags" className="mt-3 flex flex-wrap gap-2">
-          {item.tags.map((tag) => <li key={tag} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{tag}</li>)}
+          {item.tags.map(({ tag }) => <li key={tag.name} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{tag.name}</li>)}
         </ul>
-        <time dateTime={item.updatedAt} className="mt-3 block text-xs text-muted-foreground sm:hidden">Updated {dateFormat.format(new Date(item.updatedAt))}</time>
+        <time dateTime={updatedAt} className="mt-3 block text-xs text-muted-foreground sm:hidden">Updated {dateFormat.format(item.updatedAt)}</time>
       </div>
-      <time dateTime={item.updatedAt} className="hidden shrink-0 pt-1 text-xs text-muted-foreground sm:block">{dateFormat.format(new Date(item.updatedAt))}</time>
+      <time dateTime={updatedAt} className="hidden shrink-0 pt-1 text-xs text-muted-foreground sm:block">{dateFormat.format(item.updatedAt)}</time>
     </article>
   );
 }

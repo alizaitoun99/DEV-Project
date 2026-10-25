@@ -54,9 +54,11 @@ Cross-owner membership/type authorization, content-kind validation, immutable sy
 
 Run `npm run db:seed` to populate the development database configured by `DATABASE_URL` from [the seed specification](../context/features/seed-spec.md). This is separate from migrations and rejects `NODE_ENV=production`.
 
-The seed upserts `demo@devstash.io` (Demo User) with password `12345678`, hashed using bcryptjs with 12 rounds, current email verification, and `plan: FREE` (the schema equivalent of `isPro: false`). It creates seven system types, five collections, and 18 items: four snippets, three prompts, five commands, and six links. No file uploads or authentication sessions are created.
+The seed upserts `demo@devistage.io` (John Doe) with password `12345678`, hashed using bcryptjs with 12 rounds, current email verification, and `plan: PRO`. It creates seven system types, five collections, and 18 items: four snippets, three prompts, five commands, and six links. No file uploads or authentication sessions are created.
 
-Reruns refresh the specified demo fields and reuse stable, user-scoped IDs without duplicating items or memberships. System types are matched by global slug and updated to the specified names, Lucide component icons, colors, and storage kinds. Other users and earlier mock fixtures are preserved. All writes run in one transaction; ownership conflicts abort it. The dashboard still uses its local mock data until database integration is implemented.
+Reruns refresh the specified demo fields and reuse stable, user-scoped IDs without duplicating items or memberships. System types are matched by global slug and updated to the specified names, Lucide component icons, colors, and storage kinds. Other records are preserved. All writes run in one transaction; ownership conflicts abort it. The main dashboard queries this account directly from the database.
+
+On 2026-10-26, the earlier John Doe and demo accounts were merged into this account, retaining the original demo user ID so seed IDs remain stable. All 27 items, 11 collections, 19 tags, 29 collection memberships, and 20 tag memberships were preserved, including two pinned items. The one-time development merge is recorded in `script/merge-demo-users.ts`; it aborts on unexpected account conflicts.
 
 ## Verification
 
@@ -68,6 +70,6 @@ npx tsc --noEmit
 npm run build
 ```
 
-These checks work without database credentials. `db:status`, migrations, and `db:check` require real connection strings. `db:check` runs read-only checks through the Neon adapter and displays database-wide table counts, the demo profile, system types, collections, and all demo items with content previews. It verifies the demo password and bcrypt cost without printing the hash, FREE plan, email verification, seven type definitions, collection/type counts, text content, URL syntax, and owned memberships. Run `npm run db:seed` first; missing or mismatched demo data produces a nonzero exit code. It does not modify data or request external link URLs.
+These checks work without database credentials. `db:status`, migrations, and `db:check` require real connection strings. `db:check` runs read-only checks through the Neon adapter and displays database-wide table counts, the demo profile, system types, and seeded items with content previews. It verifies the demo password and bcrypt cost without printing the hash, PRO plan, email verification, seven type definitions, collection/type counts, text content, URL syntax, and owned memberships. Seed-specific assertions select records with the `demo-` ID prefix, allowing merged content to coexist. Run `npm run db:seed` first; missing or mismatched demo data produces a nonzero exit code. It does not modify data or request external link URLs.
 
 References: [Prisma 7 upgrade guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7), [Neon + Prisma](https://neon.com/docs/guides/prisma), [Auth.js Prisma adapter](https://authjs.dev/getting-started/adapters/prisma).

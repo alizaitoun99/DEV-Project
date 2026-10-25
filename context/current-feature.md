@@ -1,14 +1,22 @@
-# Current feature: Dashboard Collections
-
-Replace dashboard collection mock data with database data using the [Dashboard Collections specification](features/dashboard-collections-spec.md).
+# Current feature: null
 
 ## Status: Completed
 
 ## goals
 
+null
+
 ## notes
 
+null
+
 ## History project
+- 2026-10-26: Completed [Dashboard Items](features/dashboard-items-spec.md) on `feature/dashboard-items`. Added server-only, owner-scoped Prisma queries for pinned items, ten recent items ordered by updatedAt descending with stable ID tie-breaking, and item/favorite statistics. Database type slugs drive card icons and borders; descriptions, tags, dates, favorites, and pins are preserved. Empty pinned sections stay hidden.
+- 2026-10-26: Merged the two development users into John Doe (`demo@devistage.io`, PRO), retaining the demo password hash and original demo ID. Preserved 27 items, 11 collections, 19 tags, 29 collection memberships, and 20 tag memberships. Updated the dashboard identity, sidebar profile fixture, development seed/specification, database verification, and database documentation; recorded the transactional merge script.
+- 2026-10-26: Database checks, lint, TypeScript, and whitespace checks passed. Browser checks at 390px, 768px, and 1440px confirmed responsive layouts; after the account merge, the two database-backed pinned items and tags appeared before Recent items. Screenshot: [desktop](../artifacts/dashboard-items-desktop.png). Production build remains blocked by the recurring Turbopack CSS worker startup error (`node process exited before we could connect`), including attempts outside the sandbox.
+- 2026-10-26: Closed out at the user's request: set current feature, goals, and notes to null and moved results to history. User explicitly requested commit, merge, push to main, and feature branch deletion after the build limitation was reported.
+
+- 2026-10-25: Set [Dashboard Items](features/dashboard-items-spec.md) as the current feature with status "In Progress".
 - 2026-10-25: Completed [Dashboard Collections](features/dashboard-collections-spec.md) on `feature/dashboard-collections`: server-only, owner-scoped Prisma queries power the main collection cards and collection statistics, with item counts, type icons, dominant-type borders, stable tie-breaking, neutral empty-collection borders, and a loading skeleton. Queries temporarily use the seeded demo account until authentication is implemented. Collections are ordered by updatedAt descending and capped at six; sidebar and item sections retain mock data.
 - 2026-10-25: Lint, TypeScript, whitespace checks, and browser verification passed. The five seeded collections displayed correct counts and type indicators at 390px, 768px, and 1440px without horizontal overflow; the final browser reload had no console errors. Production build failed twice, including outside the sandbox, with the recurring Turbopack CSS worker error (`node process exited before we could connect`). The user requested commit, merge, push to main, and feature branch deletion after this limitation was reported.
 
