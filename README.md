@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+For Prisma 7 and Neon PostgreSQL configuration, migration commands, and connection verification, see [Database setup](prisma/README.md).
+
 First, run the development server:
 
 ```bash
