@@ -48,13 +48,15 @@ Never use `prisma db push`. Production must run `npm run db:deploy` with product
 
 The initial migration is generated from the project overview, with an Auth.js-compatible Session primary key, indexes for foreign-key lookups, a partial unique index for global system slugs, and a check tying system/custom types to their ownership. User deletion cascades through owned data and authentication records; deleting a collection or tag removes memberships, not items. Deleting a referenced item type is restricted, while deleting a collection's default type clears that default.
 
-Cross-owner membership/type authorization, content-kind validation, immutable system types, normalized tag slugs, full-text search, and R2 cleanup must be enforced when the corresponding services are implemented. This foundation does not expose database access through public routes or replace the mock dashboard data. No users, credentials, or sample data are seeded.
+Cross-owner membership/type authorization, content-kind validation, immutable system types, normalized tag slugs, full-text search, and R2 cleanup must be enforced when the corresponding services are implemented. This foundation does not expose database access through public routes or replace the mock dashboard data. Sample data is created only by the explicit development seed below.
 
 ## Development seed
 
-Run `npm run db:seed` to load `src/lib/mock-data.ts` into the database configured by `DATABASE_URL`. This is an explicit Prisma 7 seed command, separate from schema migrations. Use the development branch only; the script rejects `NODE_ENV=production`.
+Run `npm run db:seed` to populate the development database configured by `DATABASE_URL` from [the seed specification](../context/features/seed-spec.md). This is separate from migrations and rejects `NODE_ENV=production`.
 
-The seed creates the mock user, seven system types, six collections, nine items, normalized user-owned tags, and collection/tag memberships in a transaction. Stable IDs and upserts make reruns safe without overwriting existing records. Ownership conflicts abort the transaction. No passwords or authentication sessions are created. File/image fixtures retain metadata only, with no fabricated R2 keys or uploaded objects.
+The seed upserts `demo@devstash.io` (Demo User) with password `12345678`, hashed using bcryptjs with 12 rounds, current email verification, and `plan: FREE` (the schema equivalent of `isPro: false`). It creates seven system types, five collections, and 18 items: four snippets, three prompts, five commands, and six links. No file uploads or authentication sessions are created.
+
+Reruns refresh the specified demo fields and reuse stable, user-scoped IDs without duplicating items or memberships. System types are matched by global slug and updated to the specified names, Lucide component icons, colors, and storage kinds. Other users and earlier mock fixtures are preserved. All writes run in one transaction; ownership conflicts abort it. The dashboard still uses its local mock data until database integration is implemented.
 
 ## Verification
 
@@ -66,6 +68,6 @@ npx tsc --noEmit
 npm run build
 ```
 
-These checks work without database credentials. `db:status`, migrations, and `db:check` require real connection strings. `db:check` runs a read-only connectivity query and verifies that all ten initial model tables can be queried through the Neon adapter; it does not modify data.
+These checks work without database credentials. `db:status`, migrations, and `db:check` require real connection strings. `db:check` runs read-only checks through the Neon adapter and displays database-wide table counts, the demo profile, system types, collections, and all demo items with content previews. It verifies the demo password and bcrypt cost without printing the hash, FREE plan, email verification, seven type definitions, collection/type counts, text content, URL syntax, and owned memberships. Run `npm run db:seed` first; missing or mismatched demo data produces a nonzero exit code. It does not modify data or request external link URLs.
 
 References: [Prisma 7 upgrade guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7), [Neon + Prisma](https://neon.com/docs/guides/prisma), [Auth.js Prisma adapter](https://authjs.dev/getting-started/adapters/prisma).

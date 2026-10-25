@@ -1,30 +1,18 @@
-# Current feature: Prisma + Neon PostgreSQL Setup
+# Current feature: Development demo seed
 
-Set up Prisma 7 with Neon PostgreSQL using the [database spec](features/database-spec.md).
+Populate development demo data using the [seed specification](features/seed-spec.md).
 
 ## Status: Completed
 
 ## goals
 
-- Add `script/test-db.ts` with dotenv loading and read-only connection/table checks, available through `npm run db:check`.
-
-- Add and run a repeatable development seed from `src/lib/mock-data.ts`, preserving fixture relationships and file metadata without fabricating uploads.
-
-- Configure Prisma 7 with Neon serverless PostgreSQL.
-- Create the initial schema from the data models in [project-overview.md](project-overview.md), including the NextAuth models `Account`, `Session`, and `VerificationToken`.
-- Add appropriate indexes, relationships, and cascade deletes.
-- Create versioned migrations for the initial schema.
-
 ## notes
 
-- 2026-10-25: Added `prisma/seed.ts` and `npm run db:seed` using the dashboard fixtures. Seeded the development database and reran successfully with unchanged counts: 1 user, 7 system types, 6 collections, 9 items, 19 tags, 11 collection memberships, and 20 item-tag links. Existing records are preserved; no uploaded objects or passwords are created. Lint and TypeScript passed. Production build failed in Turbopack's CSS worker (`node process exited before we could connect`), including a retry outside the sandbox.
-
-- Before implementation, read the entire [Prisma 7 upgrade guide](https://www.prisma.io/docs/orm/more/upgrade-guides/upgrading-versions/upgrading-to-prisma-7) and consult the [setup guide](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres) for version-specific configuration and adapter requirements.
-- `DATABASE_URL` will point to the Neon development branch; production will use a separate Neon branch.
-- Always create migrations for schema changes; never use `prisma db push`. Use `prisma migrate dev` for development and `prisma migrate deploy` for production.
-- 2026-10-25: Applied the versioned initial migration `20261025120000_init` to the configured Neon development branch with `npm run db:migrate`. Migration status is up to date, all ten model tables passed the Neon adapter connectivity check, and Prisma Client was regenerated. Production must apply the same migration with `npm run db:deploy`.
-
 ## History project
+
+- 2026-10-25: Completed [Development demo seed](features/seed-spec.md) on `feature/demo-seed`. Replaced the mock-data seed with the verified FREE demo account (`demo@devstash.io`), bcryptjs password hashing at 12 rounds, seven system types, five collections, and 18 items (four snippets, three prompts, five commands, six links). Repeatable transactional upserts preserve unrelated development records; two seed runs retained the same counts. Dashboard data remains local mock data.
+- 2026-10-25: Expanded `script/test-db.ts` (`npm run db:check`) to display database-wide counts and the demo profile, system types, collections, and item content previews. Read-only checks passed for credentials/hash cost, plan, email verification, type metadata, collection/type counts, content, URL syntax, and owned memberships. Updated database documentation and added bcryptjs with a synchronized lockfile.
+- 2026-10-25: Closed out the feature at the user's request: marked Completed and cleared goals and notes. Lint, TypeScript, and demo database verification passed. The final production build attempt still failed with the previously observed Turbopack CSS worker error (`node process exited before we could connect`). The user requested commit, merge, push to main, and feature branch deletion after this limitation had been reported.
 
 - 2026-10-25: Completed Prisma + Neon PostgreSQL setup on `feature/neon-prisma`: Prisma 7 schema/client and Neon adapter, versioned initial migration applied to development, repeatable mock-data seed, and dotenv-backed `script/test-db.ts`. Migration status and all ten table queries passed; seed rerun preserved counts. Lint, TypeScript, and the final `npm run build` passed, including compilation, static generation, and optimization. Earlier CSS worker failures did not recur on the final build. Production must apply versioned migrations with `npm run db:deploy`; never use `prisma db push`.
 
