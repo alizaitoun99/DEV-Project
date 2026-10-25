@@ -3,9 +3,14 @@ import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  sidebarToggle: React.ReactNode;
+}
+
+export function DashboardHeader({ sidebarToggle }: DashboardHeaderProps) {
   return (
     <header className="flex flex-wrap items-center gap-3 border-b px-4 py-3 sm:flex-nowrap sm:px-6">
+      {sidebarToggle}
       <div className="relative min-w-0 flex-1 sm:max-w-lg">
         <Search
           aria-hidden="true"
