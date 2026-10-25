@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { COLLECTIONS, CURRENT_USER, ITEMS, ITEM_TYPES } from "@/lib/mock-data";
 import type { Collection } from "@/lib/mock-data";
+import { getRecentCollections } from "@/lib/dashboard-data";
 
 const TYPE_STYLES = {
   snippet: { icon: Code, color: "text-blue-500", route: "snippets" },
@@ -33,13 +34,7 @@ function CollectionLinks({ collections }: CollectionLinksProps) {
 }
 
 export function DashboardSidebar() {
-  const recentCollections = COLLECTIONS.map((collection) => ({
-    collection,
-    lastOpened: Math.max(0, ...ITEMS.filter((item) => item.collectionIds.includes(collection.id))
-      .map((item) => item.lastOpenedAt ? Date.parse(item.lastOpenedAt) : 0)),
-  })).filter(({ lastOpened }) => lastOpened > 0)
-    .sort((a, b) => b.lastOpened - a.lastOpened || a.collection.id.localeCompare(b.collection.id))
-    .slice(0, 3).map(({ collection }) => collection);
+  const recentCollections = getRecentCollections(3);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
