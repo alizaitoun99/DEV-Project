@@ -1,14 +1,21 @@
-# Current feature: null
+# Current feature: Collection summary performance
 
-## Status: null
+## Status: Completed
 
 ## goals
 
-null
+- Aggregate collection membership counts in PostgreSQL instead of fetching every item.
+- Preserve owner scoping, collection ordering, dominant-type ties, and empty collections.
+- Verify the user's DIRECT_URL configuration correction and run validation.
 
 ## notes
 
-null
+- Work on `fix/collection-summary-performance`; preserve the user's Prisma configuration edit.
+- Collection metadata is limited first, then a parameterized Prisma SQL query aggregates owned memberships by collection/type. Counts, deterministic type ties, and empty collections are preserved without returning individual memberships.
+- Added read-only regression verification: `node --conditions=react-server --import tsx script/check-collection-summaries.ts`. Compares existing collections at multiple limits and uses SQL CTE fixtures for 10,004 memberships, type ties, empty collections, and cross-owner filtering without database writes. The synthetic case returned five aggregate rows; current live database has one user and no collections.
+- Validation passed: lint, standalone TypeScript, Prisma schema validation, direct-connection migration status, and production build (outside the sandbox after a Windows EPERM failure). A concurrent TypeScript attempt encountered regenerated Next types; the standalone rerun after build passed.
+- Production browser checks passed at 1536px and 390px: dashboard empty state rendered, no horizontal overflow, and no console errors. Populated summaries were verified through the read-only SQL fixtures because the current database has no collections.
+- Confirmed the user's `prisma.config.ts` correction: CLI uses DIRECT_URL; application uses DATABASE_URL. No migration or dependency change required. No commit or merge performed.
 
 ## History project
 

@@ -62,6 +62,14 @@ On 2026-10-26, the earlier John Doe and demo accounts were merged into this acco
 
 ## Verification
 
+Verify collection aggregation without changing database records:
+
+```sh
+node --conditions=react-server --import tsx script/check-collection-summaries.ts
+```
+
+This standalone Node assertion script compares summaries against existing memberships at several limits, then runs read-only SQL CTE fixtures covering large collections, tied type counts, empty collections, and ownership filtering. It requires the application's `DATABASE_URL`; no test framework or database writes are used.
+
 ```sh
 npm run db:validate
 npm run db:generate

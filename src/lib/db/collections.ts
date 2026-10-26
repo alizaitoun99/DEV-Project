@@ -1,5 +1,6 @@
 import "server-only";
 
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export interface CollectionSummary {
@@ -13,6 +14,14 @@ export interface CollectionSummary {
 
 const TYPE_ORDER = ["snippet", "prompt", "command", "note", "file", "image", "link"];
 
+interface CollectionTypeCount {
+  collectionId: string;
+  id: string;
+  slug: string;
+  name: string;
+  count: bigint;
+}
+
 export async function getRecentCollections(userId: string, limit = 6): Promise<CollectionSummary[]> {
   const collections = await prisma.collection.findMany({
     where: { userId },
@@ -20,24 +29,36 @@ export async function getRecentCollections(userId: string, limit = 6): Promise<C
     take: limit,
     select: {
       id: true, name: true, description: true, isFavorite: true,
-      items: {
-        where: { item: { userId } },
-        select: { item: { select: { type: { select: { id: true, slug: true, name: true } } } } },
-      },
     },
   });
 
-  return collections.map(({ items, ...collection }) => {
-    const counts = new Map<string, CollectionSummary["types"][number]>();
-    for (const { item: { type } } of items) {
-      const existing = counts.get(type.id);
-      counts.set(type.id, { ...type, count: (existing?.count ?? 0) + 1 });
-    }
-    const types = [...counts.values()].sort((a, b) => b.count - a.count
+  if (collections.length === 0) return [];
+
+  // Return one row per collection/type, rather than one row per membership.
+  // Both owners are checked because membership foreign keys alone do not enforce ownership.
+  const counts = await prisma.$queryRaw<CollectionTypeCount[]>(Prisma.sql`
+    SELECT membership."collectionId", type."id", type."slug", type."name", COUNT(*) AS "count"
+    FROM "ItemCollection" AS membership
+    JOIN "Collection" AS collection ON collection."id" = membership."collectionId"
+    JOIN "Item" AS item ON item."id" = membership."itemId"
+    JOIN "ItemType" AS type ON type."id" = item."typeId"
+    WHERE collection."userId" = ${userId} AND item."userId" = ${userId}
+      AND membership."collectionId" IN (${Prisma.join(collections.map(({ id }) => id))})
+    GROUP BY membership."collectionId", type."id", type."slug", type."name"
+  `);
+  const typesByCollection = new Map<string, CollectionSummary["types"]>();
+  for (const { collectionId, count, ...type } of counts) {
+    const types = typesByCollection.get(collectionId) ?? [];
+    types.push({ ...type, count: Number(count) });
+    typesByCollection.set(collectionId, types);
+  }
+
+  return collections.map((collection) => {
+    const types = (typesByCollection.get(collection.id) ?? []).sort((a, b) => b.count - a.count
       || (TYPE_ORDER.indexOf(a.slug) < 0 ? TYPE_ORDER.length : TYPE_ORDER.indexOf(a.slug))
       - (TYPE_ORDER.indexOf(b.slug) < 0 ? TYPE_ORDER.length : TYPE_ORDER.indexOf(b.slug))
       || a.slug.localeCompare(b.slug));
-    return { ...collection, itemCount: items.length, types };
+    return { ...collection, itemCount: types.reduce((total, type) => total + type.count, 0), types };
   });
 }
 
