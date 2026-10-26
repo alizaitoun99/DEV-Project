@@ -10,6 +10,6 @@ export default defineConfig({
   // Generation and schema validation work without database credentials.
   // Commands that connect to a database require DIRECT_URL.
   datasource: {
-    url: process.env.DIRECT_URL,
+    url: process.env.DATABASE_URL,
   },
 });
