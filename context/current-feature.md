@@ -1,28 +1,14 @@
-# Current Feature: Auth Setup - NextAuth + GitHub Provider
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Install NextAuth v5 (`next-auth@beta`) and `@auth/prisma-adapter`.
-- Configure GitHub OAuth using split auth configuration, the Prisma adapter, and JWT sessions.
-- Export the NextAuth route handlers and extend the Session type with `user.id`.
-- Protect `/dashboard/*` with the Next.js 16 proxy and redirect unauthenticated users to the default NextAuth sign-in page.
-- Verify sign-in redirection, GitHub authentication, and return to `/dashboard`.
+<!-- Add goals when starting a feature. -->
 
 ## Notes
 
-- Specification: [Auth Phase 1](features/auth-phase-1-spec.md).
-- Create `src/auth.config.ts` (providers only, no adapter), `src/auth.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/proxy.ts`, and `src/types/next-auth.d.ts`.
-- Use Context7 to verify current configuration and conventions, and read the relevant bundled Next.js documentation before implementation.
-- Use `session: { strategy: "jwt" }` and the named proxy export `export const proxy = auth(...)` at `src/proxy.ts`.
-- Use NextAuth's default pages for testing; do not set a custom `pages.signIn`.
-- Required environment variables: `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET`. Never commit secrets.
-- Implementation branch: `feature/auth-phase-1`.
-- Installed `next-auth@5.0.0-beta.32` and `@auth/prisma-adapter@2.11.3`; implemented split configuration, JWT sessions, typed session user IDs, auth handlers, and a named dashboard proxy. Existing Prisma auth models required no migration.
-- Replaced dashboard and sidebar demo identity lookups with a request-scoped current-user helper that validates the session and loads the signed-in database user before owner-scoped queries.
-- Validation passed: lint, standalone TypeScript, whitespace checks, and production build. The first sandboxed build failed with Windows EPERM creating generated output; the build outside the sandbox passed.
-- Browser verification confirmed the default sign-in page and GitHub login redirect with the localhost callback. HTTP checks confirmed 307 redirects for `/dashboard` and nested dashboard paths, preservation of query strings, a 200 sign-in page, and a null unauthenticated session. Completing GitHub login and verifying the callback/session and authenticated dashboard remain pending user sign-in.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -61,3 +47,5 @@
 - 2026-10-26: Production build (including TypeScript, page generation, and build traces), lint, and whitespace checks passed. Browser verification remains unconfirmed after two browser-tool timeouts. Cleared current feature, status, goals, and notes at the user's request; user authorized commit, merge to main, and push to GitHub.
 - 2026-10-26: Completed collection summary performance on `fix/collection-summary-performance` and merged into `main`. Limited collection metadata first, then aggregated owned memberships by collection/type in PostgreSQL through parameterized Prisma SQL. Preserved collection ordering, deterministic type ties, counts, and empty collections; synthetic verification reduced 10,004 memberships to five aggregate rows. Included the user correction making Prisma CLI use `DIRECT_URL` while application queries retain `DATABASE_URL`.
 - 2026-10-26: Lint, standalone TypeScript, schema validation, migration status, read-only aggregation regression checks, production build, and desktop/mobile browser checks passed. Build succeeded outside the sandbox after a Windows EPERM error. Browser checks covered the empty state because the current database has no collections; populated and ownership cases used read-only SQL CTE fixtures. Implementation committed as `23d8c1b`; deleted the merged local fix branch and reset current feature, goals, and notes.
+- 2026-10-26: Completed [Auth Phase 1](features/auth-phase-1-spec.md) at the user request. Added NextAuth v5 GitHub OAuth, Prisma adapter, JWT sessions, typed session user IDs, auth handlers, and dashboard proxy redirects. Dashboard and sidebar use the authenticated database owner with server-side session checks. No migration required. Implementation committed as 48971a4 and merged into main; deleted the merged local feature branch.
+- 2026-10-26: Lint, TypeScript, whitespace checks, and production build passed. Build required execution outside the sandbox after Windows EPERM. Browser checks verified the default sign-in page and GitHub login redirect; HTTP checks verified nested dashboard protection, callback query preservation, and a null unauthenticated session. Full GitHub login and authenticated callback/dashboard verification remain pending user sign-in. Cleared current feature, goals, and notes.
