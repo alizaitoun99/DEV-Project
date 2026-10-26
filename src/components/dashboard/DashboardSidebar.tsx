@@ -7,7 +7,7 @@ import { connection } from "next/server";
 import { getTypeStyle } from "@/components/dashboard/TypeIcon";
 import { getSystemItemTypes } from "@/lib/db/items";
 import { getFavoriteCollections, getRecentCollections } from "@/lib/db/collections";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/current-user";
 
 const TYPE_STYLES = {
   snippet: { icon: Code, color: "text-blue-500", route: "snippets" },
@@ -38,11 +38,7 @@ function CollectionLinks({ collections, favorites = false }: CollectionLinksProp
 
 export async function DashboardSidebar() {
   await connection();
-  // Temporary demo identity until authentication supplies the signed-in owner.
-  const user = await prisma.user.findUnique({
-    where: { email: "demo@devistage.io" },
-    select: { id: true, name: true, email: true, plan: true },
-  });
+  const user = await getCurrentUser();
   const [types, recentCollections, favoriteCollections] = await Promise.all([
     getSystemItemTypes(user?.id),
     user ? getRecentCollections(user.id, 3) : Promise.resolve([]),

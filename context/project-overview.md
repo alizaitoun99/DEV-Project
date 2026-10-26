@@ -4,11 +4,11 @@
 
 ## Current implementation (2026-10-26)
 
-The dashboard and responsive sidebar use owner-scoped Prisma queries against Neon PostgreSQL. They display item and collection statistics, recent collections, pinned and recent items, system types with item counts, favorite collections, and the demo profile. Until authentication is implemented, queries use the seeded John Doe account (`demo@devistage.io`).
+The dashboard and responsive sidebar use owner-scoped Prisma queries against Neon PostgreSQL. They display item and collection statistics, recent collections, pinned and recent items, system types with item counts, favorite collections, and the signed-in user's profile. Auth Phase 1 adds NextAuth v5 GitHub OAuth with the Prisma adapter and JWT sessions. A proxy redirects unauthenticated dashboard requests to the default sign-in page; server-side user checks scope dashboard data to the authenticated user. GitHub login and the final callback still require user verification.
 
 Implemented foundations include Next.js 16, React 19, Tailwind CSS 4, shadcn/ui, Prisma 7, a versioned initial migration, a repeatable development seed, and `npm run db:check` for database verification. Development and production builds use Webpack with Tailwind's PostCSS plugin. The latest production build and lint passed; the latest sidebar browser verification remains unconfirmed after tool timeouts.
 
-Authentication, item and collection CRUD, search, uploads, AI actions, billing, and automated application tests remain planned. The sections below describe the target architecture and product scope; they do not imply that these capabilities are implemented. See [feature history](current-feature.md) for completed work.
+Credentials authentication and custom auth UI, item and collection CRUD, search, uploads, AI actions, billing, and automated application tests remain planned. The sections below describe the target architecture and product scope; they do not imply that these capabilities are implemented. See [feature history](current-feature.md) for completed work.
 
 ## Design
 

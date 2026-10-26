@@ -6,7 +6,7 @@ import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemCard } from "@/components/dashboard/ItemCard";
 import { getItemStats, getPinnedItems, getRecentItems } from "@/lib/db/items";
 import { getCollectionStats, getRecentCollections } from "@/lib/db/collections";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/current-user";
 
 export const metadata: Metadata = {
   title: "Dashboard | DevStash",
@@ -14,8 +14,7 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   await connection();
-  // Temporary demo identity until authentication supplies the signed-in owner.
-  const user = await prisma.user.findUnique({ where: { email: "demo@devistage.io" }, select: { id: true } });
+  const user = await getCurrentUser();
   const [collections, collectionStats, pinned, recent, itemStats] = user ? await Promise.all([
     getRecentCollections(user.id),
     getCollectionStats(user.id),

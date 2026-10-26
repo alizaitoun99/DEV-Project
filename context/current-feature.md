@@ -1,14 +1,28 @@
-# Current Feature
+# Current Feature: Auth Setup - NextAuth + GitHub Provider
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Install NextAuth v5 (`next-auth@beta`) and `@auth/prisma-adapter`.
+- Configure GitHub OAuth using split auth configuration, the Prisma adapter, and JWT sessions.
+- Export the NextAuth route handlers and extend the Session type with `user.id`.
+- Protect `/dashboard/*` with the Next.js 16 proxy and redirect unauthenticated users to the default NextAuth sign-in page.
+- Verify sign-in redirection, GitHub authentication, and return to `/dashboard`.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- Specification: [Auth Phase 1](features/auth-phase-1-spec.md).
+- Create `src/auth.config.ts` (providers only, no adapter), `src/auth.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/proxy.ts`, and `src/types/next-auth.d.ts`.
+- Use Context7 to verify current configuration and conventions, and read the relevant bundled Next.js documentation before implementation.
+- Use `session: { strategy: "jwt" }` and the named proxy export `export const proxy = auth(...)` at `src/proxy.ts`.
+- Use NextAuth's default pages for testing; do not set a custom `pages.signIn`.
+- Required environment variables: `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET`. Never commit secrets.
+- Implementation branch: `feature/auth-phase-1`.
+- Installed `next-auth@5.0.0-beta.32` and `@auth/prisma-adapter@2.11.3`; implemented split configuration, JWT sessions, typed session user IDs, auth handlers, and a named dashboard proxy. Existing Prisma auth models required no migration.
+- Replaced dashboard and sidebar demo identity lookups with a request-scoped current-user helper that validates the session and loads the signed-in database user before owner-scoped queries.
+- Validation passed: lint, standalone TypeScript, whitespace checks, and production build. The first sandboxed build failed with Windows EPERM creating generated output; the build outside the sandbox passed.
+- Browser verification confirmed the default sign-in page and GitHub login redirect with the localhost callback. HTTP checks confirmed 307 redirects for `/dashboard` and nested dashboard paths, preservation of query strings, a 200 sign-in page, and a null unauthenticated session. Completing GitHub login and verifying the callback/session and authenticated dashboard remain pending user sign-in.
 
 ## History project
 
