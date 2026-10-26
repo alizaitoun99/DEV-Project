@@ -1,21 +1,14 @@
-# Current feature: Collection summary performance
+# Current Feature
 
-## Status: Completed
+## Status: null
 
-## goals
+## Goals
 
-- Aggregate collection membership counts in PostgreSQL instead of fetching every item.
-- Preserve owner scoping, collection ordering, dominant-type ties, and empty collections.
-- Verify the user's DIRECT_URL configuration correction and run validation.
+<!-- Add goals when starting a feature. -->
 
-## notes
+## Notes
 
-- Work on `fix/collection-summary-performance`; preserve the user's Prisma configuration edit.
-- Collection metadata is limited first, then a parameterized Prisma SQL query aggregates owned memberships by collection/type. Counts, deterministic type ties, and empty collections are preserved without returning individual memberships.
-- Added read-only regression verification: `node --conditions=react-server --import tsx script/check-collection-summaries.ts`. Compares existing collections at multiple limits and uses SQL CTE fixtures for 10,004 memberships, type ties, empty collections, and cross-owner filtering without database writes. The synthetic case returned five aggregate rows; current live database has one user and no collections.
-- Validation passed: lint, standalone TypeScript, Prisma schema validation, direct-connection migration status, and production build (outside the sandbox after a Windows EPERM failure). A concurrent TypeScript attempt encountered regenerated Next types; the standalone rerun after build passed.
-- Production browser checks passed at 1536px and 390px: dashboard empty state rendered, no horizontal overflow, and no console errors. Populated summaries were verified through the read-only SQL fixtures because the current database has no collections.
-- Confirmed the user's `prisma.config.ts` correction: CLI uses DIRECT_URL; application uses DATABASE_URL. No migration or dependency change required. No commit or merge performed.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -52,3 +45,5 @@
 - 2026-10-26: Completed [Stats & Sidebar](features/stats-sidebar-spec.md) on `feature/stats-sidebar`. Replaced sidebar mock data with Prisma system types and owner-scoped item counts, favorite collections, three recently updated collections, and the demo profile. Favorite collections retain stars; recent collection circles use their dominant item type with deterministic ties and a neutral empty fallback. Added “View all collections”; preserved the existing database-backed dashboard statistics and layout.
 - 2026-10-26: Resolved the recurring CSS build failure with the [CSS build worker fix](features/build-worker-fix.md): switched development and production to supported Webpack builds, replaced Tailwind's Turbopack loader with the official PostCSS plugin, synchronized the lockfile, and added a sidebar Suspense boundary for Cache Components prerendering. Turbopack's helper process exited before its communication connection; the exact runtime trigger remains unconfirmed.
 - 2026-10-26: Production build (including TypeScript, page generation, and build traces), lint, and whitespace checks passed. Browser verification remains unconfirmed after two browser-tool timeouts. Cleared current feature, status, goals, and notes at the user's request; user authorized commit, merge to main, and push to GitHub.
+- 2026-10-26: Completed collection summary performance on `fix/collection-summary-performance` and merged into `main`. Limited collection metadata first, then aggregated owned memberships by collection/type in PostgreSQL through parameterized Prisma SQL. Preserved collection ordering, deterministic type ties, counts, and empty collections; synthetic verification reduced 10,004 memberships to five aggregate rows. Included the user correction making Prisma CLI use `DIRECT_URL` while application queries retain `DATABASE_URL`.
+- 2026-10-26: Lint, standalone TypeScript, schema validation, migration status, read-only aggregation regression checks, production build, and desktop/mobile browser checks passed. Build succeeded outside the sandbox after a Windows EPERM error. Browser checks covered the empty state because the current database has no collections; populated and ownership cases used read-only SQL CTE fixtures. Implementation committed as `23d8c1b`; deleted the merged local fix branch and reset current feature, goals, and notes.
