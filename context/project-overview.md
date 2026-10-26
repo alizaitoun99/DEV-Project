@@ -1,6 +1,14 @@
 # DevStash — Project Overview
 
-> **Status:** Planning / proposed architecture · **Product:** Developer knowledge hub · **Approach:** Single Next.js application
+> **Status:** In development · **Product:** Developer knowledge hub · **Approach:** Single Next.js application
+
+## Current implementation (2026-10-26)
+
+The dashboard and responsive sidebar use owner-scoped Prisma queries against Neon PostgreSQL. They display item and collection statistics, recent collections, pinned and recent items, system types with item counts, favorite collections, and the demo profile. Until authentication is implemented, queries use the seeded John Doe account (`demo@devistage.io`).
+
+Implemented foundations include Next.js 16, React 19, Tailwind CSS 4, shadcn/ui, Prisma 7, a versioned initial migration, a repeatable development seed, and `npm run db:check` for database verification. Development and production builds use Webpack with Tailwind's PostCSS plugin. The latest production build and lint passed; the latest sidebar browser verification remains unconfirmed after tool timeouts.
+
+Authentication, item and collection CRUD, search, uploads, AI actions, billing, and automated application tests remain planned. The sections below describe the target architecture and product scope; they do not imply that these capabilities are implemented. See [feature history](current-feature.md) for completed work.
 
 ## Design
 
@@ -491,4 +499,4 @@ Use a separate development database and production database. Test migrations aga
 
 ---
 
-**Document status:** Proposed specifications, not implemented code. Version numbers, model availability and adapter APIs must be confirmed against official docs when installing dependencies. Decisions explicitly marked *to decide* should be resolved before production release.
+**Document status:** Current implementation is summarized above; the remaining sections are target specifications. Version numbers, model availability and adapter APIs must be confirmed against official docs when installing dependencies. Decisions explicitly marked *to decide* should be resolved before production release.
