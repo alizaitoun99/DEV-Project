@@ -1,32 +1,14 @@
-# Current Feature: Auth Phase 2 — Email/Password Credentials
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Add email/password authentication with the Credentials provider and bcryptjs password verification.
-- Ensure the User model supports a password hash; add a migration only if the field is missing.
-- Add a Credentials placeholder in `auth.config.ts` and override it with database-backed validation in `auth.ts`.
-- Create `POST /api/auth/register` accepting name, email, password, and confirmPassword; validate input and matching passwords, reject existing users, hash passwords, and return success/error responses.
-- Verify registration, credentials sign-in, redirect to `/dashboard`, and continued GitHub OAuth support.
+<!-- Add goals when starting a feature. -->
 
 ## Notes
 
-- Spec: [Auth Phase 2](features/auth-phase-2-spec.md).
-- Use the already installed bcryptjs package. Store only password hashes.
-- Preserve the split auth configuration pattern: `authorize: () => null` in `auth.config.ts`, with actual bcrypt validation in `auth.ts`.
-- Exercise registration through an HTTP request and sign-in through `/api/auth/signin`.
-- Started on `feature/auth-phase-2`. The existing `passwordHash` field requires no migration.
-- Implemented the Credentials provider with server-side bcrypt verification and explicit safe user fields. Registration uses Zod validation, normalized emails, bcrypt cost 12, and duplicate-email handling including concurrent unique-key conflicts. Added Zod as a direct dependency with a synchronized lockfile.
-- Validation: production build passed outside the sandbox after Windows EPERM; lint and TypeScript passed. Browser checks confirmed registration (201), duplicate email (409), malformed JSON/invalid email/password mismatch/over-72-byte password rejection (400), successful credentials sign-in and an owner-scoped empty dashboard, and incorrect-password rejection with a null session.
-- GitHub sign-in redirects to GitHub with the correct local callback. Full OAuth callback verification remains pending the user's GitHub login.
-- Browser verification created the development account `auth-phase-2-check@example.com` (FREE); it remains available for inspection.
-- Implementation is ready for review; no commit or merge performed. Custom auth UI remains outside this phase.
-- Review fixes: added shared PostgreSQL throttling before identity lookups and bcrypt, with network/account budgets, HMAC keys, atomic concurrent enforcement, expiry cleanup, and fail-closed behavior. Only explicitly trusted proxy IP headers are used; other deployments retain a shared request budget.
-- Centralized email normalization in credentials/registration and Auth.js adapter creation, lookup, and updates. Applied `20261026234550_auth_identity_and_throttling` to development: collision-safe email normalization, canonical-format constraint, and limiter table/index. User identities and account-linking safeguards are preserved.
-- Security design, operational limits, deployment instructions, and the Node built-in regression-test command are documented in [Authentication security](auth-security.md).
-- Final review-fix validation: all seven `npm run test:auth-security` checks passed, including 20 concurrent calls admitting exactly five attempts, expiry reset, storage fail-closed behavior, adapter normalization, database uniqueness/format enforcement, and registration 429/Retry-After. Lint and production build passed; migration status is current. The first build hit a Windows filesystem tracing error; the retry passed after stopping a memory-stalled development server.
-- Production-mode browser verification on local port 3002 confirmed uppercase-email sign-in reaches the correct owner dashboard; subsequent case-variant attempts share one budget and return `code=rate_limited`. Case-variant registration returns three 409 responses followed by 429 with `Retry-After`; failed sign-in leaves the session null. Both GitHub and credentials providers remain available. Full GitHub login remains pending user interaction.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -67,3 +49,6 @@
 - 2026-10-26: Lint, standalone TypeScript, schema validation, migration status, read-only aggregation regression checks, production build, and desktop/mobile browser checks passed. Build succeeded outside the sandbox after a Windows EPERM error. Browser checks covered the empty state because the current database has no collections; populated and ownership cases used read-only SQL CTE fixtures. Implementation committed as `23d8c1b`; deleted the merged local fix branch and reset current feature, goals, and notes.
 - 2026-10-26: Completed [Auth Phase 1](features/auth-phase-1-spec.md) at the user request. Added NextAuth v5 GitHub OAuth, Prisma adapter, JWT sessions, typed session user IDs, auth handlers, and dashboard proxy redirects. Dashboard and sidebar use the authenticated database owner with server-side session checks. No migration required. Implementation committed as 48971a4 and merged into main; deleted the merged local feature branch.
 - 2026-10-26: Lint, TypeScript, whitespace checks, and production build passed. Build required execution outside the sandbox after Windows EPERM. Browser checks verified the default sign-in page and GitHub login redirect; HTTP checks verified nested dashboard protection, callback query preservation, and a null unauthenticated session. Full GitHub login and authenticated callback/dashboard verification remain pending user sign-in. Cleared current feature, goals, and notes.
+- 2026-10-27: Completed [Auth Phase 2](features/auth-phase-2-spec.md) on `feature/auth-phase-2`, committed as `9f9ce6c`, and merged into `main`. Added email/password credentials authentication, bcrypt verification, and validated registration with duplicate-email handling and safe response fields. Preserved GitHub OAuth, JWT sessions, and owner-scoped dashboard access.
+- 2026-10-27: Addressed review findings with atomic PostgreSQL account/network throttling, HMAC counter keys, expiry cleanup, fail-closed behavior, and trusted-proxy configuration. Centralized email normalization across credentials, registration, and the Auth.js adapter; applied migration `20261026234550_auth_identity_and_throttling` to development with collision detection and a canonical-email constraint. Account IDs and OAuth linking safeguards remain intact. See [authentication security](auth-security.md) for limits, deployment requirements, and regression checks.
+- 2026-10-27: Seven security regression tests, lint, TypeScript, production build, migration status, and production-mode browser checks passed. Verified mixed-case sign-in, correct owner dashboard, incorrect-password rejection, shared case-variant attempt budgets, duplicate registration, and HTTP 429 with Retry-After. Full GitHub OAuth callback remains pending user login. The development test account `auth-phase-2-check@example.com` remains available. Cleared current feature, status, goals, and notes at the user's completion request; deleted the merged local feature branch.
