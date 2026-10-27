@@ -1,14 +1,32 @@
-# Current Feature
+# Current Feature: Auth Phase 2 — Email/Password Credentials
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Add email/password authentication with the Credentials provider and bcryptjs password verification.
+- Ensure the User model supports a password hash; add a migration only if the field is missing.
+- Add a Credentials placeholder in `auth.config.ts` and override it with database-backed validation in `auth.ts`.
+- Create `POST /api/auth/register` accepting name, email, password, and confirmPassword; validate input and matching passwords, reject existing users, hash passwords, and return success/error responses.
+- Verify registration, credentials sign-in, redirect to `/dashboard`, and continued GitHub OAuth support.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- Spec: [Auth Phase 2](features/auth-phase-2-spec.md).
+- Use the already installed bcryptjs package. Store only password hashes.
+- Preserve the split auth configuration pattern: `authorize: () => null` in `auth.config.ts`, with actual bcrypt validation in `auth.ts`.
+- Exercise registration through an HTTP request and sign-in through `/api/auth/signin`.
+- Started on `feature/auth-phase-2`. The existing `passwordHash` field requires no migration.
+- Implemented the Credentials provider with server-side bcrypt verification and explicit safe user fields. Registration uses Zod validation, normalized emails, bcrypt cost 12, and duplicate-email handling including concurrent unique-key conflicts. Added Zod as a direct dependency with a synchronized lockfile.
+- Validation: production build passed outside the sandbox after Windows EPERM; lint and TypeScript passed. Browser checks confirmed registration (201), duplicate email (409), malformed JSON/invalid email/password mismatch/over-72-byte password rejection (400), successful credentials sign-in and an owner-scoped empty dashboard, and incorrect-password rejection with a null session.
+- GitHub sign-in redirects to GitHub with the correct local callback. Full OAuth callback verification remains pending the user's GitHub login.
+- Browser verification created the development account `auth-phase-2-check@example.com` (FREE); it remains available for inspection.
+- Implementation is ready for review; no commit or merge performed. Custom auth UI remains outside this phase.
+- Review fixes: added shared PostgreSQL throttling before identity lookups and bcrypt, with network/account budgets, HMAC keys, atomic concurrent enforcement, expiry cleanup, and fail-closed behavior. Only explicitly trusted proxy IP headers are used; other deployments retain a shared request budget.
+- Centralized email normalization in credentials/registration and Auth.js adapter creation, lookup, and updates. Applied `20261026234550_auth_identity_and_throttling` to development: collision-safe email normalization, canonical-format constraint, and limiter table/index. User identities and account-linking safeguards are preserved.
+- Security design, operational limits, deployment instructions, and the Node built-in regression-test command are documented in [Authentication security](auth-security.md).
+- Final review-fix validation: all seven `npm run test:auth-security` checks passed, including 20 concurrent calls admitting exactly five attempts, expiry reset, storage fail-closed behavior, adapter normalization, database uniqueness/format enforcement, and registration 429/Retry-After. Lint and production build passed; migration status is current. The first build hit a Windows filesystem tracing error; the retry passed after stopping a memory-stalled development server.
+- Production-mode browser verification on local port 3002 confirmed uppercase-email sign-in reaches the correct owner dashboard; subsequent case-variant attempts share one budget and return `code=rate_limited`. Case-variant registration returns three 409 responses followed by 429 with `Retry-After`; failed sign-in leaves the session null. Both GitHub and credentials providers remain available. Full GitHub login remains pending user interaction.
 
 ## History project
 

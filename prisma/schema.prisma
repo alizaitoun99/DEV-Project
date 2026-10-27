@@ -20,6 +20,14 @@ enum Plan {
   PRO
 }
 
+model AuthRateLimit {
+  key       String   @id
+  attempts  Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
 model User {
   id                   String       @id @default(cuid())
   name                 String?
