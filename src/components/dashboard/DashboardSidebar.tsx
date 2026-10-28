@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserMenu } from "@/components/auth/UserMenu";
 import {
   Circle, Code, File, ImageIcon, Layers, LinkIcon,
   Sparkles, Star, StickyNote, Terminal,
@@ -81,16 +82,7 @@ export async function DashboardSidebar() {
           <Link href="/collections" prefetch={false} className={linkClassName}>View all collections <span aria-hidden="true" className="ml-auto">→</span></Link>
         </section>
       </nav>
-      <div className="flex shrink-0 items-center gap-3 border-t p-4">
-        <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-sm font-semibold text-violet-300">
-          {(user?.name ?? "Guest").split(" ").map((name) => name[0]).join("")}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{user?.name ?? "Guest"}</p>
-          <p className="truncate text-xs text-muted-foreground">{user?.email ?? "No demo account"}</p>
-        </div>
-        <span className="rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground">{user?.plan ?? "FREE"}</span>
-      </div>
+      <UserMenu user={user} />
     </div>
   );
 }

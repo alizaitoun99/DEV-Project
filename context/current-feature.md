@@ -1,14 +1,31 @@
-# Current Feature
+# Current Feature: Auth Phase 3 — Sign In, Register & Sign Out UI
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Replace the default auth page with a custom `/sign-in` page supporting email/password, GitHub sign-in, validation, errors, and a registration link.
+- Add `/register` with name, email, password, and confirm password fields; validate inputs, submit to `/api/auth/register`, automatically sign in, and redirect to the dashboard on success.
+- Show three-second Sonner toasts for registration, sign-in, and sign-out success and errors.
+- Display the authenticated user's avatar, name, and email at the bottom of the sidebar.
+- Create a reusable avatar component using the GitHub image when available and name initials otherwise.
+- Add an avatar menu with sign-out and a `/profile` navigation action; signing out redirects away from the authenticated workspace.
+- Verify custom auth pages, both sign-in methods, registration, avatar rendering, menu behavior, and sign-out in the browser.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- Source: [Auth Phase 3 specification](features/auth-phase-3-spec.md).
+- Build on the existing Auth Phase 1 and Phase 2 authentication and registration functionality.
+- Avatar placement follows the sidebar requirement rather than the testing section's top-bar reference. Clicking the account avatar opens the menu; its separate Profile item navigates to `/profile`.
+- Started implementation on `feature/auth-phase-3`. Avatar placement follows the sidebar requirements; its menu includes a separate Profile link.
+- Implemented custom `/sign-in` and `/register` pages with shared validation, inline errors, pending states, and registration success feedback. Auth.js sign-in configuration, dashboard redirects, and protected `/profile` navigation use the custom page. Callback destinations accept local paths without whitespace or backslashes.
+- Added a reusable Radix avatar with image loading/error fallback to initials, and an accessible account menu with profile and sign-out. The profile page displays the authenticated user's current database details. No schema changes required.
+- Validation: lint, standalone TypeScript, production build, whitespace checks, and all seven auth security regression tests passed. Build and database tests required execution outside the sandbox after filesystem/network failures.
+- Production browser checks passed for credentials sign-in, incorrect password, registration and redirect, mismatched passwords, duplicate registration, profile details, desktop/mobile account menus, Escape focus restoration, sign-out and null session, and responsive auth pages at 390px. Protected dashboard redirects preserve query parameters. GitHub button reaches GitHub login; full OAuth callback and actual GitHub image remain pending user sign-in.
+- Production browser verification used process-only `AUTH_TRUST_HOST=true` for localhost; saved environment files were unchanged. The browser registration account `auth-phase-3-ui-check@example.com` remains in the development database.
+- Screenshots: [sign-in desktop](../artifacts/auth-phase-3-sign-in-desktop.png), [register mobile](../artifacts/auth-phase-3-register-mobile.png). Decision record: [custom authentication UI](../docs/architecture/decisions/custom-authentication-ui.md).
+- Follow-up: successful registration now authenticates through the existing credentials provider and opens `/dashboard`. Added Sonner with one root toaster, three-second success/error notifications, and client navigation so notifications survive sign-in/sign-out redirects. Preserved inline form errors. Updated the specification to reflect the user's revised registration flow.
+- Follow-up validation: lint, TypeScript, production build, and whitespace checks passed. Production browser verification confirmed registration creates an authenticated dashboard session, sign-in/sign-out success notifications survive navigation, incorrect-password toasts dismiss after approximately three seconds (3055ms observed), and mobile layouts have no overflow. Mocked browser responses verified the account-created/automatic-sign-in-failed fallback redirects to sign-in with the correct message. The additional browser test account `auth-phase-3-auto-check@example.com` remains in the development database.
 
 ## History project
 

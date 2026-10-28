@@ -3,6 +3,7 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 
 export default {
+  pages: { signIn: "/sign-in" },
   providers: [GitHub, Credentials({
     credentials: {
       email: { label: "Email", type: "email" },
