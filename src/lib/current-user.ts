@@ -13,7 +13,7 @@ export const getCurrentUser = cache(async () => {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, image: true, plan: true },
+    select: { id: true, name: true, email: true, image: true, plan: true, emailVerified: true },
   });
   if (!user) {
     redirect("/sign-in?callbackUrl=%2Fdashboard");

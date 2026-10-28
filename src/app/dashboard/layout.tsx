@@ -1,6 +1,13 @@
 import { Suspense } from "react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
+import { getCurrentUser } from "@/lib/current-user";
+import { VerificationReminder } from "@/components/auth/VerificationReminder";
+
+async function EmailVerificationReminder() {
+  const user = await getCurrentUser();
+  return <VerificationReminder verified={Boolean(user.emailVerified)} />;
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,6 +19,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <Suspense fallback={<div role="status" className="h-full animate-pulse bg-sidebar p-5 text-sm text-muted-foreground">Loading sidebar…</div>}>
         <DashboardSidebar />
       </Suspense>
-    }>{children}</DashboardShell>
+    }><Suspense fallback={null}><EmailVerificationReminder /></Suspense>{children}</DashboardShell>
   );
 }

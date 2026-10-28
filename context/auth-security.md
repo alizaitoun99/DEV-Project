@@ -23,7 +23,19 @@ Keys are HMAC-SHA256 digests using `AUTH_SECRET`; raw email addresses and IPs ar
 
 This uses the existing database to suit the application's current scale. Monitor database load, rejection rates, and shared-budget contention before adjusting thresholds. Apply production migrations with `npm run db:deploy` before starting the application; a missing limiter table fails closed.
 
-## Regression checks
+## Registration email verification
+
+Configure server-only `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (a verified Resend domain), and `APP_URL` (trusted public origin; local HTTP is accepted only for localhost/127.0.0.1). `AUTH_URL` is a fallback when `APP_URL` is absent. Verification uses Resend's REST API with a ten-second timeout. Never derive email links from the request Host header.
+
+For local testing without an owned domain, use `RESEND_FROM_EMAIL="DevStash <onboarding@resend.dev>"` and register with the email address associated with the Resend account. Resend restricts this test sender to that recipient; production delivery to other users requires a verified sender domain. A Vercel `vercel.app` deployment URL can host verification links but does not provide sender-domain DNS control. Provider rejection status/code and missing configuration flags are logged server-side without credentials, recipients, or links.
+
+Registration creates an unverified account, attempts email delivery, and returns `verificationEmailSent` independently of account creation. Delivery failure preserves the account and automatic sign-in; the UI explains how to retry. Dashboard access remains available. A persistent orange toast prompts unverified users and offers resend, limited to three requests per account per hour. The database verified state is refreshed on window focus and every minute while the reminder is mounted.
+
+Links contain 32 random bytes, expire after 24 hours, and store only SHA-256 hashes in the existing `VerificationToken` table with a namespaced user/email identifier. No schema migration is required. Opening a link automatically sends a same-origin POST from the verification page, then redirects to the dashboard without a confirmation button. React effect replay reuses the in-flight request so a single-use token is submitted once. Users without a session are sent through the normal dashboard sign-in flow. Email scanners that execute JavaScript may consume links. Consumption and verification run in one transaction; changing the account email invalidates prior links, and successful verification removes sibling tokens. Expired tokens are cleaned up when that account requests another email. Delivery retries preserve older links in case a previous email arrived despite a delivery timeout. Resend responses and API credentials are never returned to the browser.
+
+Run `npm run test:email-verification` for database-backed Node/tsx tests covering malformed/expired/replayed tokens, concurrent use, changed-email protection, delivery payloads, hashed storage, and delivery failures. Email sends are mocked; generated database fixtures are removed afterward. End-to-end inbox delivery must also be checked with a real recipient and verified sender.
+
+## Authentication regression checks
 
 Run `npm run test:auth-security` against a configured development database. Tests use Node's built-in test runner and the existing `tsx` dependency. They verify concurrent enforcement, expiration, case-variant budget bypass prevention, storage failures, OAuth adapter normalization, duplicate rejection, the database constraint, and registration's 429/Retry-After response. User fixtures roll back or are removed by their generated ID; test-owned account counters are removed. Endpoint checks consume four attempts from the normal shared registration budget. No framework dependency is added.
 

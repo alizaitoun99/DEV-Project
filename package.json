@@ -19,7 +19,9 @@
     "db:status": "prisma migrate status",
     "db:seed": "prisma db seed",
     "db:check": "node --conditions=react-server --import tsx script/test-db.ts",
-    "test:auth-security": "node --conditions=react-server --import tsx --test script/auth-security.test.ts"
+    "db:delete-users": "node --conditions=react-server --import tsx script/delete-users-except-demo.ts",
+    "test:auth-security": "node --conditions=react-server --import tsx --test script/auth-security.test.ts",
+    "test:email-verification": "node --conditions=react-server --import tsx --test script/email-verification.test.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

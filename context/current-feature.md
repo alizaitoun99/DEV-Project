@@ -1,14 +1,32 @@
-# Current Feature
+# Current Feature: Registration Email Verification
 
-## Status: null
+## Status: Complete
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Send new email/password users a verification email through Resend when they register.
+- Require users to click the link in their email to mark their email address as verified.
+- Preserve automatic sign-in and navigation to `/dashboard` after successful registration, with the registration success toast.
+- Show a persistent orange warning toast on the dashboard while the signed-in user's email is unverified: "Please check your email and click the verification link to verify your email address."
+- Stop showing the verification reminder once the user's email is verified.
+- Handle invalid, expired, or already-used verification links and email delivery failures with clear, accurate feedback.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- 2026-10-28: At the user's request, replaced the email-link confirmation button with automatic verification followed by dashboard navigation and a success toast. Invalid/expired links retain actionable error feedback. The client reuses its in-flight request during React effect replay to avoid double-consuming a token. Signed-out users follow the existing dashboard sign-in flow. This supersedes the earlier scanner-safe confirmation-page design.
+- Automatic-verification validation passed: lint for changed components, standalone TypeScript, production build, both email-verification regression tests, and a real-token production browser check. Opening the link generated exactly one verification POST, reached `/dashboard` without another click, showed success, and removed the reminder; invalid-link feedback passed. The temporary browser account was removed.
+- Use the existing `RESEND_API_KEY` in `.env` on the server only; never expose or copy its value into source code or documentation.
+- Use secure, expiring, single-use verification tokens and persist the verified state on the user record.
+- Unverified users still reach the dashboard after registration; verification does not block dashboard access in this feature.
+- Preserve the existing GitHub OAuth flow and authentication toast behavior.
+- Confirm the configured sender address and application base URL during implementation without exposing secrets.
+- Verify registration, email-link verification, reminder persistence and dismissal, and failure states. Run lint, TypeScript checks, and the production build.
+- Implemented on `feature/registration-email-verification`: Resend REST delivery; hashed, 24-hour, single-use tokens; scanner-safe confirmation page; registration delivery status; persistent orange dashboard reminder with throttled resend and verified-state refresh. Existing schema and GitHub OAuth are preserved.
+- Configured the user-provided sender `dev-project-mu-ten.vercel.app@livestash.com` and `http://localhost:3000` in ignored `.env`; API key remains server-only. Deployment needs its own public `APP_URL` and verified Resend sender.
+- Validation passed: lint, standalone TypeScript, production build, seven existing authentication security tests, and two new email-verification tests (including real registration-handler checks with mocked delivery). Sandbox database/build restrictions were resolved by running those checks outside the sandbox.
+- Production browser checks passed for registration success toast and automatic sign-in/navigation (mocked registration response, real credentials sign-in), reminder persistence after reload, exact orange styling, successful verification/reminder dismissal, reused-link feedback, malformed JSON, and mocked resend failure. Desktop/mobile screenshots: [desktop](../artifacts/email-verification-desktop.png), [mobile](../artifacts/email-verification-mobile.png). Temporary browser account removed after checks.
+- Actual Resend delivery to a real inbox and sender-domain acceptance remain unverified; regression tests mock email delivery. No commit or merge performed.
+- 2026-10-28: Diagnosed registration/resend failures with a real Resend request to its official test recipient. Resend returned HTTP 403 `validation_error`: `livestash.com` is not verified. The application's HTTP 503 reflects this provider rejection. Domain DNS verification or a sender on an already verified domain is required. Added safe server diagnostics for missing settings and provider status/code; no API keys, recipient addresses, or verification links are logged. Successful inbox delivery remains pending domain setup.
 
 ## History project
 

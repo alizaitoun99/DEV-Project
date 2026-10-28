@@ -2,6 +2,7 @@ import { hash } from "bcryptjs";
 import { Prisma } from "@/generated/prisma/client";
 import { registrationSchema } from "@/lib/auth-validation";
 import { prisma } from "@/lib/prisma";
+import { sendVerificationEmail } from "@/lib/email-verification";
 import { AuthRateLimitError, limitAuthAccount, limitAuthRequest } from "@/lib/auth-rate-limit";
 
 function registrationError(error: unknown): Response {
@@ -47,7 +48,14 @@ export async function POST(request: Request) {
       data: { name, email, passwordHash },
       select: { id: true, name: true, email: true },
     });
-    return Response.json({ success: true, data: user }, { status: 201 });
+    let verificationEmailSent = false;
+    try {
+      await sendVerificationEmail({ id: user.id, email });
+      verificationEmailSent = true;
+    } catch {
+      // Account creation succeeded; let the user sign in and retry delivery.
+    }
+    return Response.json({ success: true, data: user, verificationEmailSent }, { status: 201 });
   } catch (error) {
     return registrationError(error);
   }

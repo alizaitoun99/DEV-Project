@@ -128,3 +128,9 @@
     @apply font-sans;
   }
 }
+
+[data-sonner-toast][data-rich-colors="true"][data-type="warning"].verification-reminder {
+  background: #431407;
+  border-color: #f97316;
+  color: #ffedd5;
+}
