@@ -1,32 +1,14 @@
-# Current Feature: Registration Email Verification
+# Current Feature
 
-## Status: Complete
+## Status: null
 
 ## Goals
 
-- Send new email/password users a verification email through Resend when they register.
-- Require users to click the link in their email to mark their email address as verified.
-- Preserve automatic sign-in and navigation to `/dashboard` after successful registration, with the registration success toast.
-- Show a persistent orange warning toast on the dashboard while the signed-in user's email is unverified: "Please check your email and click the verification link to verify your email address."
-- Stop showing the verification reminder once the user's email is verified.
-- Handle invalid, expired, or already-used verification links and email delivery failures with clear, accurate feedback.
+<!-- Add goals when starting a feature. -->
 
 ## Notes
 
-- 2026-10-28: At the user's request, replaced the email-link confirmation button with automatic verification followed by dashboard navigation and a success toast. Invalid/expired links retain actionable error feedback. The client reuses its in-flight request during React effect replay to avoid double-consuming a token. Signed-out users follow the existing dashboard sign-in flow. This supersedes the earlier scanner-safe confirmation-page design.
-- Automatic-verification validation passed: lint for changed components, standalone TypeScript, production build, both email-verification regression tests, and a real-token production browser check. Opening the link generated exactly one verification POST, reached `/dashboard` without another click, showed success, and removed the reminder; invalid-link feedback passed. The temporary browser account was removed.
-- Use the existing `RESEND_API_KEY` in `.env` on the server only; never expose or copy its value into source code or documentation.
-- Use secure, expiring, single-use verification tokens and persist the verified state on the user record.
-- Unverified users still reach the dashboard after registration; verification does not block dashboard access in this feature.
-- Preserve the existing GitHub OAuth flow and authentication toast behavior.
-- Confirm the configured sender address and application base URL during implementation without exposing secrets.
-- Verify registration, email-link verification, reminder persistence and dismissal, and failure states. Run lint, TypeScript checks, and the production build.
-- Implemented on `feature/registration-email-verification`: Resend REST delivery; hashed, 24-hour, single-use tokens; scanner-safe confirmation page; registration delivery status; persistent orange dashboard reminder with throttled resend and verified-state refresh. Existing schema and GitHub OAuth are preserved.
-- Configured the user-provided sender `dev-project-mu-ten.vercel.app@livestash.com` and `http://localhost:3000` in ignored `.env`; API key remains server-only. Deployment needs its own public `APP_URL` and verified Resend sender.
-- Validation passed: lint, standalone TypeScript, production build, seven existing authentication security tests, and two new email-verification tests (including real registration-handler checks with mocked delivery). Sandbox database/build restrictions were resolved by running those checks outside the sandbox.
-- Production browser checks passed for registration success toast and automatic sign-in/navigation (mocked registration response, real credentials sign-in), reminder persistence after reload, exact orange styling, successful verification/reminder dismissal, reused-link feedback, malformed JSON, and mocked resend failure. Desktop/mobile screenshots: [desktop](../artifacts/email-verification-desktop.png), [mobile](../artifacts/email-verification-mobile.png). Temporary browser account removed after checks.
-- Actual Resend delivery to a real inbox and sender-domain acceptance remain unverified; regression tests mock email delivery. No commit or merge performed.
-- 2026-10-28: Diagnosed registration/resend failures with a real Resend request to its official test recipient. Resend returned HTTP 403 `validation_error`: `livestash.com` is not verified. The application's HTTP 503 reflects this provider rejection. Domain DNS verification or a sender on an already verified domain is required. Added safe server diagnostics for missing settings and provider status/code; no API keys, recipient addresses, or verification links are logged. Successful inbox delivery remains pending domain setup.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -74,3 +56,8 @@
 - 2026-10-28: Added a reusable image/initials avatar, accessible sidebar account menu with Profile and Sign out, and a protected read-only `/profile` page using current database user details. The avatar opens the menu and its separate Profile item navigates to the profile. Updated auth configuration and proxy redirects to the custom sign-in page with local callback paths. Added the [decision record](../docs/architecture/decisions/custom-authentication-ui.md) and synchronized Sonner dependency/lockfile; no migration required.
 - 2026-10-28: Lint, standalone TypeScript, production build, whitespace checks, all seven auth security regression tests, and final migration status passed. Production browser checks passed for registration and authenticated dashboard session, credentials sign-in and errors, mismatched passwords, duplicate registration, profile navigation, desktop/mobile menu behavior and Escape focus restoration, sign-out and null session, responsive layouts, and three-second toast dismissal (3055ms observed). Mocked responses verified the automatic-sign-in failure fallback. GitHub login redirect passed; the full OAuth callback and actual GitHub avatar remain pending user sign-in. Local production verification used process-only `AUTH_TRUST_HOST=true`; saved environment files were unchanged.
 - 2026-10-28: Browser test accounts `auth-phase-3-ui-check@example.com` and `auth-phase-3-auto-check@example.com` remain in the development database. Screenshots: [sign-in desktop](../artifacts/auth-phase-3-sign-in-desktop.png) and [register mobile](../artifacts/auth-phase-3-register-mobile.png). Cleared current feature, status, goals, and notes at the user's completion request. Preserved pre-existing local tooling and layout edits outside the feature commits.
+
+- 2026-10-28: Completed Registration Email Verification on `feature/registration-email-verification`, committed as `3d1670f`, and merged into `main`. Added server-only Resend delivery, SHA-256-hashed 24-hour single-use tokens in the existing table, automatic email verification and dashboard redirect without a confirmation button, success feedback, and invalid/expired-link handling. Registration preserves automatic sign-in and dashboard access; email delivery failure is reported independently from successful account creation. No schema migration required; GitHub OAuth is preserved.
+- 2026-10-28: Added a persistent orange dashboard verification toast with throttled resend (three requests per account per hour), periodic/window-focus verified-state refresh, and safe server-side delivery diagnostics. Diagnosed Resend's HTTP 403 for the unverified `livestash.com` sender and configured the ignored local environment to use `onboarding@resend.dev` with localhost links. This test sender permits only the Resend account owner's recipient; sending to arbitrary users requires an owned, verified sender domain and deployment-specific public APP_URL. Secrets and environment files were not committed.
+- 2026-10-28: Added the requested preview-first `npm run db:delete-users` maintenance script with explicit `-- --execute`, serializable transactional deletion, and preservation checks for `demo@devistage.io` and its content/memberships. Executed the cleanup at the user's requests; retained the main demo account. Test accounts and temporary verification fixtures were removed after checks.
+- 2026-10-28: Validation passed: production build, lint, standalone TypeScript, seven authentication security tests, two email verification tests (including registration-handler delivery success/failure), whitespace checks, and migration status. Production browser checks covered registration navigation/success toast (mocked registration response with real sign-in), persistent orange reminder, reload, mobile overflow, resend failure, automatic real-token verification with exactly one POST and dashboard navigation, reminder dismissal, invalid/reused links, and malformed JSON. Screenshots: [desktop](../artifacts/email-verification-desktop.png) and [mobile](../artifacts/email-verification-mobile.png). Preserved pre-existing local tooling and layout changes outside the feature commits. Cleared current feature, goals, and notes at the user's completion request.
