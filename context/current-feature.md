@@ -1,31 +1,14 @@
-# Current Feature: Profile Page
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Extend the protected `/profile` page with the user's email, name, GitHub avatar or initials, and account creation date.
-- Display owner-scoped usage statistics: total items, total collections, and counts for snippets, prompts, notes, commands, links, files, and images.
-- Add a change password action for email/password accounts only.
-- Add account deletion with a confirmation dialog to prevent accidental deletion.
-- Follow existing data-fetching, authentication, validation, and component patterns.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Profile Page](features/profile-spec.md).
-- Reuse the existing `/profile` route and avatar behavior where applicable.
-- Require authentication and scope all profile data and account actions to the signed-in user.
-- Hide change password for GitHub OAuth-only accounts.
-- Implementation started on `feature/profile-page`; no schema migration is planned.
-- Forgot Password is completed, committed as 61392ce, and merged into main; completion and validation results are recorded below.
-
-- Implemented profile details, UTC account creation date, owner-scoped item/collection totals and type counts, including zero-count system types and owned custom types.
-- Added authenticated Server Actions with shared validation, per-account throttling, current-password verification, bcrypt cost 12, and atomic reset-token invalidation. Passwordless accounts cannot change passwords.
-- Added an accessible Radix confirmation dialog with typed DELETE confirmation, current-password verification for credentials accounts, transactional account/token cleanup, and sign-out navigation. Database cascades remove owned records; physical R2 cleanup remains outside the unimplemented upload lifecycle.
-- Added `npm run test:profile` (Node test runner with tsx): database-backed checks cover invalid confirmation/passwords, OAuth-only password rejection, successful password change, reset-token invalidation, cascading deletion and preservation of another account.
-- Validation passed: lint, standalone TypeScript, final production build, migration status, whitespace checks, profile test, two password-reset tests, three email-verification tests, and seven auth-security tests. The existing retry-window assertion failed once and passed on rerun. Sandbox build/network failures required outside-sandbox checks; standalone TypeScript was rerun successfully after a concurrent build regenerated .next types.
-- Production Chrome checks passed for unauthenticated profile protection, authenticated details/initials/date, empty and populated owner counts, seven type rows, confirmation dialog/cancel/focus restoration, passwordless form hiding, and desktop/390px mobile overflow. Password change and destructive deletion were verified through isolated database-backed service tests rather than browser submission; real GitHub avatar remains pending OAuth sign-in.
-- Generated profile fixtures were removed. Existing JWT sessions retain their normal lifetime after password changes. No schema migration, commit, or merge performed.
+<!-- Load a feature specification to begin. -->
 
 ## History project
 
@@ -114,3 +97,7 @@
 - Production HTTP smoke checks passed for sign-in, forgot-password, reset-password, cross-origin rejection, invalid-token rejection, and generic unknown-account responses.
 - Browser interaction/responsive verification remains unconfirmed: Playwright reported a busy profile, the in-app browser timed out, and the isolated browser runtime failed to initialize. Real inbox delivery remains unverified; Resend test-sender recipient restrictions still apply. Test email delivery was mocked.
 - Existing JWT sessions retain their normal lifetime after password reset. No commit or merge performed.
+
+- 2026-10-29: Completed [Profile Page](features/profile-spec.md) on `feature/profile-page`, committed as `7f34b84`, and merged into `main`. Extended the protected profile with account details/date, owner-scoped usage totals and type counts, credentials-only password changes, and accessible confirmed account deletion. Server Actions derive ownership from the session, validate and throttle mutations, verify current passwords, hash at bcrypt cost 12, invalidate reset links atomically, and remove tokens and owned database records transactionally. No schema migration required.
+- 2026-10-29: Validation passed: lint, final standalone TypeScript, production build, migration status, whitespace checks, one profile regression test, two password-reset tests, three email-verification tests, and seven authentication security tests. The existing retry-window assertion failed once and passed on rerun; sandbox build/network failures required outside-sandbox checks. Chrome verified profile protection, authenticated details, empty/populated counts, all seven types, deletion dialog cancellation/focus, passwordless form hiding, and desktop/mobile overflow. Password mutation/deletion passed isolated service tests; browser mutation submissions and the actual GitHub avatar remain unverified. Generated fixtures were removed.
+- 2026-10-29: Closed out at the user's completion request: cleared current feature, status, goals, and notes; deleted the merged local feature branch. Existing JWT sessions retain their normal lifetime after password changes. Physical R2 cleanup remains part of the future upload lifecycle. Preserved pre-existing local tooling, AGENTS.md, and root-layout changes outside feature commits.
