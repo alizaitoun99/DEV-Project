@@ -1,0 +1,3 @@
+[  294978ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ http://localhost:3109/api/auth/verification:0
+[  295499ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:3109/api/auth/verification:0
+[  295537ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:3109/api/auth/verification:0

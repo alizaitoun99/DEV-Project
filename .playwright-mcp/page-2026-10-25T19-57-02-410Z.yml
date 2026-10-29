@@ -1,0 +1,265 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - complementary "Sidebar" [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - link "DevStash" [ref=f1e5] [cursor=pointer]:
+          - /url: /dashboard
+        - navigation "Dashboard navigation" [ref=f1e12]:
+          - region "Types" [ref=f1e13]:
+            - heading "Types" [level=2] [ref=f1e14]
+            - link "Snippets 3" [ref=f1e15] [cursor=pointer]:
+              - /url: /items/snippets
+              - generic [ref=f1e19]: Snippets
+              - generic [ref=f1e20]: "3"
+            - link "Prompts 1" [ref=f1e21] [cursor=pointer]:
+              - /url: /items/prompts
+              - generic [ref=f1e25]: Prompts
+              - generic [ref=f1e26]: "1"
+            - link "Commands 1" [ref=f1e27] [cursor=pointer]:
+              - /url: /items/commands
+              - generic [ref=f1e30]: Commands
+              - generic [ref=f1e31]: "1"
+            - link "Notes 1" [ref=f1e32] [cursor=pointer]:
+              - /url: /items/notes
+              - generic [ref=f1e36]: Notes
+              - generic [ref=f1e37]: "1"
+            - link "Files 1" [ref=f1e38] [cursor=pointer]:
+              - /url: /items/files
+              - generic [ref=f1e42]: Files
+              - generic [ref=f1e43]: "1"
+            - link "Images 1" [ref=f1e44] [cursor=pointer]:
+              - /url: /items/images
+              - generic [ref=f1e49]: Images
+              - generic [ref=f1e50]: "1"
+            - link "Links 1" [ref=f1e51] [cursor=pointer]:
+              - /url: /items/links
+              - generic [ref=f1e55]: Links
+              - generic [ref=f1e56]: "1"
+          - region "Collections" [ref=f1e57]:
+            - heading "Collections" [level=2] [ref=f1e58]
+            - generic [ref=f1e59]:
+              - heading "Favorites" [level=3] [ref=f1e60]
+              - link "React Patterns Favorite" [ref=f1e61] [cursor=pointer]:
+                - /url: /collections/react-patterns
+                - generic [ref=f1e64]: React Patterns
+                - img "Favorite" [ref=f1e65]
+              - link "Context Files Favorite" [ref=f1e67] [cursor=pointer]:
+                - /url: /collections/context-files
+                - generic [ref=f1e70]: Context Files
+                - img "Favorite" [ref=f1e71]
+              - link "Git Commands Favorite" [ref=f1e73] [cursor=pointer]:
+                - /url: /collections/git-commands
+                - generic [ref=f1e76]: Git Commands
+                - img "Favorite" [ref=f1e77]
+            - generic [ref=f1e79]:
+              - heading "Recent collections" [level=3] [ref=f1e80]
+              - link "React Patterns Favorite" [ref=f1e81] [cursor=pointer]:
+                - /url: /collections/react-patterns
+                - generic [ref=f1e84]: React Patterns
+                - img "Favorite" [ref=f1e85]
+              - link "AI Prompts" [ref=f1e87] [cursor=pointer]:
+                - /url: /collections/ai-prompts
+              - link "Interview Prep" [ref=f1e91] [cursor=pointer]:
+                - /url: /collections/interview-prep
+            - link "All collections" [ref=f1e95] [cursor=pointer]:
+              - /url: /collections
+              - text: All collections
+              - generic [aria-hidden] [ref=f1e96]: →
+        - generic [ref=f1e97]:
+          - generic [aria-hidden] [ref=f1e98]: JD
+          - generic [ref=f1e99]:
+            - paragraph [ref=f1e100]: John Doe
+            - paragraph [ref=f1e101]: john@example.com
+          - generic [ref=f1e102]: PRO
+    - generic [ref=f1e103]:
+      - banner [ref=f1e104]:
+        - button "Collapse sidebar" [expanded] [ref=f1e105]
+        - searchbox "Search items" [ref=f1e107]
+        - button "New Item" [disabled] [ref=f1e108]
+      - main [ref=f1e109]:
+        - generic [ref=f1e110]:
+          - generic [ref=f1e111]:
+            - heading "Dashboard" [level=1] [ref=f1e112]
+            - paragraph [ref=f1e113]: Your developer knowledge hub
+          - generic "Library statistics" [ref=f1e114]:
+            - generic [ref=f1e115]:
+              - term [ref=f1e116]: Items
+              - definition [ref=f1e121]: "9"
+            - generic [ref=f1e122]:
+              - term [ref=f1e123]: Collections
+              - definition [ref=f1e126]: "5"
+            - generic [ref=f1e127]:
+              - term [ref=f1e128]: Favorite items
+              - definition [ref=f1e131]: "4"
+            - generic [ref=f1e132]:
+              - term [ref=f1e133]: Favorite collections
+              - definition [ref=f1e136]: "0"
+          - region [ref=f1e137]:
+            - generic [ref=f1e138]:
+              - heading "Recent collections" [level=2] [ref=f1e139]
+              - link "View all collections" [ref=f1e140] [cursor=pointer]:
+                - /url: /collections
+                - text: View all
+                - generic [ref=f1e141]: collections
+            - generic [ref=f1e142]:
+              - link [ref=f1e143] [cursor=pointer]:
+                - /url: /collections/demo-cmvo715r80000kclxx2ef0sag-design-resources
+                - heading "Design Resources" [level=3] [ref=f1e145]
+                - paragraph [ref=f1e146]: 4 items
+                - paragraph [ref=f1e147]: UI/UX resources and references
+                - img "link" [ref=f1e149]
+              - link [ref=f1e153] [cursor=pointer]:
+                - /url: /collections/demo-cmvo715r80000kclxx2ef0sag-terminal-commands
+                - heading "Terminal Commands" [level=3] [ref=f1e155]
+                - paragraph [ref=f1e156]: 4 items
+                - paragraph [ref=f1e157]: Useful shell commands for everyday development
+                - img "command" [ref=f1e159]
+              - link [ref=f1e162] [cursor=pointer]:
+                - /url: /collections/demo-cmvo715r80000kclxx2ef0sag-devops
+                - heading "DevOps" [level=3] [ref=f1e164]
+                - paragraph [ref=f1e165]: 4 items
+                - paragraph [ref=f1e166]: Infrastructure and deployment resources
+                - generic [ref=f1e167]:
+                  - img "link" [ref=f1e168]
+                  - img "snippet" [ref=f1e172]
+                  - img "command" [ref=f1e176]
+              - link [ref=f1e179] [cursor=pointer]:
+                - /url: /collections/demo-cmvo715r80000kclxx2ef0sag-ai-workflows
+                - heading "AI Workflows" [level=3] [ref=f1e181]
+                - paragraph [ref=f1e182]: 3 items
+                - paragraph [ref=f1e183]: AI prompts and workflow automations
+                - img "prompt" [ref=f1e185]
+              - link [ref=f1e189] [cursor=pointer]:
+                - /url: /collections/demo-cmvo715r80000kclxx2ef0sag-react-patterns
+                - heading "React Patterns" [level=3] [ref=f1e191]
+                - paragraph [ref=f1e192]: 3 items
+                - paragraph [ref=f1e193]: Reusable React patterns and hooks
+                - img "snippet" [ref=f1e195]
+          - region [ref=f1e199]:
+            - heading "Pinned items" [level=2] [ref=f1e200]
+            - generic [ref=f1e203]:
+              - article [ref=f1e204]:
+                - img "Snippets" [ref=f1e206]
+                - generic [ref=f1e210]:
+                  - generic [ref=f1e211]:
+                    - heading "useAuth Hook" [level=3] [ref=f1e212]
+                    - img "Pinned item" [ref=f1e213]
+                    - img "Favorite item" [ref=f1e215]
+                  - paragraph [ref=f1e217]: Custom authentication hook for React applications
+                  - list "Tags" [ref=f1e218]:
+                    - listitem [ref=f1e219]: react
+                    - listitem [ref=f1e220]: auth
+                    - listitem [ref=f1e221]: hooks
+                - time [ref=f1e222]: Jan 15, 2026
+              - article [ref=f1e223]:
+                - img "Snippets" [ref=f1e225]
+                - generic [ref=f1e229]:
+                  - generic [ref=f1e230]:
+                    - heading "API Error Handling Pattern" [level=3] [ref=f1e231]
+                    - img "Pinned item" [ref=f1e232]
+                  - paragraph [ref=f1e234]: Fetch wrapper with exponential backoff retry logic
+                  - list "Tags" [ref=f1e235]:
+                    - listitem [ref=f1e236]: api
+                    - listitem [ref=f1e237]: fetch
+                    - listitem [ref=f1e238]: error-handling
+                - time [ref=f1e239]: Jan 12, 2026
+          - region [ref=f1e240]:
+            - heading "Recent items" [level=2] [ref=f1e241]
+            - paragraph [ref=f1e245]: Your 9 most recently updated items
+            - generic [ref=f1e246]:
+              - article [ref=f1e247]:
+                - img "Snippets" [ref=f1e249]
+                - generic [ref=f1e253]:
+                  - generic [ref=f1e254]:
+                    - heading "useAuth Hook" [level=3] [ref=f1e255]
+                    - img "Pinned item" [ref=f1e256]
+                    - img "Favorite item" [ref=f1e258]
+                  - paragraph [ref=f1e260]: Custom authentication hook for React applications
+                  - list "Tags" [ref=f1e261]:
+                    - listitem [ref=f1e262]: react
+                    - listitem [ref=f1e263]: auth
+                    - listitem [ref=f1e264]: hooks
+                - time [ref=f1e265]: Jan 15, 2026
+              - article [ref=f1e266]:
+                - img "Prompts" [ref=f1e268]
+                - generic [ref=f1e272]:
+                  - generic [ref=f1e273]:
+                    - heading "Code Review Assistant" [level=3] [ref=f1e274]
+                    - img "Favorite item" [ref=f1e275]
+                  - paragraph [ref=f1e277]: Review code for correctness, readability, and edge cases
+                  - list "Tags" [ref=f1e278]:
+                    - listitem [ref=f1e279]: ai
+                    - listitem [ref=f1e280]: code-review
+                - time [ref=f1e281]: Jan 14, 2026
+              - article [ref=f1e282]:
+                - img "Commands" [ref=f1e284]
+                - generic [ref=f1e287]:
+                  - generic [ref=f1e288]:
+                    - heading "Visual Git History" [level=3] [ref=f1e289]
+                    - img "Favorite item" [ref=f1e290]
+                  - paragraph [ref=f1e292]: Show a compact graph of all branches
+                  - list "Tags" [ref=f1e293]:
+                    - listitem [ref=f1e294]: git
+                    - listitem [ref=f1e295]: history
+                - time [ref=f1e296]: Jan 13, 2026
+              - article [ref=f1e297]:
+                - img "Notes" [ref=f1e299]
+                - generic [ref=f1e303]:
+                  - heading "Technical Interview Checklist" [level=3] [ref=f1e305]
+                  - paragraph [ref=f1e306]: A quick checklist for approaching coding problems
+                  - list "Tags" [ref=f1e307]:
+                    - listitem [ref=f1e308]: interview
+                    - listitem [ref=f1e309]: checklist
+                - time [ref=f1e310]: Jan 12, 2026
+              - article [ref=f1e311]:
+                - img "Snippets" [ref=f1e313]
+                - generic [ref=f1e317]:
+                  - generic [ref=f1e318]:
+                    - heading "API Error Handling Pattern" [level=3] [ref=f1e319]
+                    - img "Pinned item" [ref=f1e320]
+                  - paragraph [ref=f1e322]: Fetch wrapper with exponential backoff retry logic
+                  - list "Tags" [ref=f1e323]:
+                    - listitem [ref=f1e324]: api
+                    - listitem [ref=f1e325]: fetch
+                    - listitem [ref=f1e326]: error-handling
+                - time [ref=f1e327]: Jan 12, 2026
+              - article [ref=f1e328]:
+                - img "Files" [ref=f1e330]
+                - generic [ref=f1e334]:
+                  - heading "Project Context" [level=3] [ref=f1e336]
+                  - paragraph [ref=f1e337]: Architecture and conventions for AI coding sessions
+                  - list "Tags" [ref=f1e338]:
+                    - listitem [ref=f1e339]: context
+                    - listitem [ref=f1e340]: architecture
+                - time [ref=f1e341]: Jan 11, 2026
+              - article [ref=f1e342]:
+                - img "Images" [ref=f1e344]
+                - generic [ref=f1e349]:
+                  - heading "Dashboard Wireframe" [level=3] [ref=f1e351]
+                  - paragraph [ref=f1e352]: Layout reference for the developer knowledge hub
+                  - list "Tags" [ref=f1e353]:
+                    - listitem [ref=f1e354]: design
+                    - listitem [ref=f1e355]: dashboard
+                - time [ref=f1e356]: Jan 10, 2026
+              - article [ref=f1e357]:
+                - img "Links" [ref=f1e359]
+                - generic [ref=f1e363]:
+                  - generic [ref=f1e364]:
+                    - heading "React Documentation" [level=3] [ref=f1e365]
+                    - img "Favorite item" [ref=f1e366]
+                  - paragraph [ref=f1e368]: Official guides and API reference for React
+                  - list "Tags" [ref=f1e369]:
+                    - listitem [ref=f1e370]: react
+                    - listitem [ref=f1e371]: documentation
+                - time [ref=f1e372]: Jan 9, 2026
+              - article [ref=f1e373]:
+                - img "Snippets" [ref=f1e375]
+                - generic [ref=f1e379]:
+                  - heading "Flatten a Nested List" [level=3] [ref=f1e381]
+                  - paragraph [ref=f1e382]: Flatten one level of nested lists with a comprehension
+                  - list "Tags" [ref=f1e383]:
+                    - listitem [ref=f1e384]: python
+                    - listitem [ref=f1e385]: lists
+                - time [ref=f1e386]: Jan 8, 2026
+  - button "Open Next.js Dev Tools" [ref=f1e392] [cursor=pointer]
+  - alert [ref=f1e396]

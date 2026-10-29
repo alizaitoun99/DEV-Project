@@ -1,0 +1,25 @@
+- generic [active] [ref=f2e1]:
+  - main [ref=f2e2]:
+    - generic [ref=f2e3]:
+      - link [ref=f2e4] [cursor=pointer]:
+        - /url: /sign-in
+      - generic [ref=f2e10]:
+        - heading "Welcome back" [level=1] [ref=f2e11]
+        - paragraph [ref=f2e12]: Sign in to your developer knowledge hub.
+        - generic [ref=f2e13]:
+          - group [ref=f2e15]:
+            - generic [ref=f2e16]:
+              - text: Email
+              - textbox "Email" [ref=f2e17]:
+                - /placeholder: you@example.com
+            - generic [ref=f2e18]:
+              - text: Password
+              - textbox "Password" [ref=f2e19]
+            - button "Sign in" [ref=f2e20]
+          - generic [ref=f2e21]: or continue with
+          - button "Sign in with GitHub" [ref=f2e24]
+          - paragraph [ref=f2e25]:
+            - text: New to DevStash?
+            - link "Create an account" [ref=f2e26] [cursor=pointer]:
+              - /url: /register
+  - alert [ref=f2e27]

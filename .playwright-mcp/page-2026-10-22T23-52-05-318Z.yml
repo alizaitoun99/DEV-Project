@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - heading "Sidebar" [level=2] [ref=e4]
+    - generic [ref=e5]:
+      - banner [ref=e6]:
+        - searchbox "Search items" [ref=e8]
+        - button "New Item" [disabled] [ref=e9]
+      - main [ref=e10]:
+        - heading "Main" [level=2] [ref=e11]
+  - alert [ref=e12]
