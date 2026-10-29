@@ -21,6 +21,7 @@
     "db:check": "node --conditions=react-server --import tsx script/test-db.ts",
     "db:delete-users": "node --conditions=react-server --import tsx script/delete-users-except-demo.ts",
     "test:auth-security": "node --conditions=react-server --import tsx --test script/auth-security.test.ts",
+    "test:password-reset": "node --conditions=react-server --import tsx --test script/password-reset.test.ts",
     "test:email-verification": "node --conditions=react-server --import tsx --test script/email-verification.test.ts"
   },
   "dependencies": {

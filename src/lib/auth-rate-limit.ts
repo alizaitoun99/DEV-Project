@@ -5,7 +5,7 @@ import { isIP } from "node:net";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail } from "@/lib/email";
 
-type AuthOperation = "signin" | "register";
+type AuthOperation = "signin" | "register" | "password-reset";
 
 interface RateLimitResult {
   allowed: boolean;

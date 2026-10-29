@@ -1,14 +1,29 @@
-# Current Feature
+# Current Feature: Forgot Password
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Add a "Forgot password?" link to the sign-in page and an email request form.
+- Email a password reset link for eligible credentials accounts, with a generic response that does not disclose whether an account exists.
+- Reuse the existing `VerificationToken` model for hashed, expiring, single-use password reset tokens without a schema migration.
+- Provide a reset form with password confirmation and the existing password validation and hashing rules.
+- Reject invalid, expired, or reused tokens and allow sign-in with the new password after a successful reset.
+- Throttle reset requests and verify the affected flow, lint, TypeScript, and production build.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- Reuse the existing email delivery infrastructure and authentication UI patterns.
+- Namespace password reset tokens separately from email verification tokens so neither flow can consume the other's tokens.
+- Consume the token and update the password atomically; invalidate outstanding reset tokens after success.
+- Password reset email delivery must work independently of the registration email verification toggle.
+- Preserve GitHub OAuth behavior; do not create a password for OAuth-only accounts through this flow.
+- Never log raw reset tokens or passwords. Keep reset links on the configured application origin.
+- Implemented on `feature/forgot-password`; no schema migration or dependency changes required.
+- Validation: lint, standalone TypeScript, final production build, two password reset tests, three email verification tests, seven authentication security tests, and whitespace checks passed. One authentication retry-window assertion failed on the first run and passed on rerun. Initial sandbox build failed with Windows EPERM; the final outside-sandbox build passed.
+- Production HTTP smoke checks passed for sign-in, forgot-password, reset-password, cross-origin rejection, invalid-token rejection, and generic unknown-account responses.
+- Browser interaction/responsive verification remains unconfirmed: Playwright reported a busy profile, the in-app browser timed out, and the isolated browser runtime failed to initialize. Real inbox delivery remains unverified; Resend test-sender recipient restrictions still apply. Test email delivery was mocked.
+- Existing JWT sessions retain their normal lifetime after password reset. No commit or merge performed.
 
 ## History project
 

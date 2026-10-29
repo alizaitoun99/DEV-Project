@@ -39,6 +39,18 @@ Links contain 32 random bytes, expire after 24 hours, and store only SHA-256 has
 
 Run `npm run test:email-verification` for database-backed Node/tsx tests covering malformed/expired/replayed tokens, concurrent use, changed-email protection, delivery payloads, hashed storage, and delivery failures. Email sends are mocked; generated database fixtures are removed afterward. End-to-end inbox delivery must also be checked with a real recipient and verified sender.
 
+## Password reset
+
+The sign-in page links to `/forgot-password`; credentials users receive a link to `/reset-password`. Reset delivery uses the same Resend and application URL settings above, independently of `EMAIL_VERIFICATION_ENABLED`. Unknown and OAuth-only accounts receive the same response, including when delivery fails. Check server logs for the generic delivery failure diagnostic; no recipients, passwords, or tokens are logged. The existing Resend test-sender recipient restriction still applies.
+
+Reset tokens use 32 random bytes, SHA-256 storage, a separate `password-reset:userId:email` identifier, and a 30-minute expiry in the existing `VerificationToken` model. Email verification tokens cannot reset passwords. Changing the email invalidates the link. A transaction compares the previous password hash, updates the password with bcrypt cost 12, consumes the unexpired token, and deletes sibling reset tokens. Concurrent links can change the password only once. Opening a link does not consume it; users must submit a valid, matching password. Success requires a fresh sign-in; existing JWT sessions retain their normal lifetime.
+
+Same-origin POST requests are required. Reset email requests have a separate budget of three per normalized account per hour, ten per trusted IP per hour, or fifty per hour in the shared fallback. Reset submissions share the network budget. Rate limits return 429 with `Retry-After`; storage errors fail closed. No schema migration is required.
+
+Account lookup and email delivery run through Next.js `after` once the generic response has been sent, keeping account existence and provider latency out of public response timing. The deployment must support Next.js post-response work and allow enough execution time for the ten-second provider timeout.
+
+Run `npm run test:password-reset` for database-backed regression checks with mocked email delivery. Generated test accounts and tokens are removed afterward.
+
 ## Authentication regression checks
 
 Run `npm run test:auth-security` against a configured development database. Tests use Node's built-in test runner and the existing `tsx` dependency. They verify concurrent enforcement, expiration, case-variant budget bypass prevention, storage failures, OAuth adapter normalization, duplicate rejection, the database constraint, and registration's 429/Retry-After response. User fixtures roll back or are removed by their generated ID; test-owned account counters are removed. Endpoint checks consume four attempts from the normal shared registration budget. No framework dependency is added.

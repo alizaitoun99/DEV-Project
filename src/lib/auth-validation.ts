@@ -10,6 +10,16 @@ export const credentialsSchema = z.object({
   password: passwordSchema,
 });
 
+export const forgotPasswordSchema = credentialsSchema.pick({ email: true });
+export const resetPasswordSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/, "Invalid reset link. Request a new one."),
+  password: passwordSchema,
+  confirmPassword: z.string().max(72),
+}).refine((value) => value.password === value.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+});
+
 export const registrationSchema = credentialsSchema.extend({
   name: z.string().trim().min(1, "Name is required.").max(100),
   confirmPassword: z.string().max(72),

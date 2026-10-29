@@ -12,6 +12,8 @@ Auth Phase 2 adds credentials authentication and registration with bcrypt and Zo
 
 Registration email verification uses Resend, hashed 24-hour single-use tokens, and a persistent orange dashboard reminder with throttled resend. Email links verify automatically and redirect to the dashboard; invalid or expired links show actionable feedback. Unverified users retain dashboard access. Local testing uses Resend's test sender and account-owner recipient; production delivery requires a verified domain. No schema migration was needed. A preview-first `npm run db:delete-users` maintenance script preserves `demo@devistage.io` and requires `-- --execute` for deletion.
 
+Password recovery adds a sign-in link, email request form, and password reset form using hashed, 30-minute single-use tokens in the existing VerificationToken model. Reset tokens are separate from email verification, delivery works independently of the verification toggle, and requests are throttled with generic public responses. See [authentication security](auth-security.md) for configuration and regression checks.
+
 ## Design
 
 Refer to the screenshot below as a base for the dashboard. It does not have to be exact, use it as a reference:
