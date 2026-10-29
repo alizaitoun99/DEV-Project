@@ -1,34 +1,14 @@
-# Current Feature: Email Verification Toggle
+# Current Feature
 
-## Status: Complete
+## Status: null
 
 ## Goals
 
-- Add a server-only `EMAIL_VERIFICATION_ENABLED` environment flag so email verification can be disabled while no verified Resend sender domain is available.
-- Preserve existing verification behavior by default; only an explicit `false` disables it.
-- When disabled, allow registration and automatic sign-in without sending verification emails, creating verification tokens, or displaying email-delivery warnings.
-- Hide the dashboard verification reminder and disable resend delivery server-side while the flag is off, including for existing unverified accounts.
-- Preserve actual email verification status: disabling verification must not mark accounts as verified. Re-enabling must restore reminders and resend for unverified accounts.
-- Document the flag, default, restart/redeployment requirement, and how to enable verification after configuring a verified Resend sender domain.
-- Validate enabled and disabled flows, existing auth security checks, lint, TypeScript, production build, and affected browser behavior.
+<!-- Add goals when starting a feature. -->
 
 ## Notes
 
-- Implementation started on `feature/email-verification-toggle`.
-- Follow-up: reproduced a disabled account dropdown after sign-out followed by registration. Next.js restored the cached UserMenu with its successful sign-out pending state still true. Reset pending in finally so restored dashboards retain an interactive account menu, including when signing back into the same account.
-- The same round-trip browser check also reproduced a disabled sign-in form after successful sign-in and sign-out. Registration and sign-in now clear pending in finally as well, including their successful early-return paths, so cached forms remain usable.
-- Account-menu fix validation passed: lint, standalone TypeScript, production build, and production browser checks for repeated sign-in/sign-out to the same account, sign-out then new registration with an immediately working dropdown, mobile dropdown, Escape dismissal, and enabled cached registration/sign-in forms. Screenshot: [account menu after registration](../artifacts/account-menu-after-registration.png). Removed all four generated browser accounts and stopped the verification server; left the existing user development server running.
-- Implemented the server-only flag, registration response/UI handling, dashboard reminder guard, and authenticated resend guard. Existing token redemption remains active.
-- Set the ignored local `.env.local` flag to `false`; application default remains enabled. Restart any existing development server to load the setting.
-- Validation passed: lint, standalone TypeScript, production build, all seven authentication security tests, and all three email verification tests. Database tests required network access outside the sandbox. The first build hit Windows EPERM writing generated output; the outside-sandbox production build passed.
-- Production browser checks passed: disabled registration/automatic sign-in without warnings or reminder, reminder hidden after reload, disabled resend HTTP 403, enabled reminder restored for the same unverified account, and mobile overflow. Enabled resend retained delivery-error handling with a deliberately empty process-only API key; no real email was sent. Screenshot: [mobile](../artifacts/email-verification-toggle-mobile.png).
-- Confirmed the browser fixture retained a null verification date and no tokens, then removed the generated account. Test servers were stopped. Changes are uncommitted.
-- An environment flag is recommended because this is an application-wide deployment setting and needs no schema or admin UI changes.
-- Resend's test sender currently delivers only to the Resend account owner's address. Registration already creates accounts even when delivery fails; this toggle removes verification sends, warnings, and reminders while disabled.
-- Keep the setting server-only; client behavior should receive the effective setting from server responses or rendering.
-- Keep existing verification links usable with their normal expiry and single-use checks; disabling the flag must not bypass token validation or alter stored verification dates.
-- Do not change credentials/GitHub authentication, registration validation, throttling, or dashboard access.
-- No database migration is expected. Do not edit local environment files as part of loading the feature.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -81,3 +61,7 @@
 - 2026-10-28: Added a persistent orange dashboard verification toast with throttled resend (three requests per account per hour), periodic/window-focus verified-state refresh, and safe server-side delivery diagnostics. Diagnosed Resend's HTTP 403 for the unverified `livestash.com` sender and configured the ignored local environment to use `onboarding@resend.dev` with localhost links. This test sender permits only the Resend account owner's recipient; sending to arbitrary users requires an owned, verified sender domain and deployment-specific public APP_URL. Secrets and environment files were not committed.
 - 2026-10-28: Added the requested preview-first `npm run db:delete-users` maintenance script with explicit `-- --execute`, serializable transactional deletion, and preservation checks for `demo@devistage.io` and its content/memberships. Executed the cleanup at the user's requests; retained the main demo account. Test accounts and temporary verification fixtures were removed after checks.
 - 2026-10-28: Validation passed: production build, lint, standalone TypeScript, seven authentication security tests, two email verification tests (including registration-handler delivery success/failure), whitespace checks, and migration status. Production browser checks covered registration navigation/success toast (mocked registration response with real sign-in), persistent orange reminder, reload, mobile overflow, resend failure, automatic real-token verification with exactly one POST and dashboard navigation, reminder dismissal, invalid/reused links, and malformed JSON. Screenshots: [desktop](../artifacts/email-verification-desktop.png) and [mobile](../artifacts/email-verification-mobile.png). Preserved pre-existing local tooling and layout changes outside the feature commits. Cleared current feature, goals, and notes at the user's completion request.
+
+- 2026-10-29: Completed Email Verification Toggle on `feature/email-verification-toggle`, committed as `6f88ff4`, and merged into `main`. Added server-only `EMAIL_VERIFICATION_ENABLED`: only exact `false` disables registration emails, token creation, delivery warnings, dashboard reminders, and authenticated resend. Unset defaults to enabled. Preserved actual verification dates, existing single-use links, authentication, and throttling. Documented restart/redeployment and re-enabling after configuring a verified Resend domain. Set the ignored local `.env.local` flag to false; no environment files were committed or migration required.
+- 2026-10-29: Reproduced and fixed the account dropdown remaining disabled after sign-out followed by registration: cached dashboard components retained successful sign-out pending state. Reset pending in finally for the account menu, sign-in, and registration, including successful early returns. Production browser checks confirmed repeated same-account sign-in/sign-out, sign-out then registration with an immediately working dropdown, mobile dropdown and Escape dismissal, and reusable cached auth forms. Removed all generated browser accounts. Screenshots: [account dropdown](../artifacts/account-menu-after-registration.png) and [verification disabled on mobile](../artifacts/email-verification-toggle-mobile.png).
+- 2026-10-29: Validation passed: lint, standalone TypeScript, final production build, seven auth security tests, three email verification tests, whitespace checks, and migration status. Database checks required network access; the initial build hit Windows EPERM but the outside-sandbox build passed. Enabled delivery success/failure used mocked email sends; enabled browser resend used an empty process-only API key to verify error handling without sending real email. Preserved pre-existing local tooling, AGENTS.md, and root-layout changes outside the feature commits. Cleared current feature, status, goals, and notes at the user's completion request and deleted the merged local feature branch.
