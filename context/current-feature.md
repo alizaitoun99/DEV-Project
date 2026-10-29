@@ -1,14 +1,31 @@
-# Current Feature
+# Current Feature: Profile Page
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- Add goals when starting a feature. -->
+- Extend the protected `/profile` page with the user's email, name, GitHub avatar or initials, and account creation date.
+- Display owner-scoped usage statistics: total items, total collections, and counts for snippets, prompts, notes, commands, links, files, and images.
+- Add a change password action for email/password accounts only.
+- Add account deletion with a confirmation dialog to prevent accidental deletion.
+- Follow existing data-fetching, authentication, validation, and component patterns.
 
 ## Notes
 
-<!-- Add notes when starting a feature. -->
+- Specification: [Profile Page](features/profile-spec.md).
+- Reuse the existing `/profile` route and avatar behavior where applicable.
+- Require authentication and scope all profile data and account actions to the signed-in user.
+- Hide change password for GitHub OAuth-only accounts.
+- Implementation started on `feature/profile-page`; no schema migration is planned.
+- Forgot Password is completed, committed as 61392ce, and merged into main; completion and validation results are recorded below.
+
+- Implemented profile details, UTC account creation date, owner-scoped item/collection totals and type counts, including zero-count system types and owned custom types.
+- Added authenticated Server Actions with shared validation, per-account throttling, current-password verification, bcrypt cost 12, and atomic reset-token invalidation. Passwordless accounts cannot change passwords.
+- Added an accessible Radix confirmation dialog with typed DELETE confirmation, current-password verification for credentials accounts, transactional account/token cleanup, and sign-out navigation. Database cascades remove owned records; physical R2 cleanup remains outside the unimplemented upload lifecycle.
+- Added `npm run test:profile` (Node test runner with tsx): database-backed checks cover invalid confirmation/passwords, OAuth-only password rejection, successful password change, reset-token invalidation, cascading deletion and preservation of another account.
+- Validation passed: lint, standalone TypeScript, final production build, migration status, whitespace checks, profile test, two password-reset tests, three email-verification tests, and seven auth-security tests. The existing retry-window assertion failed once and passed on rerun. Sandbox build/network failures required outside-sandbox checks; standalone TypeScript was rerun successfully after a concurrent build regenerated .next types.
+- Production Chrome checks passed for unauthenticated profile protection, authenticated details/initials/date, empty and populated owner counts, seven type rows, confirmation dialog/cancel/focus restoration, passwordless form hiding, and desktop/390px mobile overflow. Password change and destructive deletion were verified through isolated database-backed service tests rather than browser submission; real GitHub avatar remains pending OAuth sign-in.
+- Generated profile fixtures were removed. Existing JWT sessions retain their normal lifetime after password changes. No schema migration, commit, or merge performed.
 
 ## History project
 
@@ -68,3 +85,32 @@
 
 - 2026-10-29: Completed Forgot Password on `feature/forgot-password`, committed as `61392ce` and merged into `main`; deleted the merged local branch. Added sign-in recovery navigation, request/reset forms, independent Resend delivery after the generic response, throttling, and hashed 30-minute single-use reset tokens in the existing VerificationToken model. Atomic password replacement invalidates sibling links; email verification and OAuth-only accounts remain protected. No migration required; existing JWT sessions retain their normal lifetime.
 - 2026-10-29: Final production build, lint, standalone TypeScript, two password reset tests, three email verification tests, seven authentication security tests, migration status, whitespace checks, and production HTTP smoke checks passed. One existing authentication retry-window assertion failed initially and passed on rerun. Sandbox EPERM required an outside-sandbox build. Browser interaction/responsive verification and real inbox delivery remain unconfirmed due to browser tool failures and Resend test-sender restrictions; email sends were mocked. Preserved unrelated local tooling, layout edits, and the newly loaded Profile Page specification.
+
+### Previous feature state retained on 2026-10-29
+
+# Current Feature: Forgot Password
+
+## Status: In Progress
+
+## Goals
+
+- Add a "Forgot password?" link to the sign-in page and an email request form.
+- Email a password reset link for eligible credentials accounts, with a generic response that does not disclose whether an account exists.
+- Reuse the existing `VerificationToken` model for hashed, expiring, single-use password reset tokens without a schema migration.
+- Provide a reset form with password confirmation and the existing password validation and hashing rules.
+- Reject invalid, expired, or reused tokens and allow sign-in with the new password after a successful reset.
+- Throttle reset requests and verify the affected flow, lint, TypeScript, and production build.
+
+## Notes
+
+- Reuse the existing email delivery infrastructure and authentication UI patterns.
+- Namespace password reset tokens separately from email verification tokens so neither flow can consume the other's tokens.
+- Consume the token and update the password atomically; invalidate outstanding reset tokens after success.
+- Password reset email delivery must work independently of the registration email verification toggle.
+- Preserve GitHub OAuth behavior; do not create a password for OAuth-only accounts through this flow.
+- Never log raw reset tokens or passwords. Keep reset links on the configured application origin.
+- Implemented on `feature/forgot-password`; no schema migration or dependency changes required.
+- Validation: lint, standalone TypeScript, final production build, two password reset tests, three email verification tests, seven authentication security tests, and whitespace checks passed. One authentication retry-window assertion failed on the first run and passed on rerun. Initial sandbox build failed with Windows EPERM; the final outside-sandbox build passed.
+- Production HTTP smoke checks passed for sign-in, forgot-password, reset-password, cross-origin rejection, invalid-token rejection, and generic unknown-account responses.
+- Browser interaction/responsive verification remains unconfirmed: Playwright reported a busy profile, the in-app browser timed out, and the isolated browser runtime failed to initialize. Real inbox delivery remains unverified; Resend test-sender recipient restrictions still apply. Test email delivery was mocked.
+- Existing JWT sessions retain their normal lifetime after password reset. No commit or merge performed.

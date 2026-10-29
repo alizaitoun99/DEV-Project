@@ -14,6 +14,8 @@ Registration email verification uses Resend, hashed 24-hour single-use tokens, a
 
 Password recovery adds a sign-in link, email request form, and password reset form using hashed, 30-minute single-use tokens in the existing VerificationToken model. Reset tokens are separate from email verification, delivery works independently of the verification toggle, and requests are throttled with generic public responses. See [authentication security](auth-security.md) for configuration and regression checks.
 
+The protected `/profile` page now includes account creation date, owner-scoped usage totals and type counts, credentials-only password changes with current-password verification, and confirmed account deletion. Account actions are validated and throttled; password changes invalidate reset links, and account deletion cascades through owned database records. See [authentication security](auth-security.md) for session behavior and regression checks.
+
 ## Design
 
 Refer to the screenshot below as a base for the dashboard. It does not have to be exact, use it as a reference:
