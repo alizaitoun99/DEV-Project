@@ -1,29 +1,14 @@
-# Current Feature: Forgot Password
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Add a "Forgot password?" link to the sign-in page and an email request form.
-- Email a password reset link for eligible credentials accounts, with a generic response that does not disclose whether an account exists.
-- Reuse the existing `VerificationToken` model for hashed, expiring, single-use password reset tokens without a schema migration.
-- Provide a reset form with password confirmation and the existing password validation and hashing rules.
-- Reject invalid, expired, or reused tokens and allow sign-in with the new password after a successful reset.
-- Throttle reset requests and verify the affected flow, lint, TypeScript, and production build.
+<!-- Add goals when starting a feature. -->
 
 ## Notes
 
-- Reuse the existing email delivery infrastructure and authentication UI patterns.
-- Namespace password reset tokens separately from email verification tokens so neither flow can consume the other's tokens.
-- Consume the token and update the password atomically; invalidate outstanding reset tokens after success.
-- Password reset email delivery must work independently of the registration email verification toggle.
-- Preserve GitHub OAuth behavior; do not create a password for OAuth-only accounts through this flow.
-- Never log raw reset tokens or passwords. Keep reset links on the configured application origin.
-- Implemented on `feature/forgot-password`; no schema migration or dependency changes required.
-- Validation: lint, standalone TypeScript, final production build, two password reset tests, three email verification tests, seven authentication security tests, and whitespace checks passed. One authentication retry-window assertion failed on the first run and passed on rerun. Initial sandbox build failed with Windows EPERM; the final outside-sandbox build passed.
-- Production HTTP smoke checks passed for sign-in, forgot-password, reset-password, cross-origin rejection, invalid-token rejection, and generic unknown-account responses.
-- Browser interaction/responsive verification remains unconfirmed: Playwright reported a busy profile, the in-app browser timed out, and the isolated browser runtime failed to initialize. Real inbox delivery remains unverified; Resend test-sender recipient restrictions still apply. Test email delivery was mocked.
-- Existing JWT sessions retain their normal lifetime after password reset. No commit or merge performed.
+<!-- Add notes when starting a feature. -->
 
 ## History project
 
@@ -80,3 +65,6 @@
 - 2026-10-29: Completed Email Verification Toggle on `feature/email-verification-toggle`, committed as `6f88ff4`, and merged into `main`. Added server-only `EMAIL_VERIFICATION_ENABLED`: only exact `false` disables registration emails, token creation, delivery warnings, dashboard reminders, and authenticated resend. Unset defaults to enabled. Preserved actual verification dates, existing single-use links, authentication, and throttling. Documented restart/redeployment and re-enabling after configuring a verified Resend domain. Set the ignored local `.env.local` flag to false; no environment files were committed or migration required.
 - 2026-10-29: Reproduced and fixed the account dropdown remaining disabled after sign-out followed by registration: cached dashboard components retained successful sign-out pending state. Reset pending in finally for the account menu, sign-in, and registration, including successful early returns. Production browser checks confirmed repeated same-account sign-in/sign-out, sign-out then registration with an immediately working dropdown, mobile dropdown and Escape dismissal, and reusable cached auth forms. Removed all generated browser accounts. Screenshots: [account dropdown](../artifacts/account-menu-after-registration.png) and [verification disabled on mobile](../artifacts/email-verification-toggle-mobile.png).
 - 2026-10-29: Validation passed: lint, standalone TypeScript, final production build, seven auth security tests, three email verification tests, whitespace checks, and migration status. Database checks required network access; the initial build hit Windows EPERM but the outside-sandbox build passed. Enabled delivery success/failure used mocked email sends; enabled browser resend used an empty process-only API key to verify error handling without sending real email. Preserved pre-existing local tooling, AGENTS.md, and root-layout changes outside the feature commits. Cleared current feature, status, goals, and notes at the user's completion request and deleted the merged local feature branch.
+
+- 2026-10-29: Completed Forgot Password on `feature/forgot-password`, committed as `61392ce` and merged into `main`; deleted the merged local branch. Added sign-in recovery navigation, request/reset forms, independent Resend delivery after the generic response, throttling, and hashed 30-minute single-use reset tokens in the existing VerificationToken model. Atomic password replacement invalidates sibling links; email verification and OAuth-only accounts remain protected. No migration required; existing JWT sessions retain their normal lifetime.
+- 2026-10-29: Final production build, lint, standalone TypeScript, two password reset tests, three email verification tests, seven authentication security tests, migration status, whitespace checks, and production HTTP smoke checks passed. One existing authentication retry-window assertion failed initially and passed on rerun. Sandbox EPERM required an outside-sandbox build. Browser interaction/responsive verification and real inbox delivery remain unconfirmed due to browser tool failures and Resend test-sender restrictions; email sends were mocked. Preserved unrelated local tooling, layout edits, and the newly loaded Profile Page specification.
