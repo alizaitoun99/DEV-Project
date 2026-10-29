@@ -3,6 +3,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { registrationSchema } from "@/lib/auth-validation";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email-verification";
+import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
 import { AuthRateLimitError, limitAuthAccount, limitAuthRequest } from "@/lib/auth-rate-limit";
 
 function registrationError(error: unknown): Response {
@@ -49,13 +50,13 @@ export async function POST(request: Request) {
       select: { id: true, name: true, email: true },
     });
     let verificationEmailSent = false;
+    const verificationEnabled = isEmailVerificationEnabled();
     try {
-      await sendVerificationEmail({ id: user.id, email });
-      verificationEmailSent = true;
+      verificationEmailSent = await sendVerificationEmail({ id: user.id, email });
     } catch {
       // Account creation succeeded; let the user sign in and retry delivery.
     }
-    return Response.json({ success: true, data: user, verificationEmailSent }, { status: 201 });
+    return Response.json({ success: true, data: user, verificationEnabled, verificationEmailSent }, { status: 201 });
   } catch (error) {
     return registrationError(error);
   }

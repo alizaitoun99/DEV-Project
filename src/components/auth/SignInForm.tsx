@@ -50,7 +50,7 @@ export function SignInForm() {
         return;
       }
     } catch { showError("Unable to sign in. Please try again."); }
-    setPending(false);
+    finally { setPending(false); }
   }
   async function github() {
     setPending(true);

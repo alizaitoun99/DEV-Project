@@ -28,6 +28,8 @@ export function UserMenu({ user }: UserMenuProps) {
     } catch {
       setError("Unable to sign out. Please try again.");
       toast.error("Unable to sign out. Please try again.");
+    } finally {
+      // Cached dashboard routes can restore this component after another sign-in.
       setPending(false);
     }
   }

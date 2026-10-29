@@ -5,6 +5,7 @@ import {
   verifyEmailToken,
 } from "@/lib/email-verification";
 import { prisma } from "@/lib/prisma";
+import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
 
 export async function POST(request: Request) {
   try {
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user.id)
       return Response.json({ error: "Please sign in." }, { status: 401 });
+    if (!isEmailVerificationEnabled())
+      return Response.json({ error: "Email verification is currently disabled." }, { status: 403 });
     await consumeAuthLimit(`verification:${session.user.id}`, 3, 3600);
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },

@@ -13,6 +13,7 @@ interface RegistrationResponse {
   success?: boolean;
   error?: string;
   verificationEmailSent?: boolean;
+  verificationEnabled?: boolean;
 }
 
 const fields = [
@@ -55,13 +56,13 @@ export function RegisterForm() {
       const response = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed.data) });
       const result: RegistrationResponse = await response.json();
       if (response.ok && result.success) {
-        if (result.verificationEmailSent === false) toast.error("Account created, but the verification email could not be sent. Use Resend email on your dashboard to try again.", { duration: 10000 });
+        if (result.verificationEnabled !== false && result.verificationEmailSent === false) toast.error("Account created, but the verification email could not be sent. Use Resend email on your dashboard to try again.", { duration: 10000 });
         await signInNewAccount(parsed.data.email, parsed.data.password);
         return;
       }
       showError(result.error ?? "Unable to create account. Please try again.");
     } catch { showError("Unable to create account. Check your connection and try again."); }
-    setPending(false);
+    finally { setPending(false); }
   }
   return (
     <div className="space-y-5">

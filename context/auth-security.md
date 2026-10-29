@@ -25,6 +25,10 @@ This uses the existing database to suit the application's current scale. Monitor
 
 ## Registration email verification
 
+Set server-only `EMAIL_VERIFICATION_ENABLED=false` in the root `.env.local` or deployment environment to disable verification emails and dashboard reminders, including for existing unverified accounts. Restart the server or redeploy after changing it. Only the exact string `false` disables verification; unset, empty, and other values preserve the enabled default. No Resend configuration is needed while disabled. Registration returns `verificationEnabled: false` and `verificationEmailSent: false`, creates no verification tokens, and shows no delivery warning. Auth validation, throttling, automatic sign-in, and dashboard access remain unchanged. Resend requests are rejected server-side before consuming the resend budget. Existing verification links remain usable with normal expiry and single-use validation.
+
+Disabling verification never sets `emailVerified` or modifies existing tokens. After configuring a verified Resend sender domain and the delivery settings below, set `EMAIL_VERIFICATION_ENABLED=true` and restart/redeploy. Reminders and resend return for all unverified accounts. No migration is required.
+
 Configure server-only `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (a verified Resend domain), and `APP_URL` (trusted public origin; local HTTP is accepted only for localhost/127.0.0.1). `AUTH_URL` is a fallback when `APP_URL` is absent. Verification uses Resend's REST API with a ten-second timeout. Never derive email links from the request Host header.
 
 For local testing without an owned domain, use `RESEND_FROM_EMAIL="DevStash <onboarding@resend.dev>"` and register with the email address associated with the Resend account. Resend restricts this test sender to that recipient; production delivery to other users requires a verified sender domain. A Vercel `vercel.app` deployment URL can host verification links but does not provide sender-domain DNS control. Provider rejection status/code and missing configuration flags are logged server-side without credentials, recipients, or links.

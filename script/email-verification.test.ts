@@ -5,6 +5,7 @@ import { after, test } from "node:test";
 import { prisma } from "../src/lib/prisma";
 import { sendVerificationEmail, verificationDigest, verifyEmailToken } from "../src/lib/email-verification";
 import { POST as register } from "../src/app/api/auth/register/route";
+import { isEmailVerificationEnabled } from "../src/lib/email-verification-config";
 
 after(async () => { await prisma.$disconnect(); });
 
@@ -35,6 +36,8 @@ test("verification rejects malformed, expired and changed-email tokens; concurre
 });
 
 test("Resend receives the raw link while only its hash is stored; delivery failure preserves retryable account", async (t) => {
+  const originalFlag = process.env.EMAIL_VERIFICATION_ENABLED;
+  process.env.EMAIL_VERIFICATION_ENABLED = "true";
   const original = { key: process.env.RESEND_API_KEY, from: process.env.RESEND_FROM_EMAIL, url: process.env.APP_URL };
   process.env.RESEND_API_KEY = "test-key";
   process.env.RESEND_FROM_EMAIL = "DevStash <test@example.com>";
@@ -77,6 +80,8 @@ test("Resend receives the raw link while only its hash is stored; delivery failu
     assert.equal((await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).emailVerified, null);
     assert.equal(await verifyEmailToken(token), true);
   } finally {
+    if (originalFlag === undefined) delete process.env.EMAIL_VERIFICATION_ENABLED;
+    else process.env.EMAIL_VERIFICATION_ENABLED = originalFlag;
     fetchMock.mock.restore();
     for (const [key, value] of Object.entries({ RESEND_API_KEY: original.key, RESEND_FROM_EMAIL: original.from, APP_URL: original.url })) {
       if (value === undefined) delete process.env[key]; else process.env[key] = value;
@@ -89,6 +94,55 @@ test("Resend receives the raw link while only its hash is stored; delivery failu
         await prisma.verificationToken.deleteMany({ where: { identifier: `email-verification:${registered.id}:${address}` } });
         await prisma.user.delete({ where: { id: registered.id } });
       }
+    }
+  }
+});
+
+test("only explicit false disables verification; disabled registration skips delivery and preserves unverified state", async (t) => {
+  const originalFlag = process.env.EMAIL_VERIFICATION_ENABLED;
+  const email = `disabled-${randomUUID()}@example.com`;
+  const fetchMock = t.mock.method(globalThis, "fetch", async () => { throw new Error("Disabled verification must not send email"); });
+  let userId: string | undefined;
+  try {
+    delete process.env.EMAIL_VERIFICATION_ENABLED;
+    assert.equal(isEmailVerificationEnabled(), true);
+    for (const value of ["", "true", "FALSE", "0", "typo"]) {
+      process.env.EMAIL_VERIFICATION_ENABLED = value;
+      assert.equal(isEmailVerificationEnabled(), true);
+    }
+    process.env.EMAIL_VERIFICATION_ENABLED = "false";
+    assert.equal(isEmailVerificationEnabled(), false);
+    const response = await register(new Request("http://localhost:3000/api/auth/register", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Disabled verification", email, password: "Verification-test-2026!", confirmPassword: "Verification-test-2026!" }),
+    }));
+    const user = await prisma.user.findUnique({ where: { email } });
+    userId = user?.id;
+    assert.equal(response.status, 201);
+    const body = await response.json();
+    assert.equal(body.success, true);
+    assert.equal(body.verificationEnabled, false);
+    assert.equal(body.verificationEmailSent, false);
+    assert.ok(user);
+    assert.equal(user.emailVerified, null);
+    assert.equal(await sendVerificationEmail({ id: user.id, email }), false);
+    const identifier = `email-verification:${user.id}:${email}`;
+    assert.equal(await prisma.verificationToken.count({ where: { identifier } }), 0);
+    assert.equal(fetchMock.mock.callCount(), 0);
+    // Existing links still verify while delivery is disabled.
+    const token = randomBytes(32).toString("hex");
+    await prisma.verificationToken.create({ data: { identifier, token: verificationDigest(token), expires: new Date(Date.now() + 60000) } });
+    assert.equal(await verifyEmailToken(token), true);
+    assert.equal(await verifyEmailToken(token), false);
+    process.env.EMAIL_VERIFICATION_ENABLED = "true";
+    assert.equal(isEmailVerificationEnabled(), true);
+  } finally {
+    fetchMock.mock.restore();
+    if (originalFlag === undefined) delete process.env.EMAIL_VERIFICATION_ENABLED;
+    else process.env.EMAIL_VERIFICATION_ENABLED = originalFlag;
+    if (userId) {
+      await prisma.verificationToken.deleteMany({ where: { identifier: `email-verification:${userId}:${email}` } });
+      await prisma.user.delete({ where: { id: userId } });
     }
   }
 });

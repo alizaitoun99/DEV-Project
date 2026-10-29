@@ -3,9 +3,11 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { getCurrentUser } from "@/lib/current-user";
 import { VerificationReminder } from "@/components/auth/VerificationReminder";
+import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
 
 async function EmailVerificationReminder() {
   const user = await getCurrentUser();
+  if (!isEmailVerificationEnabled()) return null;
   return <VerificationReminder verified={Boolean(user.emailVerified)} />;
 }
 

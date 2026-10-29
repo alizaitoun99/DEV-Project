@@ -2,12 +2,14 @@ import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
 
 export function verificationDigest(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
 export async function sendVerificationEmail(user: { id: string; email: string }) {
+  if (!isEmailVerificationEnabled()) return false;
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
   const baseUrl = process.env.APP_URL ?? process.env.AUTH_URL;
@@ -45,6 +47,7 @@ export async function sendVerificationEmail(user: { id: string; email: string })
     });
     throw new Error("Verification email delivery failed.");
   }
+  return true;
 }
 
 export async function verifyEmailToken(token: string): Promise<boolean> {
