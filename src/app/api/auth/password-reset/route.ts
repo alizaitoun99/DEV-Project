@@ -3,6 +3,7 @@ import { forgotPasswordSchema, resetPasswordSchema } from "@/lib/auth-validation
 import { AuthRateLimitError, limitAuthAccount, limitAuthRequest } from "@/lib/auth-rate-limit";
 import { prisma } from "@/lib/prisma";
 import { resetPassword, sendPasswordResetEmail } from "@/lib/password-reset";
+import { enforceRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
@@ -14,11 +15,13 @@ export async function POST(request: Request) {
     try { body = await request.json(); }
     catch { return Response.json({ error: "Invalid request." }, { status: 400 }); }
     if (typeof body === "object" && body !== null && "token" in body) {
+      await enforceRateLimit("reset-password", request);
       const parsed = resetPasswordSchema.safeParse(body);
       if (!parsed.success) return Response.json({ error: parsed.error.issues[0].message }, { status: 400 });
       const success = await resetPassword(parsed.data.token, parsed.data.password);
       return Response.json({ success, error: success ? undefined : "This reset link is invalid, expired, or already used. Request a new link." }, { status: success ? 200 : 400 });
     }
+    await enforceRateLimit("forgot-password", request);
     const parsed = forgotPasswordSchema.safeParse(body);
     if (!parsed.success) return Response.json({ error: "Enter a valid email address." }, { status: 400 });
     await limitAuthAccount("password-reset", parsed.data.email);
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
     return Response.json({ success: true, message: "If this email has a password account, a reset link will be sent. Check your inbox and spam folder." });
   } catch (error) {
     if (error instanceof AuthRateLimitError) {
-      return Response.json({ error: error.message }, { status: 429, headers: { "Retry-After": String(error.retryAfter) } });
+      return rateLimitResponse(error);
     }
     return Response.json({ error: "Unable to process your request. Please try again later." }, { status: 503 });
   }

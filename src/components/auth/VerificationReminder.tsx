@@ -13,7 +13,7 @@ export function VerificationReminder({ verified }: VerificationReminderProps) {
     if (verified) { toast.dismiss(id); return; }
     async function resend() {
       try {
-        const response = await fetch("/api/auth/verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        const response = await fetch("/api/auth/resend-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
         const result = await response.json();
         if (!response.ok) { toast.error(result.error); return; }
         if (result.verified) router.refresh();

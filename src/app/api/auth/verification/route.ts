@@ -6,6 +6,7 @@ import {
 } from "@/lib/email-verification";
 import { prisma } from "@/lib/prisma";
 import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
+import { enforceRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
         { error: "No email address is available." },
         { status: 400 },
       );
+    await enforceRateLimit("resend-verification", request, user.email);
     if (!user.emailVerified)
       await sendVerificationEmail({ id: user.id, email: user.email });
     return Response.json({
@@ -63,10 +65,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof AuthRateLimitError)
-      return Response.json(
-        { error: error.message },
-        { status: 429, headers: { "Retry-After": String(error.retryAfter) } },
-      );
+      return rateLimitResponse(error);
     return Response.json(
       { error: "Unable to send or verify your email. Please try again later." },
       { status: 503 },

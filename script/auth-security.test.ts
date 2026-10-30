@@ -1,5 +1,9 @@
 import "dotenv/config";
 
+// This suite verifies PostgreSQL throttling; Redis has separate isolated/live checks.
+delete process.env.UPSTASH_REDIS_REST_URL;
+delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
 import assert from "node:assert/strict";
 import { createHmac, randomUUID } from "node:crypto";
 import { after, test } from "node:test";

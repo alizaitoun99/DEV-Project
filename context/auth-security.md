@@ -8,6 +8,26 @@ The `auth_identity_and_throttling` migration locks user writes briefly, checks f
 
 ## Shared throttling
 
+### Upstash sliding windows
+
+Set server-only `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to enable the additional sliding-window limiter. Restart or redeploy after changing credentials. Without both variables, the Upstash layer allows requests; existing PostgreSQL limits below remain enforced. Upstash errors or a one-second timeout also allow requests through this layer. PostgreSQL failures still deny requests. No migration is required.
+
+| Operation | Upstash budget | Key |
+| --- | --- | --- |
+| Credentials callback | 5 / 15 minutes | Trusted IP + normalized email |
+| Registration | 3 / hour | Trusted IP |
+| Forgot password | 3 / hour | Trusted IP |
+| Reset password | 5 / 15 minutes | Trusted IP |
+| Verification resend | 3 / 15 minutes | Trusted IP + authenticated account email |
+
+The same `AUTH_TRUSTED_IP_HEADER` policy below applies. Use a proxy-overwritten, single-IP header. When that setting or a valid single IP is missing, the Redis check allows the request without contacting Redis; existing PostgreSQL shared/network and account limits continue to apply. Malformed values and forwarded lists also skip Redis. This avoids applying the small per-IP Redis budget to every visitor collectively. Do not enable an arbitrary client-controlled `x-forwarded-for` header. Redis keys are HMAC digests using `AUTH_SECRET`; operation prefixes isolate budgets. Existing account and network limits remain active, including the stricter three-per-hour verification resend safeguard.
+
+The forms now use `/api/auth/forgot-password`, `/api/auth/reset-password`, and `/api/auth/resend-verification`. The existing combined `/api/auth/password-reset` and `/api/auth/verification` endpoints remain compatible and use the same enforcement functions and budgets, so switching URLs cannot bypass limits. Reset operation selection is based on the submitted token, as on the original combined endpoint.
+
+Credentials checks run inside Auth.js `authorize`, covering direct callbacks and server-side sign-in. The callback route translates a rate-limit error into HTTP 429 with `Retry-After` while retaining the error URL consumed by the Auth.js client. Other auth flows also return 429 and retry seconds. Frontend toasts explain the remaining wait in rounded-up minutes. OAuth handlers remain unchanged.
+
+Run `npm run test:rate-limit` for isolated key normalization, trusted-header handling, endpoint policy, Redis failure behavior, and Auth.js callback response metadata/cookie checks. Missing, malformed, and untrusted IP tests assert zero limiter calls for every operation. These tests do not contact Redis. The PostgreSQL authentication regression suite disables Upstash in its own process to avoid consuming live Redis budgets. With configured Upstash credentials, run `node --conditions=react-server --import tsx script/rate-limit-live.ts` to verify five allowed attempts followed by a denial using random test identities and a synthetic trusted IP configured only within that script. Redis test keys expire automatically; no users are created or saved environment files changed.
+
 PostgreSQL stores atomic, fixed-window counters shared across app instances. Each attempt first consumes a network budget, then a normalized-email budget before user lookup or bcrypt work. Successful sign-ins also consume the budget; counters are not reset on success. Database time defines expiration, so app clock differences cannot bypass the limits.
 
 | Operation | Account | Trusted IP | Shared fallback when no trusted IP is available |

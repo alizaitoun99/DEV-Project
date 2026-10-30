@@ -7,9 +7,15 @@ import { compare } from "bcryptjs";
 import { credentialsSchema } from "@/lib/auth-validation";
 import { authAdapter } from "@/lib/auth-adapter";
 import { AuthRateLimitError, limitAuthAccount, limitAuthRequest } from "@/lib/auth-rate-limit";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 class RateLimitedCredentials extends CredentialsSignin {
   code = "rate_limited";
+
+  constructor(retryAfter: number) {
+    super();
+    this.code = `rate_limited_${retryAfter}`;
+  }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -23,16 +29,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         await limitAuthRequest("signin", request);
       } catch (error) {
-        if (error instanceof AuthRateLimitError) throw new RateLimitedCredentials();
+        if (error instanceof AuthRateLimitError) throw new RateLimitedCredentials(error.retryAfter);
         throw error;
       }
       const parsed = credentialsSchema.safeParse(credentials);
       if (!parsed.success) return null;
 
       try {
+        await enforceRateLimit("signin", request, parsed.data.email);
         await limitAuthAccount("signin", parsed.data.email);
       } catch (error) {
-        if (error instanceof AuthRateLimitError) throw new RateLimitedCredentials();
+        if (error instanceof AuthRateLimitError) throw new RateLimitedCredentials(error.retryAfter);
         throw error;
       }
 

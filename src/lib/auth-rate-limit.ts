@@ -18,7 +18,7 @@ interface RateLimitStore {
 
 export class AuthRateLimitError extends Error {
   constructor(public readonly retryAfter: number) {
-    super("Too many attempts. Please try again later.");
+    super(`Too many attempts. Please try again in ${Math.max(1, Math.ceil(retryAfter / 60))} minutes.`);
   }
 }
 

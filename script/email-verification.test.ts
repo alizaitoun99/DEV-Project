@@ -1,4 +1,8 @@
 import "dotenv/config";
+
+// This suite mocks global fetch to verify email delivery. Redis is covered separately.
+delete process.env.UPSTASH_REDIS_REST_URL;
+delete process.env.UPSTASH_REDIS_REST_TOKEN;
 import assert from "node:assert/strict";
 import { randomBytes, randomUUID } from "node:crypto";
 import { after, test } from "node:test";

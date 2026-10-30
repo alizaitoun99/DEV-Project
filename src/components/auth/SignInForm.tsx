@@ -12,8 +12,12 @@ import { Input } from "@/components/ui/input";
 
 function authError(error: string | null, code?: string | null) {
   if (!error) return "";
-  if (code === "rate_limited")
-    return "Too many sign-in attempts. Please try again later.";
+  if (code?.startsWith("rate_limited")) {
+    const seconds = Number(code.replace("rate_limited_", ""));
+    return Number.isFinite(seconds) && seconds > 0
+      ? `Too many attempts. Please try again in ${Math.max(1, Math.ceil(seconds / 60))} minutes.`
+      : "Too many sign-in attempts. Please try again later.";
+  }
   if (error === "CredentialsSignin") return "Email or password is incorrect.";
   if (error === "OAuthAccountNotLinked")
     return "Sign in using the method originally used for this email address.";

@@ -5,13 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email-verification";
 import { isEmailVerificationEnabled } from "@/lib/email-verification-config";
 import { AuthRateLimitError, limitAuthAccount, limitAuthRequest } from "@/lib/auth-rate-limit";
+import { enforceRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 function registrationError(error: unknown): Response {
   if (error instanceof AuthRateLimitError) {
-    return Response.json({ success: false, error: error.message }, {
-      status: 429,
-      headers: { "Retry-After": String(error.retryAfter), "Cache-Control": "no-store" },
-    });
+    return rateLimitResponse(error);
   }
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
     return Response.json({ success: false, error: "An account with this email already exists." }, { status: 409 });
@@ -21,6 +19,7 @@ function registrationError(error: unknown): Response {
 
 export async function POST(request: Request) {
   try {
+    await enforceRateLimit("register", request);
     await limitAuthRequest("register", request);
   } catch (error) {
     return registrationError(error);

@@ -27,7 +27,7 @@ export function PasswordResetForm({ reset = false }: PasswordResetFormProps) {
     setError("");
     setMessage("");
     try {
-      const response = await fetch("/api/auth/password-reset", {
+      const response = await fetch(reset ? "/api/auth/reset-password" : "/api/auth/forgot-password", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(parsed.data),
       });
       const result: ResetResponse = await response.json();
