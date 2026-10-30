@@ -1,28 +1,14 @@
-# Current Feature: Rate Limiting for Auth
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Add reusable, serverless-compatible authentication rate limiting using Upstash Redis and `@upstash/ratelimit` with sliding windows.
-- Limit credentials login to 5 attempts per 15 minutes by IP + email; registration and forgot-password to 3 attempts per hour by IP; reset-password to 5 attempts per 15 minutes by IP; and resend-verification to 3 attempts per 15 minutes by IP + email.
-- Return HTTP 429 with a user-friendly error and `Retry-After`, and display rate-limit errors through frontend toasts.
-- Return `{ success, remaining, reset }` from reusable rate-limit checks.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Rate Limiting for Auth](features/rate-limiting-spec.md).
-- Configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` on the server.
-- The spec requests IP extraction from `x-forwarded-for` (Vercel) or the request, combining IP and normalized email where applicable.
-- Implemented Upstash as an additional sliding-window layer: Redis errors, missing configuration, or a one-second timeout fail open; existing PostgreSQL account/network throttling continues to fail closed. Trusted-proxy rules and HMAC keys are preserved. See [authentication security](auth-security.md).
-- Credentials checks run inside NextAuth authorize; the callback returns 429 and Retry-After while preserving the Auth.js client error URL. Login shows wait minutes inline and through a toast.
-- Rate-limiting middleware is a possible later enhancement, outside the required implementation.
-- Implementation branch: `feature/rate-limiting`. Added the named recovery/resend endpoints; existing combined endpoints share the same enforcement and remain compatible. Added `npm run test:rate-limit` and a live Upstash verification script.
-- Verified live Redis enforcement: five attempts allowed, sixth denied, normalized-email budgets shared, and separate identities isolated. Production browser submissions also confirmed the sixth login receives 429 with Retry-After, inline/toast feedback, and no overflow at 390px. Screenshot: [mobile feedback](../artifacts/rate-limiting-mobile.png).
-- Authentication security (7), password reset (2), email verification (3), and profile (1) regression tests passed with database network access. The email suite disables Redis in its own process so its email fetch mock remains isolated; rate-limit behavior has separate isolated and live checks.
-- Final validation passed: production build, lint, standalone TypeScript, four isolated rate-limit tests, and whitespace checks. The build required execution outside the sandbox after Windows EPERM. Changes remain uncommitted for review; unrelated pre-existing edits were preserved.
-- Review fixes: without a valid proxy-trusted IP, Redis is skipped entirely and existing PostgreSQL safeguards remain active. This removes the accidental site-wide three-attempt Redis budget. Auth-security regressions disable Upstash within their process; the live Redis script uses a synthetic trusted IP. Saved environment files and database schema are unchanged.
-- Review-fix validation passed: five isolated rate-limit tests (including zero Redis calls for absent/invalid/untrusted IPs), two consecutive seven-test auth-security runs, lint, standalone TypeScript, production build, and whitespace checks. An initial auth run hit the previously observed retry-window timing assertion; it was not changed, and both consecutive reruns passed. No commits were created.
+<!-- Load a feature specification to begin. -->
 
 ## History project
 
@@ -86,3 +72,7 @@
 - 2026-10-29: Completed [Profile Page](features/profile-spec.md) on `feature/profile-page`, committed as `7f34b84`, and merged into `main`. Extended the protected profile with account details/date, owner-scoped usage totals and type counts, credentials-only password changes, and accessible confirmed account deletion. Server Actions derive ownership from the session, validate and throttle mutations, verify current passwords, hash at bcrypt cost 12, invalidate reset links atomically, and remove tokens and owned database records transactionally. No schema migration required.
 - 2026-10-29: Validation passed: lint, final standalone TypeScript, production build, migration status, whitespace checks, one profile regression test, two password-reset tests, three email-verification tests, and seven authentication security tests. The existing retry-window assertion failed once and passed on rerun; sandbox build/network failures required outside-sandbox checks. Chrome verified profile protection, authenticated details, empty/populated counts, all seven types, deletion dialog cancellation/focus, passwordless form hiding, and desktop/mobile overflow. Password mutation/deletion passed isolated service tests; browser mutation submissions and the actual GitHub avatar remain unverified. Generated fixtures were removed.
 - 2026-10-29: Closed out at the user's completion request: cleared current feature, status, goals, and notes; deleted the merged local feature branch. Existing JWT sessions retain their normal lifetime after password changes. Physical R2 cleanup remains part of the future upload lifecycle. Preserved pre-existing local tooling, AGENTS.md, and root-layout changes outside feature commits.
+
+- 2026-10-31: Completed [Rate Limiting for Auth](features/rate-limiting-spec.md) on `feature/rate-limiting`, committed as `7a6253f`, and merged into `main`; deleted the merged local branch. Added reusable Upstash Redis sliding-window policies for credentials, registration, password recovery/reset, and verification resend; named API endpoints retain compatibility with the original combined handlers. HTTP 429 responses include Retry-After, and Auth.js client error URLs preserve inline/toast feedback. No schema migration required.
+- 2026-10-31: Resolved both review findings: missing or invalid proxy-trusted IPs skip Redis without consuming a global budget, while PostgreSQL account/network safeguards remain enforced. Redis failures and missing configuration fail open only for that additional layer. Auth/email regression suites isolate Redis from their process; the live limiter check uses random identities and a synthetic trusted IP. Saved environment files were unchanged.
+- 2026-10-31: Validation passed: production build, lint, standalone TypeScript, five isolated limiter tests, two consecutive seven-test auth-security runs, password-reset/email-verification/profile regressions, migration status, and final staged whitespace checks. Live Redis and production browser checks verified five allowed attempts followed by HTTP 429, Retry-After, inline/toast feedback, and mobile layout. An initial auth run hit the pre-existing retry-window timing assertion; both consecutive reruns passed without changing it. Screenshot: [mobile feedback](../artifacts/rate-limiting-mobile.png). Cleared the feature tracker at the user's completion request and preserved unrelated local edits.
