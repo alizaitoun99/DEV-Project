@@ -35,6 +35,14 @@ export async function getPinnedItems(userId: string): Promise<ItemSummary[]> {
   });
 }
 
+export async function getItemsByType(userId: string, typeId: string): Promise<ItemSummary[]> {
+  return prisma.item.findMany({
+    where: { userId, typeId },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: itemSelect(userId),
+  });
+}
+
 export async function getRecentItems(userId: string, limit = 10): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId },
