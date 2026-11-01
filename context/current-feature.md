@@ -1,14 +1,29 @@
-# Current Feature
+# Current Feature: Item Deletion
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Enable Delete in the item drawer for authenticated users.
+- Show a shadcn/ui confirmation dialog before permanently deleting an item, with clear Delete and Cancel actions.
+- Delete only items owned by the signed-in user through a validated Server Action.
+- On success, close the drawer, refresh affected item lists and counts, and show a success toast.
+- Keep the confirmation open and show useful error feedback if deletion fails; prevent duplicate submissions while pending.
+- Add meaningful mocked Server Action and utility tests for validation, authorization, successful deletion, and failure handling.
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Loaded from the user's inline description using the feature load workflow.
+- Interpret "shadow UI confirmation" as a shadcn/ui confirmation dialog, consistent with the project's existing components.
+- Cancel must preserve the item. Confirmation should identify the item and explain that deletion is permanent and removes its collection memberships.
+- Use existing Sonner toast conventions and accessible dialog focus/keyboard behavior.
+- Preserve collections and tags themselves when deleting their item memberships.
+- Respect the project's storage lifecycle requirements for file/image items; account for safe storage cleanup if stored objects are supported by the implementation.
+- Implementation branch: `feature/item-deletion`.
+- Upload/storage cleanup is not implemented. Items with non-null private file keys are preserved with actionable error feedback until a retryable cleanup lifecycle exists; metadata-only file/image items can be deleted.
+- Implemented drawer deletion confirmation using the existing Radix/shadcn styling and Sonner patterns, pending protection, inline/toast errors, owner-scoped deletion, drawer dismissal, and route refresh. Existing foreign-key cascades remove memberships while retaining collections and tags.
+- Validation: all 57 Vitest tests passed, including 14 new deletion tests; ESLint, standalone TypeScript, and whitespace checks passed. Browser checks at localhost and 127.0.0.1 timed out; desktop/mobile interaction verification remains unconfirmed. Existing auth integration scripts were not run because authentication behavior is unchanged.
+- Production build passed outside the sandbox after the initial Windows EPERM failure. No schema or dependency changes were needed.
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.

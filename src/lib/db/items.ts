@@ -25,6 +25,14 @@ export async function getItemDetail(userId: string, id: string, db: Prisma.Trans
 
 export type ItemDetail = NonNullable<Awaited<ReturnType<typeof getItemDetail>>>;
 
+export async function deleteItem(userId: string, id: string) {
+  // Keep storage references intact until a retryable object cleanup lifecycle exists.
+  const result = await prisma.item.deleteMany({ where: { id, userId, fileKey: null } });
+  if (result.count > 0) return "deleted";
+  const remaining = await prisma.item.findFirst({ where: { id, userId }, select: { fileKey: true } });
+  return remaining?.fileKey != null ? "stored-file" : "not-found";
+}
+
 export interface ItemSummary {
   id: string;
   title: string;

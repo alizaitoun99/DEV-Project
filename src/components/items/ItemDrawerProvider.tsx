@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Copy, Pencil, Pin, Star, Trash2 } from "lucide-react";
+import { Copy, Pencil, Pin, Star } from "lucide-react";
+import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
 import { ItemEditForm } from "@/components/items/ItemEditForm";
@@ -64,15 +65,15 @@ export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
             </div>
           </div>
         </header>
-        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} onSaved={setItem} />}
+        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} onSaved={setItem} onDeleted={() => { setSelection(null); setItem(null); }} />}
       </SheetContent>
     </Sheet>
   </DrawerContext.Provider>;
 }
 
-interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; }
+interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; onDeleted: () => void; }
 
-function ItemDetails({ item, onSaved }: ItemDetailsProps) {
+function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
   const [editing, setEditing] = useState(false);
   const text = item.content ?? item.url;
   async function copy() {
@@ -89,7 +90,7 @@ function ItemDetails({ item, onSaved }: ItemDetailsProps) {
       <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
       <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
       <Button variant="ghost" onClick={() => setEditing(true)}><Pencil />Edit</Button>
-      <Button variant="ghost" size="icon" disabled title="Deletion coming later" aria-label="Delete item" className="ml-auto text-destructive"><Trash2 /></Button>
+      <DeleteItemDialog id={item.id} title={item.title} onDeleted={onDeleted} />
     </div>
     <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
       <section><h3 className="mb-3 text-sm text-muted-foreground">Description</h3><p className="whitespace-pre-wrap text-sm">{item.description || "No description"}</p></section>
