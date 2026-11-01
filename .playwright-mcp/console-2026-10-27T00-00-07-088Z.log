@@ -1,6 +1,0 @@
-[     599ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3002/api/auth/signin?callbackUrl=%2Fdashboard:0
-[    4629ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3002/api/auth/signin?callbackUrl=%2Fdashboard:0
-[   15747ms] [ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ http://localhost:3002/api/auth/register:0
-[   15834ms] [ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ http://localhost:3002/api/auth/register:0
-[   15922ms] [ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ http://localhost:3002/api/auth/register:0
-[   15984ms] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests) @ http://localhost:3002/api/auth/register:0

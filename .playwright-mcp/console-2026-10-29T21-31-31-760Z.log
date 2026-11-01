@@ -1,2 +1,0 @@
-[   14905ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:3101/api/auth/verification:0
-[   19826ms] [ERROR] Failed to load resource: the server responded with a status of 503 (Service Unavailable) @ http://localhost:3102/api/auth/verification:0

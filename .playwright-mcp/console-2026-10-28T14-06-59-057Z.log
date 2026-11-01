@@ -1,7 +1,0 @@
-[   18656ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/auth/providers:0
-[   18658ms] [ERROR] H: There was a problem with the server configuration. Check the server logs for more information.. Read more at https://errors.authjs.dev#autherror
-    at O (http://localhost:3001/_next/static/chunks/587-896d25cb248f752a.js:1:3170)
-    at async q (http://localhost:3001/_next/static/chunks/587-896d25cb248f752a.js:1:4128)
-    at async h (http://localhost:3001/_next/static/chunks/app/sign-in/page-7f1cfdccc722bca5.js:1:1994) @ http://localhost:3001/_next/static/chunks/587-896d25cb248f752a.js:0
-[   18694ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/auth/error:0
-[  207177ms] [ERROR] Failed to load resource: the server responded with a status of 409 (Conflict) @ http://localhost:3001/api/auth/register:0
