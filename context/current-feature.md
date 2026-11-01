@@ -1,26 +1,14 @@
-# Current Feature: Item Drawer
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Open a right-side shadcn Sheet with full item details when an ItemCard is clicked, on both dashboard and items list pages.
-- Manage drawer state in a client wrapper while retaining server-rendered pages and card data.
-- Fetch full item details on click without page navigation and show a skeleton while loading.
-- Display an action bar with Favorite (yellow star when active), Pin, Copy, Edit (pencil), and right-aligned Delete (trash).
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Item Drawer](features/item-drawer-spec.md).
-- This drawer is the item detail view; there is no separate item page.
-- Fetch content, collections, language, and other full details through `/api/items/[id]`; the route checks authentication and calls a query in `src/lib/db/items.ts`. Scope item access to the authenticated owner.
-- Use [the drawer screenshot](screenshots/dashboard-ui-drawer.png) as the visual reference.
-- This phase covers the details display. Code editors and item-specific features come later; mutation behavior for the action buttons is not specified here.
-- Implementation branch: `feature/item-drawer`. Shared client provider connects server-rendered cards on dashboard and type lists to a right-side Sheet. Includes loading skeletons, retry/error states, request cancellation, keyboard triggers, Escape dismissal, and focus restoration.
-- Displays plain-text content, description, safe HTTP(S) links, file metadata, tags, collections, language, and dates. Copy uses the clipboard with toast feedback. Favorite, Pin, Edit, and Delete are visibly disabled pending their mutation flows.
-- Detail API returns private, non-cacheable JSON with owner-scoped item/tag/collection queries; excludes private storage keys and serializes file sizes safely.
-- Validation: 17 Vitest tests, lint, standalone TypeScript, whitespace checks, and production build passed. Build required an outside-sandbox retry after Windows EPERM. Browser verification remains unconfirmed: local dashboard navigation failed with connection refused and then timed out.
-- Feature test review: expanded item-detail coverage to seven tests, including successful full-detail JSON with null file metadata and authentication-service failure. All 19 unit tests, lint, standalone TypeScript, and whitespace checks pass. Components are excluded by project policy; browser behavior remains unverified. Only tests and documentation changed in this review, so the preceding production build remains the applicable build validation.
+<!-- Load a feature specification to begin. -->
 
 ## Testing infrastructure
 
@@ -96,3 +84,6 @@
 - 2026-11-01: Completed [Items List View](features/item-list-view-spec.md) on `feature/items-list-view`, committed as `12f4eda`, and merged into `main`; deleted the merged local branch. Added seven type-filtered routes with authenticated owner-scoped queries, existing ItemCards and dashboard shell, stable updated-date ordering, loading/empty states, unknown-type handling, and item-route proxy protection. No schema migration or dependency changes required.
 - 2026-11-01: Resolved the medium-width card layout review finding using container queries for compact icons/spacing and date placement. Actual rendered ItemCards with compiled Tailwind CSS passed isolated browser checks at 390, 768, 1024, 1440, and 1920px with the desktop sidebar, two columns on medium and up, and no horizontal overflow. At 768px, content width increased from approximately 24px to 134px. Unauthenticated redirect/callback checks passed; authenticated filtering and full-page browser verification remain unconfirmed after sign-in and connection failures.
 - 2026-11-01: Final production build (including TypeScript and page generation), lint, all 12 available Vitest tests, migration status, and staged whitespace checks passed. The earlier missing-Vitest failures were resolved by the concurrent testing setup; an overlapping standalone TypeScript run encountered regenerated `.next/types` files. Cleared the active feature tracker at the user's completion request and preserved unrelated testing, tooling, research, documentation, and root-layout edits outside feature commits.
+
+- 2026-11-01: Completed [Item Drawer](features/item-drawer-spec.md) on `feature/item-drawer`, committed as `d178d90`, and merged into `main`; deleted the merged local branch. Dashboard and type-list ItemCards open a shared right-side shadcn Sheet with on-demand authenticated detail fetching, loading skeletons, error/retry states, request cancellation, keyboard triggers, Escape dismissal, and focus restoration. Displays description, plain-text content, safe HTTP(S) links, language, file metadata, tags, collections, and dates. Copy includes toast feedback; Favorite, Pin, Edit, and Delete remain visibly disabled for this details-display phase. No schema or dependency changes.
+- 2026-11-01: Item detail API uses owner-scoped item/tag/collection queries, excludes private storage keys, returns non-cacheable JSON, and safely serializes file sizes/dates. Validation passed: all 19 Vitest tests (seven item-detail tests), lint, standalone TypeScript, production build, migration status, and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity errors. Browser layout and interaction verification remain unconfirmed after connection refused and timeout errors. Existing integration scripts were not rerun because auth and other integration code were unchanged. Cleared the feature tracker at the user's completion request.
