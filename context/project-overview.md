@@ -2,13 +2,13 @@
 
 > **Status:** In development · **Product:** Developer knowledge hub · **Approach:** Single Next.js application
 
-## Current implementation (2026-10-28)
+## Current implementation (2026-10-30)
 
 The dashboard and responsive sidebar use owner-scoped Prisma queries against Neon PostgreSQL. They display item and collection statistics, recent collections, pinned and recent items, system types with item counts, favorite collections, and the signed-in user's profile. Auth Phase 1 adds NextAuth v5 GitHub OAuth with the Prisma adapter and JWT sessions. A proxy redirects unauthenticated dashboard requests to the custom sign-in page; server-side user checks scope dashboard data to the authenticated user. The full GitHub callback still requires user verification.
 
-Implemented foundations include Next.js 16, React 19, Tailwind CSS 4, shadcn/ui, Prisma 7, a versioned initial migration, a repeatable development seed, and `npm run db:check` for database verification. Development and production builds use Webpack with Tailwind's PostCSS plugin. The latest production build and lint passed; the latest sidebar browser verification remains unconfirmed after tool timeouts.
+Implemented foundations include Next.js 16, React 19, Tailwind CSS 4, shadcn/ui, Prisma 7, a versioned initial migration, a repeatable development seed, and `npm run db:check` for database verification. Development and production builds use Webpack with Tailwind's PostCSS plugin. The latest recorded production build and lint passed. Subsequent production browser checks covered desktop/mobile account menus, profile navigation, and responsive layouts; full GitHub callback verification remains pending user sign-in.
 
-Auth Phase 2 adds credentials authentication and registration with bcrypt and Zod, shared PostgreSQL request/account throttling, canonical email identity across credentials and OAuth, and targeted security regression tests. See [authentication security](auth-security.md) for limits, trusted-proxy configuration, and migration requirements. Auth Phase 3 adds custom `/sign-in` and `/register` pages, automatic sign-in to the dashboard after registration, three-second Sonner authentication toasts, a sidebar avatar/account menu with sign-out, and a protected read-only `/profile` page. Credentials, registration, errors, profile navigation, and sign-out have passed production browser checks. Item and collection CRUD, search, uploads, AI actions, billing, and broader automated application tests remain planned. The sections below describe the target architecture and product scope; they do not imply that these capabilities are implemented. See [feature history](current-feature.md) for completed work.
+Auth Phase 2 adds credentials authentication and registration with bcrypt and Zod, shared PostgreSQL request/account throttling, canonical email identity across credentials and OAuth, and targeted security regression tests. See [authentication security](auth-security.md) for limits, trusted-proxy configuration, and migration requirements. Auth Phase 3 adds custom `/sign-in` and `/register` pages, automatic sign-in to the dashboard after registration, three-second Sonner authentication toasts, a sidebar avatar/account menu with sign-out, and a protected `/profile` page, later extended with the account actions described below. Credentials, registration, errors, profile navigation, and sign-out have passed production browser checks. Item and collection CRUD, search, uploads, AI actions, billing, and broader automated application tests remain planned. The sections below describe the target architecture and product scope; they do not imply that these capabilities are implemented. See [feature history](current-feature.md) for completed work.
 
 Registration email verification uses Resend, hashed 24-hour single-use tokens, and a persistent orange dashboard reminder with throttled resend. Email links verify automatically and redirect to the dashboard; invalid or expired links show actionable feedback. Unverified users retain dashboard access. Local testing uses Resend's test sender and account-owner recipient; production delivery requires a verified domain. No schema migration was needed. A preview-first `npm run db:delete-users` maintenance script preserves `demo@devistage.io` and requires `-- --execute` for deletion.
 
@@ -335,7 +335,7 @@ App shell
 | `/favorites` | Favorite items and collections |
 | `/settings` | Profile, theme, data export |
 | `/settings/billing` | Plan and subscription management |
-| `/sign-in`, `/sign-up` | Authentication |
+| `/sign-in`, `/register` | Authentication |
 
 The drawer can be controlled by local UI state or URL-based intercepted/parallel routes so deep links and browser history work. Use accessible keyboard navigation, focus management and screen-reader labels. Provide loading skeletons, toasts, optimistic updates where safe and a copy-to-clipboard button for snippets/commands/prompts.
 
