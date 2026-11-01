@@ -3,8 +3,8 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
-export async function getItemDetail(userId: string, id: string) {
-  const item = await prisma.item.findFirst({
+export async function getItemDetail(userId: string, id: string, db: Prisma.TransactionClient = prisma) {
+  const item = await db.item.findFirst({
     where: { id, userId },
     select: {
       ...itemSelect(userId), content: true, url: true, language: true,
@@ -90,5 +90,30 @@ export async function getSystemItemTypes(userId?: string) {
       id: true, slug: true, name: true,
       _count: { select: { items: { where: { userId: userId ?? "" } } } },
     },
+  });
+}
+
+export async function updateItem(userId: string, id: string, input: import("@/lib/item-validation").ItemUpdateInput) {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.item.findFirst({ where: { id, userId }, select: { type: { select: { slug: true } } } });
+    if (!existing) return null;
+    const slug = existing.type.slug;
+    const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
+    await tx.item.update({
+      where: { id, userId },
+      data: {
+        title: input.title, description: input.description,
+        ...(["snippet", "prompt", "command", "note"].includes(slug) ? { content: input.content } : {}),
+        ...(["snippet", "command"].includes(slug) ? { language: input.language } : {}),
+        ...(slug === "link" ? { url: input.url } : {}),
+        tags: {
+          deleteMany: {},
+          create: tags.map(([tagSlug, name]) => ({ tag: { connectOrCreate: {
+            where: { userId_slug: { userId, slug: tagSlug } }, create: { userId, slug: tagSlug, name },
+          } } })),
+        },
+      },
+    });
+    return getItemDetail(userId, id, tx);
   });
 }

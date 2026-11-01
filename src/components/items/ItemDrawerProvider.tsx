@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { Copy, Pencil, Pin, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
+import { ItemEditForm } from "@/components/items/ItemEditForm";
 import { TypeIcon } from "@/components/dashboard/TypeIcon";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
@@ -63,15 +64,16 @@ export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
             </div>
           </div>
         </header>
-        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails item={item} />}
+        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} onSaved={setItem} />}
       </SheetContent>
     </Sheet>
   </DrawerContext.Provider>;
 }
 
-interface ItemDetailsProps { item: ItemDetail; }
+interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; }
 
-function ItemDetails({ item }: ItemDetailsProps) {
+function ItemDetails({ item, onSaved }: ItemDetailsProps) {
+  const [editing, setEditing] = useState(false);
   const text = item.content ?? item.url;
   async function copy() {
     try {
@@ -79,13 +81,14 @@ function ItemDetails({ item }: ItemDetailsProps) {
       toast.success("Copied to clipboard");
     } catch { toast.error("Unable to copy. Please try again."); }
   }
+  if (editing) return <ItemEditForm item={item} onCancel={() => setEditing(false)} onSaved={(updated) => { onSaved(updated); setEditing(false); }} />;
   const safeUrl = item.url && /^https?:\/\//i.test(item.url) ? item.url : null;
   return <>
     <div aria-label="Item actions" className="flex flex-wrap items-center gap-1 border-b px-4 py-4">
       <Button variant="ghost" disabled title="Favorite changes coming later" className={item.isFavorite ? "text-yellow-400" : ""}><Star className={item.isFavorite ? "fill-yellow-400" : ""} />Favorite</Button>
       <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
       <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
-      <Button variant="ghost" disabled title="Editing coming later"><Pencil />Edit</Button>
+      <Button variant="ghost" onClick={() => setEditing(true)}><Pencil />Edit</Button>
       <Button variant="ghost" size="icon" disabled title="Deletion coming later" aria-label="Delete item" className="ml-auto text-destructive"><Trash2 /></Button>
     </div>
     <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
