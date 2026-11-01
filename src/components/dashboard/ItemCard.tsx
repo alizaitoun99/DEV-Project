@@ -1,4 +1,5 @@
 import { Pin, Star } from "lucide-react";
+import { ItemDrawerTrigger } from "@/components/items/ItemDrawerProvider";
 import type { ItemSummary } from "@/lib/db/items";
 import { getTypeStyle, TypeIcon } from "@/components/dashboard/TypeIcon";
 
@@ -11,7 +12,8 @@ const dateFormat = new Intl.DateTimeFormat("en", { month: "short", day: "numeric
 export function ItemCard({ item }: ItemCardProps) {
   const updatedAt = item.updatedAt.toISOString();
   return (
-    <article className={`@container min-w-0 rounded-xl border border-l-2 bg-card/20 ${getTypeStyle(item.type.slug).border}`}>
+    <article className={`@container relative min-w-0 rounded-xl border border-l-2 bg-card/20 ${getTypeStyle(item.type.slug).border}`}>
+      <ItemDrawerTrigger id={item.id} title={item.title} />
       <div className="flex min-w-0 items-start gap-2 p-3 @min-[320px]:gap-4 @min-[320px]:p-5">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/50 @min-[320px]:size-10">
           <TypeIcon typeId={item.type.slug} label={item.type.name} />

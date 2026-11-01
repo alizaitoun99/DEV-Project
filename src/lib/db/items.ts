@@ -3,6 +3,28 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
+export async function getItemDetail(userId: string, id: string) {
+  const item = await prisma.item.findFirst({
+    where: { id, userId },
+    select: {
+      ...itemSelect(userId), content: true, url: true, language: true,
+      createdAt: true, fileName: true, fileSize: true, fileMimeType: true,
+      collections: {
+        where: { collection: { userId } },
+        orderBy: { collection: { name: "asc" } },
+        select: { collection: { select: { id: true, name: true } } },
+      },
+    },
+  });
+  if (!item) return null;
+  return {
+    ...item, fileSize: item.fileSize?.toString() ?? null,
+    createdAt: item.createdAt.toISOString(), updatedAt: item.updatedAt.toISOString(),
+  };
+}
+
+export type ItemDetail = NonNullable<Awaited<ReturnType<typeof getItemDetail>>>;
+
 export interface ItemSummary {
   id: string;
   title: string;

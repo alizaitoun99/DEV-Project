@@ -1,0 +1,101 @@
+"use client";
+
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { Copy, Pencil, Pin, Star, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import type { ItemDetail } from "@/lib/db/items";
+import { TypeIcon } from "@/components/dashboard/TypeIcon";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+
+interface Selection { id: string; title: string; }
+interface ItemDrawerProviderProps { children: ReactNode; }
+const DrawerContext = createContext<((item: Selection, trigger: HTMLButtonElement) => void) | null>(null);
+const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "long", timeZone: "UTC" });
+
+export function ItemDrawerTrigger({ id, title }: Selection) {
+  const open = useContext(DrawerContext);
+  return <button type="button" aria-label={`View ${title}`} aria-haspopup="dialog" onClick={(event) => open?.({ id, title }, event.currentTarget)} className="absolute inset-0 z-10 cursor-pointer rounded-xl outline-none hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring" />;
+}
+
+export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const [item, setItem] = useState<ItemDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!selection) return;
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const response = await fetch(`/api/items/${encodeURIComponent(selection!.id)}`, { signal: controller.signal, cache: "no-store" });
+        if (!response.ok) throw new Error(response.status === 404 ? "Item not found." : response.status === 401 ? "Your session expired. Sign in again." : "Unable to load item. Please try again.");
+        const result: { data: ItemDetail } = await response.json();
+        if (!controller.signal.aborted) setItem(result.data);
+      } catch (error) {
+        if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "Unable to load item.");
+      }
+    }
+    void load();
+    return () => controller.abort();
+  }, [selection, attempt]);
+
+  function open(next: Selection, element: HTMLButtonElement) {
+    trigger.current = element;
+    setItem(null);
+    setError(null);
+    setSelection(next);
+  }
+
+  return <DrawerContext.Provider value={open}>
+    {children}
+    <Sheet open={Boolean(selection)} onOpenChange={(open) => { if (!open) setSelection(null); }}>
+      <SheetContent onCloseAutoFocus={(event) => { event.preventDefault(); trigger.current?.focus(); }}>
+        <header className="border-b p-6 pr-12">
+          <div className="flex items-start gap-3">
+            {item && <span className="rounded-lg bg-muted p-3"><TypeIcon typeId={item.type.slug} label={item.type.name} /></span>}
+            <div className="min-w-0">
+              <SheetTitle className="break-words text-xl font-semibold">{item?.title ?? selection?.title ?? "Item details"}</SheetTitle>
+              <SheetDescription className="sr-only">Saved item details</SheetDescription>
+              {item && <p className="mt-2 flex flex-wrap gap-2 text-xs"><span className="rounded bg-muted px-2 py-1">{item.type.name}</span>{item.language && <span className="rounded border px-2 py-1">{item.language}</span>}</p>}
+            </div>
+          </div>
+        </header>
+        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails item={item} />}
+      </SheetContent>
+    </Sheet>
+  </DrawerContext.Provider>;
+}
+
+interface ItemDetailsProps { item: ItemDetail; }
+
+function ItemDetails({ item }: ItemDetailsProps) {
+  const text = item.content ?? item.url;
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text ?? "");
+      toast.success("Copied to clipboard");
+    } catch { toast.error("Unable to copy. Please try again."); }
+  }
+  const safeUrl = item.url && /^https?:\/\//i.test(item.url) ? item.url : null;
+  return <>
+    <div aria-label="Item actions" className="flex flex-wrap items-center gap-1 border-b px-4 py-4">
+      <Button variant="ghost" disabled title="Favorite changes coming later" className={item.isFavorite ? "text-yellow-400" : ""}><Star className={item.isFavorite ? "fill-yellow-400" : ""} />Favorite</Button>
+      <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
+      <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
+      <Button variant="ghost" disabled title="Editing coming later"><Pencil />Edit</Button>
+      <Button variant="ghost" size="icon" disabled title="Deletion coming later" aria-label="Delete item" className="ml-auto text-destructive"><Trash2 /></Button>
+    </div>
+    <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
+      <section><h3 className="mb-3 text-sm text-muted-foreground">Description</h3><p className="whitespace-pre-wrap text-sm">{item.description || "No description"}</p></section>
+      {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3><pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre></section>}
+      {item.url && <section><h3 className="mb-3 text-sm text-muted-foreground">URL</h3>{safeUrl ? <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{item.url}</a> : <p className="text-sm">{item.url}</p>}</section>}
+      {item.fileName && <section><h3 className="mb-3 text-sm text-muted-foreground">File</h3><p className="text-sm">{item.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{[item.fileMimeType, item.fileSize !== null ? `${item.fileSize} bytes` : null].filter(Boolean).join(" · ")}</p></section>}
+      <section className="border-t pt-6"><h3 className="mb-3 text-sm text-muted-foreground">Tags</h3><div className="flex flex-wrap gap-2">{item.tags.length ? item.tags.map(({ tag }) => <span key={tag.name} className="rounded bg-muted px-2 py-1 text-xs">{tag.name}</span>) : <p className="text-sm">No tags</p>}</div></section>
+      <section><h3 className="mb-3 text-sm text-muted-foreground">Collections</h3><div className="flex flex-wrap gap-2">{item.collections.length ? item.collections.map(({ collection }) => <span key={collection.id} className="rounded border px-2 py-1 text-xs">{collection.name}</span>) : <p className="text-sm">No collections</p>}</div></section>
+      <section><h3 className="mb-3 text-sm text-muted-foreground">Details</h3><dl className="space-y-2 text-sm">{[["Created", item.createdAt], ["Updated", item.updatedAt]].map(([label, value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt className="text-muted-foreground">{label}</dt><dd><time dateTime={value}>{dateFormat.format(new Date(value))}</time></dd></div>)}</dl></section>
+    </div>
+  </>;
+}

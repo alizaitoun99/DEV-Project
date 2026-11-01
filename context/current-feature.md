@@ -1,14 +1,26 @@
-# Current Feature
+# Current Feature: Item Drawer
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Open a right-side shadcn Sheet with full item details when an ItemCard is clicked, on both dashboard and items list pages.
+- Manage drawer state in a client wrapper while retaining server-rendered pages and card data.
+- Fetch full item details on click without page navigation and show a skeleton while loading.
+- Display an action bar with Favorite (yellow star when active), Pin, Copy, Edit (pencil), and right-aligned Delete (trash).
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Specification: [Item Drawer](features/item-drawer-spec.md).
+- This drawer is the item detail view; there is no separate item page.
+- Fetch content, collections, language, and other full details through `/api/items/[id]`; the route checks authentication and calls a query in `src/lib/db/items.ts`. Scope item access to the authenticated owner.
+- Use [the drawer screenshot](screenshots/dashboard-ui-drawer.png) as the visual reference.
+- This phase covers the details display. Code editors and item-specific features come later; mutation behavior for the action buttons is not specified here.
+- Implementation branch: `feature/item-drawer`. Shared client provider connects server-rendered cards on dashboard and type lists to a right-side Sheet. Includes loading skeletons, retry/error states, request cancellation, keyboard triggers, Escape dismissal, and focus restoration.
+- Displays plain-text content, description, safe HTTP(S) links, file metadata, tags, collections, language, and dates. Copy uses the clipboard with toast feedback. Favorite, Pin, Edit, and Delete are visibly disabled pending their mutation flows.
+- Detail API returns private, non-cacheable JSON with owner-scoped item/tag/collection queries; excludes private storage keys and serializes file sizes safely.
+- Validation: 17 Vitest tests, lint, standalone TypeScript, whitespace checks, and production build passed. Build required an outside-sandbox retry after Windows EPERM. Browser verification remains unconfirmed: local dashboard navigation failed with connection refused and then timed out.
+- Feature test review: expanded item-detail coverage to seven tests, including successful full-detail JSON with null file metadata and authentication-service failure. All 19 unit tests, lint, standalone TypeScript, and whitespace checks pass. Components are excluded by project policy; browser behavior remains unverified. Only tests and documentation changed in this review, so the preceding production build remains the applicable build validation.
 
 ## Testing infrastructure
 

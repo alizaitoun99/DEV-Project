@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { ItemDrawerProvider } from "@/components/items/ItemDrawerProvider";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { getCurrentUser } from "@/lib/current-user";
@@ -21,6 +22,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <Suspense fallback={<div role="status" className="h-full animate-pulse bg-sidebar p-5 text-sm text-muted-foreground">Loading sidebar…</div>}>
         <DashboardSidebar />
       </Suspense>
-    }><Suspense fallback={null}><EmailVerificationReminder /></Suspense>{children}</DashboardShell>
+    }><Suspense fallback={null}><EmailVerificationReminder /></Suspense><ItemDrawerProvider>{children}</ItemDrawerProvider></DashboardShell>
   );
 }
