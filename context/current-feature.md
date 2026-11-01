@@ -1,23 +1,14 @@
-# Current Feature: Item Create
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Open a shadcn Dialog from the top bar's "New Item" button.
-- Support snippet, prompt, command, note, and link types with type-specific fields.
-- Provide required title, optional description, and tags for all types; content and language for snippets/commands, content for prompts/notes, and required URL for links.
-- Add a Zod-validated `createItem` Server Action and a `createItem` query function in `src/lib/db/items.ts`.
-- Show a success toast, close the modal, and refresh after creation.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Item Create](features/item-create-spec.md).
-- File and image creation are outside this specification's type selector.
-- Implemented on `feature/item-create`: top-bar dialog, type-dependent fields, authenticated Zod-validated Server Action, and transactional item/tag creation with owner-scoped case-insensitive tag identities. Links require HTTP(S) URLs. No schema or dependency changes.
-- Validation: all 81 Vitest tests passed (24 new creation tests), ESLint, standalone TypeScript, production build, and whitespace checks passed. The build required an outside-sandbox retry after Windows EPERM.
-- Development browser checks on port 3001 verified real note creation, modal dismissal and dashboard refresh, fixture cleanup through item deletion, type-dependent link fields, reset on reopening, Escape/focus restoration, and no horizontal overflow at 390px and 1440px. Screenshots: [mobile](../artifacts/item-create-mobile.png), [desktop](../artifacts/item-create-desktop.png). Existing development route diagnostics appeared during checks. Other item types were covered by mocked action/data tests rather than live browser creation.
-- Existing auth integration scripts were not rerun because authentication behavior is unchanged. Implementation remains uncommitted for review.
+<!-- Load a feature specification to begin. -->
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -101,3 +92,6 @@
 
 - 2026-11-01: Completed Item Deletion on feature/item-deletion, committed as 6c9dccb and merged into main; deleted the merged local branch. Enabled drawer deletion with an accessible Radix confirmation dialog matching existing shadcn styling, Cancel/Delete actions, pending protection, inline/toast errors, success toast, drawer dismissal, and route refresh. The validated Server Action derives ownership from the session; atomic owner-scoped deletion cascades through memberships while preserving collections and tags. Items with private stored file keys remain protected until retryable storage cleanup is implemented. No schema or dependency changes.
 - 2026-11-01: All 57 Vitest tests (including 14 deletion tests), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity failures. Browser attempts at localhost and 127.0.0.1 timed out; desktop/mobile interaction checks remain unconfirmed. Existing auth integration scripts were not rerun because authentication behavior was unchanged. Cleared the active feature tracker at the user's completion request.
+
+- 2026-11-01: Completed [Item Create](features/item-create-spec.md) on feature/item-create, committed as 7d36462 and merged into main; deleted the merged local branch. Added the top-bar shadcn-style Dialog with snippet, prompt, command, note, and link selection, type-dependent fields, pending protection, validation feedback, success toast, modal dismissal, and dashboard refresh. Authenticated Zod validation and transactional persistence derive ownership from the session, restrict creation to system types, require HTTP(S) URLs for links, and deduplicate owner-scoped tags case-insensitively. No schema or dependency changes.
+- 2026-11-01: All 81 Vitest tests (24 new creation tests), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Development browser checks verified live note creation and dashboard refresh, test-item cleanup, link-specific fields, reset on reopening, Escape/focus restoration, and no horizontal overflow at 390px and 1440px. Screenshots: [mobile](../artifacts/item-create-mobile.png), [desktop](../artifacts/item-create-desktop.png). A dashboard prerender crypto diagnostic appeared in development; the production build passed. Other types used mocked action/data tests; existing auth integration scripts were not rerun because auth behavior is unchanged. Cleared the active feature tracker at the user's completion request.
