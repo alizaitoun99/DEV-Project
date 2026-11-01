@@ -1,6 +1,6 @@
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { CreateItemDialog } from "@/components/items/CreateItemDialog";
 import { Input } from "@/components/ui/input";
 
 interface DashboardHeaderProps {
@@ -24,10 +24,7 @@ export function DashboardHeader({ sidebarToggle }: DashboardHeaderProps) {
           readOnly
         />
       </div>
-      <Button type="button" aria-disabled="true" className="h-11 shrink-0 sm:ml-auto">
-        <Plus aria-hidden="true" />
-        New Item
-      </Button>
+      <CreateItemDialog />
     </header>
   );
 }

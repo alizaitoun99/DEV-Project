@@ -10,3 +10,11 @@ export const itemUpdateSchema = z.object({
 });
 
 export type ItemUpdateInput = z.infer<typeof itemUpdateSchema>;
+
+export const itemCreateSchema = itemUpdateSchema.extend({
+  type: z.enum(["snippet", "prompt", "command", "note", "link"]),
+}).refine((input) => input.type !== "link" || Boolean(input.url), {
+  path: ["url"], message: "URL is required for links.",
+});
+
+export type ItemCreateInput = z.infer<typeof itemCreateSchema>;

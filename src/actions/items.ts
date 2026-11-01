@@ -5,6 +5,23 @@ import { updateItem as persistItem, type ItemDetail } from "@/lib/db/items";
 import { itemUpdateSchema } from "@/lib/item-validation";
 import { z } from "zod";
 import { deleteItem as removeItem } from "@/lib/db/items";
+import { createItem as insertItem } from "@/lib/db/items";
+import { itemCreateSchema } from "@/lib/item-validation";
+
+type CreateResult = { success: true; data: { id: string } } | { success: false; error: string };
+
+export async function createItem(input: unknown): Promise<CreateResult> {
+  try {
+    const session = await auth();
+    if (!session?.user.id) return { success: false, error: "Please sign in again." };
+    const parsed = itemCreateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("\n") };
+    const item = await insertItem(session.user.id, parsed.data);
+    return item ? { success: true, data: item } : { success: false, error: "This item type is unavailable." };
+  } catch {
+    return { success: false, error: "Unable to create item. Please try again." };
+  }
+}
 
 type DeleteResult = { success: true } | { success: false; error: string };
 

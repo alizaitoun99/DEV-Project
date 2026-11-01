@@ -1,14 +1,23 @@
-# Current Feature
+# Current Feature: Item Create
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Open a shadcn Dialog from the top bar's "New Item" button.
+- Support snippet, prompt, command, note, and link types with type-specific fields.
+- Provide required title, optional description, and tags for all types; content and language for snippets/commands, content for prompts/notes, and required URL for links.
+- Add a Zod-validated `createItem` Server Action and a `createItem` query function in `src/lib/db/items.ts`.
+- Show a success toast, close the modal, and refresh after creation.
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Specification: [Item Create](features/item-create-spec.md).
+- File and image creation are outside this specification's type selector.
+- Implemented on `feature/item-create`: top-bar dialog, type-dependent fields, authenticated Zod-validated Server Action, and transactional item/tag creation with owner-scoped case-insensitive tag identities. Links require HTTP(S) URLs. No schema or dependency changes.
+- Validation: all 81 Vitest tests passed (24 new creation tests), ESLint, standalone TypeScript, production build, and whitespace checks passed. The build required an outside-sandbox retry after Windows EPERM.
+- Development browser checks on port 3001 verified real note creation, modal dismissal and dashboard refresh, fixture cleanup through item deletion, type-dependent link fields, reset on reopening, Escape/focus restoration, and no horizontal overflow at 390px and 1440px. Screenshots: [mobile](../artifacts/item-create-mobile.png), [desktop](../artifacts/item-create-desktop.png). Existing development route diagnostics appeared during checks. Other item types were covered by mocked action/data tests rather than live browser creation.
+- Existing auth integration scripts were not rerun because authentication behavior is unchanged. Implementation remains uncommitted for review.
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.

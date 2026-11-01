@@ -3,6 +3,29 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
+export async function createItem(userId: string, input: import("@/lib/item-validation").ItemCreateInput) {
+  return prisma.$transaction(async (tx) => {
+    const type = await tx.itemType.findFirst({
+      where: { slug: input.type, isSystem: true, userId: null, kind: input.type === "link" ? "URL" : "TEXT" },
+      select: { id: true },
+    });
+    if (!type) return null;
+    const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
+    return tx.item.create({
+      data: {
+        userId, typeId: type.id, title: input.title, description: input.description ?? null,
+        content: input.type === "link" ? null : input.content ?? null,
+        language: ["snippet", "command"].includes(input.type) ? input.language ?? null : null,
+        url: input.type === "link" ? input.url : null,
+        tags: { create: tags.map(([slug, name]) => ({ tag: { connectOrCreate: {
+          where: { userId_slug: { userId, slug } }, create: { userId, slug, name },
+        } } })) },
+      },
+      select: { id: true },
+    });
+  });
+}
+
 export async function getItemDetail(userId: string, id: string, db: Prisma.TransactionClient = prisma) {
   const item = await db.item.findFirst({
     where: { id, userId },
