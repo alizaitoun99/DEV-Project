@@ -1,29 +1,14 @@
-# Current Feature: Item Deletion
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Enable Delete in the item drawer for authenticated users.
-- Show a shadcn/ui confirmation dialog before permanently deleting an item, with clear Delete and Cancel actions.
-- Delete only items owned by the signed-in user through a validated Server Action.
-- On success, close the drawer, refresh affected item lists and counts, and show a success toast.
-- Keep the confirmation open and show useful error feedback if deletion fails; prevent duplicate submissions while pending.
-- Add meaningful mocked Server Action and utility tests for validation, authorization, successful deletion, and failure handling.
+<!-- No active feature. -->
 
 ## Notes
 
-- Loaded from the user's inline description using the feature load workflow.
-- Interpret "shadow UI confirmation" as a shadcn/ui confirmation dialog, consistent with the project's existing components.
-- Cancel must preserve the item. Confirmation should identify the item and explain that deletion is permanent and removes its collection memberships.
-- Use existing Sonner toast conventions and accessible dialog focus/keyboard behavior.
-- Preserve collections and tags themselves when deleting their item memberships.
-- Respect the project's storage lifecycle requirements for file/image items; account for safe storage cleanup if stored objects are supported by the implementation.
-- Implementation branch: `feature/item-deletion`.
-- Upload/storage cleanup is not implemented. Items with non-null private file keys are preserved with actionable error feedback until a retryable cleanup lifecycle exists; metadata-only file/image items can be deleted.
-- Implemented drawer deletion confirmation using the existing Radix/shadcn styling and Sonner patterns, pending protection, inline/toast errors, owner-scoped deletion, drawer dismissal, and route refresh. Existing foreign-key cascades remove memberships while retaining collections and tags.
-- Validation: all 57 Vitest tests passed, including 14 new deletion tests; ESLint, standalone TypeScript, and whitespace checks passed. Browser checks at localhost and 127.0.0.1 timed out; desktop/mobile interaction verification remains unconfirmed. Existing auth integration scripts were not run because authentication behavior is unchanged.
-- Production build passed outside the sandbox after the initial Windows EPERM failure. No schema or dependency changes were needed.
+<!-- Load a feature specification to begin. -->
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -104,3 +89,6 @@
 - 2026-11-01: Completed [Item Drawer — Edit Mode](features/item-drawer-edit-spec.md) on `feature/item-drawer-edit`, committed as `b8c6511`, and merged into `main`. Added inline controlled editing with Save/Cancel, type-specific fields, pending controls, validation errors and toast feedback. Saves return updated details and refresh underlying cards; Cancel discards edits. Item type, collections, dates, and file metadata remain protected.
 - 2026-11-01: Added a Zod-validated authenticated Server Action and owner-scoped transactional item/tag updates with case-insensitive per-owner tag identities. No schema migration or dependency changes. Review found no confirmed code defects. All 43 Vitest tests passed, including 24 edit-feature action/data tests covering authorization, validation, safe URLs, field clearing, tag replacement, type-specific persistence, errors, and serialization. Auth and Prisma were mocked; live database mutation/rollback was not verified.
 - 2026-11-01: Final production build, ESLint, standalone TypeScript, migration status, and staged whitespace checks passed. The final build ran outside the sandbox because the earlier sandbox build hit Windows EPERM. Browser interactions and responsive layouts remain unconfirmed after local connection failures; existing auth integration scripts were not rerun because those flows are unchanged. Closed out at the user's completion request and cleared the active feature tracker.
+
+- 2026-11-01: Completed Item Deletion on feature/item-deletion, committed as 6c9dccb and merged into main; deleted the merged local branch. Enabled drawer deletion with an accessible Radix confirmation dialog matching existing shadcn styling, Cancel/Delete actions, pending protection, inline/toast errors, success toast, drawer dismissal, and route refresh. The validated Server Action derives ownership from the session; atomic owner-scoped deletion cascades through memberships while preserving collections and tags. Items with private stored file keys remain protected until retryable storage cleanup is implemented. No schema or dependency changes.
+- 2026-11-01: All 57 Vitest tests (including 14 deletion tests), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity failures. Browser attempts at localhost and 127.0.0.1 timed out; desktop/mobile interaction checks remain unconfirmed. Existing auth integration scripts were not rerun because authentication behavior was unchanged. Cleared the active feature tracker at the user's completion request.
