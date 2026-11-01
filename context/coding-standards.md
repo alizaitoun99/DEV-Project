@@ -95,3 +95,11 @@ Example v4 configuration:
 - No commented-out code unless specified
 - No unused imports or variables
 - Keep functions under 50 lines when possible
+
+## Unit Testing
+
+- Use Vitest for Server Actions and utilities only; no component unit tests.
+- Colocate `*.test.ts` files under `src/actions/` and `src/lib/`.
+- Test behavior, validation, authorization, and meaningful error paths.
+- Mock auth, Prisma, external services, and Next.js request APIs; no secrets or live infrastructure.
+- Import test APIs from `vitest`; see [Testing](../docs/testing.md).

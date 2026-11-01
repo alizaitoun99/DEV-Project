@@ -23,6 +23,8 @@ Use npm and keep `package-lock.json` synchronized with dependency changes.
 - `npm run dev`: start the local development server at `http://localhost:3000`.
 - `npm run build`: create the production build.
 - `npm start`: serve the production build after building.
+- `npm test`: run Vitest unit tests once.
+- `npm run test:watch`: watch unit tests during development.
 - `npm run lint`: run the configured ESLint checks.
 - `npx tsc --noEmit`: check TypeScript without emitting JavaScript.
 
@@ -32,7 +34,7 @@ Use two-space indentation, double quotes, and semicolons in TypeScript, matching
 
 ## Testing Guidelines
 
-There is currently no test framework, test script, or coverage threshold. For changes, run lint, type checking, and the production build; manually verify affected routes and responsive layouts. Report failing checks explicitly. When adding automated tests, document the framework and command and use descriptive filenames such as `Component.test.tsx`.
+Use Vitest in Node for Server Actions and utilities only; no component unit tests. Colocate `*.test.ts` files under `src/actions/` or `src/lib/`. Mock external services and request context so unit tests need no credentials or live database. Run `npm test`, lint, type checking, and the production build; manually verify affected routes and responsive layouts for UI changes. Existing Node regression scripts remain separate. No coverage threshold is configured. Report skipped or failing checks explicitly. See [Testing](docs/testing.md).
 
 ## Commit & Pull Request Guidelines
 

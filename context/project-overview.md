@@ -16,6 +16,8 @@ Password recovery adds a sign-in link, email request form, and password reset fo
 
 The protected `/profile` page now includes account creation date, owner-scoped usage totals and type counts, credentials-only password changes with current-password verification, and confirmed account deletion. Account actions are validated and throttled; password changes invalidate reset links, and account deletion cascades through owned database records. See [authentication security](auth-security.md) for session behavior and regression checks.
 
+Vitest is configured for Server Action and utility unit tests, with mocked dependencies and no live services. Components are outside the unit testing scope. See [Testing](../docs/testing.md).
+
 ## Design
 
 Refer to the screenshot below as a base for the dashboard. It does not have to be exact, use it as a reference:
@@ -349,7 +351,7 @@ The drawer can be controlled by local UI state or URL-based intercepted/parallel
 | AI | OpenAI `gpt-5-nano` | Verify model availability, API support and current pricing before implementation |
 | Billing | Stripe | Checkout, customer portal, verified webhooks |
 | Caching | None initially | Add Redis only for a measured bottleneck |
-| Testing | Vitest + Playwright (suggested) | Unit, integration, end-to-end |
+| Testing | Vitest + existing Node regression scripts | Server Action and utility unit tests only; Playwright E2E remains planned |
 | CI | GitHub Actions (suggested) | Typecheck, lint, test, build, migration checks |
 
 ### Suggested code organization

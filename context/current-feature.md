@@ -10,6 +10,10 @@
 
 <!-- Load a feature specification to begin. -->
 
+## Testing infrastructure
+
+- 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
+
 ## History project
 
 - 2026-10-23: Completed the dashboard mock-data file with seven types, six collections, and nine representative items.
