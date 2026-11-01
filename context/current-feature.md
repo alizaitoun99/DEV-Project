@@ -1,37 +1,14 @@
-# Current Feature: Item Drawer — Edit Mode
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Toggle the existing item drawer inline between view and edit modes, with Save and Cancel replacing the action bar.
-- Edit title, description, and comma-separated tags for all item types; show content for snippets, prompts, commands, and notes, language for snippets and commands, and URL for links.
-- Keep item type, collections, and created/updated dates display-only; Cancel discards unsaved changes.
-- Validate updates with Zod in an authenticated, owner-scoped `updateItem(itemId, data)` Server Action in `src/actions/items.ts`, using the `{ success, data, error }` response pattern.
-- Persist updates through `src/lib/db/items.ts`, replace tag associations with user-scoped connect-or-create tags, and return the updated `ItemDetail`.
-- On save success, return to view mode with refreshed detail data, show toast feedback, and call `router.refresh()` to update underlying cards; display validation and save errors.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Item Drawer — Edit Mode](features/item-drawer-edit-spec.md).
-- Use controlled inputs and local state without a form library; use a plain textarea for content.
-- Require a trimmed, non-empty title and disable Save when the title is empty. Validate nullable/optional description, content, language, and URL plus trimmed, non-empty tag strings server-side.
-- Preserve authenticated ownership boundaries for items and tags, and restrict link URLs to safe HTTP(S) schemes as required by project standards.
-- Implementation branch: `feature/item-drawer-edit`.
-## Implementation and validation
-
-- Implemented inline Edit/Save/Cancel with controlled fields, type-specific inputs, pending-state controls, inline errors, and toast feedback. Saves return updated details and refresh underlying cards.
-- Added an authenticated Zod-validated Server Action and an owner-scoped transaction that updates allowed fields and replaces tags using case-insensitive, per-owner connect-or-create identities. Type, collections, file metadata, and dates remain protected.
-- Validation passed: all 35 Vitest tests (16 new action/data tests), ESLint, standalone TypeScript, production build, and whitespace checks. The production build required an outside-sandbox retry after Windows EPERM while generating Next.js types.
-- Browser interaction and responsive layout verification remain unconfirmed: the browser tool could not connect to the local production server (connection refused, then timeout). Existing auth integration scripts were not rerun because those flows are unchanged.
-- No migration or dependency changes. Review found no confirmed code defects. User requested completion after the browser-verification limitation was reported.
-
-## Feature test review
-
-- 2026-11-01: Reviewed the update Server Action, validation schema, and transactional data utility. Expanded tests for nullable field clearing, safe HTTP(S) URLs, field-specific validation errors, all four text types, empty tag replacement, and serialized update results.
-- All 43 Vitest tests passed across five files, including 24 edit-feature action/data tests. Tests mock auth and Prisma; they do not establish live database rollback or browser behavior. No component unit tests added; no coverage percentage measured.
-- Production code is unchanged by this test action; the previously passing production build remains applicable. Browser verification remains pending due to the recorded connection failures.
-
+<!-- Load a feature specification to begin. -->
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -109,3 +86,6 @@
 
 - 2026-11-01: Completed [Item Drawer](features/item-drawer-spec.md) on `feature/item-drawer`, committed as `d178d90`, and merged into `main`; deleted the merged local branch. Dashboard and type-list ItemCards open a shared right-side shadcn Sheet with on-demand authenticated detail fetching, loading skeletons, error/retry states, request cancellation, keyboard triggers, Escape dismissal, and focus restoration. Displays description, plain-text content, safe HTTP(S) links, language, file metadata, tags, collections, and dates. Copy includes toast feedback; Favorite, Pin, Edit, and Delete remain visibly disabled for this details-display phase. No schema or dependency changes.
 - 2026-11-01: Item detail API uses owner-scoped item/tag/collection queries, excludes private storage keys, returns non-cacheable JSON, and safely serializes file sizes/dates. Validation passed: all 19 Vitest tests (seven item-detail tests), lint, standalone TypeScript, production build, migration status, and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity errors. Browser layout and interaction verification remain unconfirmed after connection refused and timeout errors. Existing integration scripts were not rerun because auth and other integration code were unchanged. Cleared the feature tracker at the user's completion request.
+- 2026-11-01: Completed [Item Drawer — Edit Mode](features/item-drawer-edit-spec.md) on `feature/item-drawer-edit`, committed as `b8c6511`, and merged into `main`. Added inline controlled editing with Save/Cancel, type-specific fields, pending controls, validation errors and toast feedback. Saves return updated details and refresh underlying cards; Cancel discards edits. Item type, collections, dates, and file metadata remain protected.
+- 2026-11-01: Added a Zod-validated authenticated Server Action and owner-scoped transactional item/tag updates with case-insensitive per-owner tag identities. No schema migration or dependency changes. Review found no confirmed code defects. All 43 Vitest tests passed, including 24 edit-feature action/data tests covering authorization, validation, safe URLs, field clearing, tag replacement, type-specific persistence, errors, and serialization. Auth and Prisma were mocked; live database mutation/rollback was not verified.
+- 2026-11-01: Final production build, ESLint, standalone TypeScript, migration status, and staged whitespace checks passed. The final build ran outside the sandbox because the earlier sandbox build hit Windows EPERM. Browser interactions and responsive layouts remain unconfirmed after local connection failures; existing auth integration scripts were not rerun because those flows are unchanged. Closed out at the user's completion request and cleared the active feature tracker.
