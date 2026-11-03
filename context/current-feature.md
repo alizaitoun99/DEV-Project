@@ -1,25 +1,16 @@
-# Current Feature: Image Gallery View
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Replace regular image item cards with image thumbnail cards.
-- Display images in a three-column grid/gallery.
-- Show thumbnails at a 16:9 aspect ratio using `aspect-video`.
-- Use `object-cover` to fill each thumbnail, allowing cropped edges.
-- Add a subtle 5% hover zoom with a 300ms transition.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Image Gallery View](features/image-display-spec.md).
-- Branch: `feature/image-gallery`.
-- Reuse the owner-authorized preview endpoint and preserve drawer interactions.
-- Responsive gallery: one column on phones, two on medium screens, three on wide screens.
-- Implemented thumbnail cards for image items across existing card surfaces, with 16:9 cropped previews, 5% hover/focus zoom over 300ms, reduced-motion support, and unavailable-preview placeholders. Image cards retain metadata and the existing drawer trigger.
-- Validation: all 134 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The final build passed outside the sandbox after earlier memory and Windows EPERM failures. No component unit tests added under project policy. Browser navigation failed with `ERR_ABORTED`, so visual and interaction verification remains unconfirmed. Existing auth integration scripts were not rerun because those flows are unchanged. No schema or dependency changes; no commits made.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -118,3 +109,6 @@ In Progress
 - 2026-11-03: Completed [File and Image Upload with Supabase Storage](features/file-image-spec.md) on `feature/file-image-upload`, committed as `ef4280a`, and merged into `main`; deleted the merged local feature branch. Added signed direct uploads with progress, file/image creation, server-side size/MIME/content verification, safe bitmap previews and SVG placeholders, and owner-authorized streamed downloads. Supabase remains Storage-only; Neon/Prisma and Auth.js remain in place. Added format-validation dependencies and synchronized the lockfile.
 - 2026-11-03: Applied migration `20261103073814_storage_object_lifecycle` and confirmed the private bucket's 10 MiB maximum and MIME allowlist. The durable storage ledger handles upload failures, abandonment, and item/account deletion; the existing bulk-user maintenance script also queues storage cleanup before cascading. Retryable cleanup retains records across failures and account deletion. Vercel cleanup is scheduled daily; deployment requires `CRON_SECRET`, with operational instructions in [Supabase Storage](../docs/supabase-storage.md).
 - 2026-11-03: Final validation passed: all 134 mocked Vitest tests, ESLint, standalone TypeScript, migration status, and staged whitespace checks. Production builds were explicitly skipped at the user's instruction. No E2E tests were created or run. Browser interaction/responsive verification remains unconfirmed after a navigation timeout. The existing profile integration script was attempted during implementation and failed on database connectivity; it was not rerun. Dependency audit reported eight existing production advisories, including critical DOMPurify through Monaco; unrelated remediation remains outstanding. Closed out at the user's completion request, cleared the tracker, and preserved unrelated testing documentation, ignore-rule, and environment-example edits outside the feature commits.
+
+- 2026-11-03: Completed [Image Gallery View](features/image-display-spec.md) on `feature/image-gallery`, committed as `3b052ba` and merged into `main`; deleted the merged local branch. Image items now use thumbnail cards across existing card surfaces, with 16:9 object-cover previews, 5% hover/focus zoom over 300ms, reduced-motion support, and unavailable-preview placeholders. The image route uses one, two, or three columns by screen width; drawer interactions, titles, tags, dates, and favorite/pin indicators are preserved. Previews reuse the owner-authorized private download endpoint; no schema or dependency changes.
+- 2026-11-03: All 134 Vitest tests, ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. The final build passed outside the sandbox after memory and Windows EPERM failures; migration status passed with network access after a sandbox connectivity failure. Browser verification remains unconfirmed after navigation failed with ERR_ABORTED. No component unit tests added under project policy; unchanged auth integration scripts were not rerun. Cleared the feature tracker at the user completion request and preserved unrelated local edits outside feature commits.
