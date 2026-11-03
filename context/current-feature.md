@@ -1,26 +1,16 @@
-# Current Feature: File List View
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Display `/items/files` as a single-column list of rows instead of grid cards.
-- Show an extension-based file icon, file name, file size, upload date, and download button in each row.
-- Highlight rows on hover and open ItemDrawer when a row is clicked.
-- Trigger a direct download from the download button without opening the drawer (stop propagation).
-- Stack file information vertically on mobile.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [File List View](features/file-display-spec.md).
-- Worktree: `file-display`; created from committed HEAD, preserving the separate Image Gallery work in the source checkout.
-- Branch: `feature/file-list-view`.
-- Implemented a file-only list with extension icons, original filename, formatted size, upload date, hover/focus feedback, existing drawer triggers, and direct download controls that stop propagation. Container queries stack metadata when the row is narrow.
-- Added an owner/type-scoped file metadata query and regression test excluding storage keys and contents. No schema or dependency changes.
-- Validation: all 135 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. Initial dependency installation failed on sandbox DNS; installation and build required outside-sandbox retries. The final build inherited existing source-checkout environment settings in memory without copying environment files.
-- Browser interaction and responsive verification remain unconfirmed: localhost navigation failed with connection refusal and timeout. Existing integration scripts were not rerun because auth/storage behavior is unchanged. Dependency installation reported 23 advisories (3 low, 19 moderate, 1 critical); dependencies were unchanged.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -122,3 +112,6 @@ In Progress
 
 - 2026-11-03: Completed [Image Gallery View](features/image-display-spec.md) on `feature/image-gallery`, committed as `3b052ba` and merged into `main`; deleted the merged local branch. Image items now use thumbnail cards across existing card surfaces, with 16:9 object-cover previews, 5% hover/focus zoom over 300ms, reduced-motion support, and unavailable-preview placeholders. The image route uses one, two, or three columns by screen width; drawer interactions, titles, tags, dates, and favorite/pin indicators are preserved. Previews reuse the owner-authorized private download endpoint; no schema or dependency changes.
 - 2026-11-03: All 134 Vitest tests, ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. The final build passed outside the sandbox after memory and Windows EPERM failures; migration status passed with network access after a sandbox connectivity failure. Browser verification remains unconfirmed after navigation failed with ERR_ABORTED. No component unit tests added under project policy; unchanged auth integration scripts were not rerun. Cleared the feature tracker at the user completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-03: Completed [File List View](features/file-display-spec.md) in the `file-display` worktree on `feature/file-list-view`. Added single-column file rows with extension icons, original filenames, formatted sizes, upload dates, hover/focus feedback, drawer access, separate direct downloads, and metadata stacking based on available width. Added an owner/type-scoped metadata query and regression test excluding private storage keys and contents. Integrated the completed Image Gallery changes from main, preserving its three-column layout. No schema or dependency changes.
+- 2026-11-03: Validation passed after integration: all 135 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks. Browser interaction/responsive verification remains unconfirmed after connection refusal and timeout. Dependency installation and production build required outside-sandbox retries; build settings were inherited from the source checkout in memory. Existing auth/storage integration scripts were not rerun because their behavior was unchanged. Dependency installation reported 23 advisories (3 low, 19 moderate, 1 critical); dependencies were unchanged. Closed out at the user's completion request and cleared the active tracker.
