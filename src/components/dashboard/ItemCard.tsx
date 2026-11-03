@@ -1,4 +1,5 @@
 import { Pin, Star } from "lucide-react";
+import { ImageThumbnail } from "@/components/items/ImageThumbnail";
 import { ItemDrawerTrigger } from "@/components/items/ItemDrawerProvider";
 import type { ItemSummary } from "@/lib/db/items";
 import { getTypeStyle, TypeIcon } from "@/components/dashboard/TypeIcon";
@@ -11,6 +12,24 @@ const dateFormat = new Intl.DateTimeFormat("en", { month: "short", day: "numeric
 
 export function ItemCard({ item }: ItemCardProps) {
   const updatedAt = item.updatedAt.toISOString();
+  if (item.type.slug === "image") return (
+    <article className={`group relative min-w-0 overflow-hidden rounded-xl border border-l-2 bg-card/20 ${getTypeStyle(item.type.slug).border}`}>
+      <ItemDrawerTrigger id={item.id} title={item.title} />
+      <ImageThumbnail id={item.id} title={item.title} mime={item.fileMimeType} />
+      <div className="space-y-2 p-4">
+        <div className="flex items-start gap-2">
+          <h3 className="min-w-0 flex-1 break-words font-medium">{item.title}</h3>
+          {item.isPinned && <Pin aria-label="Pinned item" className="mt-1 size-3.5 shrink-0 text-muted-foreground" />}
+          {item.isFavorite && <Star aria-label="Favorite item" className="mt-1 size-4 shrink-0 fill-yellow-400 text-yellow-400" />}
+        </div>
+        {item.description && <p className="line-clamp-2 break-words text-sm text-muted-foreground">{item.description}</p>}
+        {item.tags.length > 0 && <ul aria-label="Tags" className="flex flex-wrap gap-2">
+          {item.tags.map(({ tag }) => <li key={tag.name} className="break-all rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{tag.name}</li>)}
+        </ul>}
+        <time dateTime={updatedAt} className="block text-xs text-muted-foreground">Updated {dateFormat.format(item.updatedAt)}</time>
+      </div>
+    </article>
+  );
   return (
     <article className={`@container relative min-w-0 rounded-xl border border-l-2 bg-card/20 ${getTypeStyle(item.type.slug).border}`}>
       <ItemDrawerTrigger id={item.id} title={item.title} />

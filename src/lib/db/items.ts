@@ -164,6 +164,7 @@ export interface ItemSummary {
   id: string;
   title: string;
   description: string | null;
+  fileMimeType: string | null;
   isPinned: boolean;
   isFavorite: boolean;
   updatedAt: Date;
@@ -174,7 +175,7 @@ export interface ItemSummary {
 function itemSelect(userId: string) {
   return {
     id: true, title: true, description: true, isPinned: true, isFavorite: true,
-    updatedAt: true,
+    updatedAt: true, fileMimeType: true,
     type: { select: { slug: true, name: true } },
     tags: {
       where: { tag: { userId } },
