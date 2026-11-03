@@ -1,24 +1,14 @@
-# Current Feature: Markdown Editor
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Create a reusable MarkdownEditor for notes and prompts with Write/Preview tabs using react-markdown and remark-gfm.
-- Integrate the editor into NewItemDialog and ItemDrawer edit mode for note and prompt content.
-- Render note and prompt content in ItemDrawer using readonly Preview mode.
-- Provide a header copy button matching CodeEditor and fluid height capped at 400px.
-- Style headings, code blocks, inline code, lists, blockquotes, links, and tables for the existing dark theme.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Markdown Editor Spec](features/markdown-editor-spec.md).
-- Edit mode defaults to Write with Preview available; readonly mode shows only Preview.
-- Use a `bg-[#1e1e1e]` container and `bg-[#2d2d2d]` header, with a custom `.markdown-preview` CSS class for reliable styling.
-- Keep the existing CodeEditor for snippets and commands unchanged; MarkdownEditor applies only to notes and prompts.
-- Implemented on `feature/markdown-editor`: shared MarkdownEditor, create/edit integration, readonly drawer preview, GitHub Flavored Markdown, copy feedback, and dark preview styles. Added react-markdown and remark-gfm with synchronized lockfile; no schema changes.
-- Validation: all 81 Vitest tests, ESLint, standalone TypeScript, and whitespace checks passed. Production build passed outside the sandbox after a Windows EPERM error. No component unit tests added under the project testing policy; Server Actions and utilities are unchanged, so existing auth integration scripts were not rerun.
-- Browser verification remains unconfirmed: Chrome reported connection refused, then timed out reaching the running localhost production server. Desktop/mobile layout, tab interaction, copy, and live persistence need manual verification. Preserved the unrelated local docs/testing.md edit; no commit made.
+<!-- Load a feature specification to begin. -->
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -109,3 +99,6 @@
 - 2026-11-03: Completed [Code Editor](features/code-editor-spec.md) on `feature/code-editor`, committed as `34bbd3f`, and merged into `main`. Added a reusable lazy-loaded dark Monaco editor for snippet/command creation, editing, and readonly drawer display, with macOS window dots, language labels, copy feedback, theme-matched scrollbars, keyboard Tab navigation, and fluid height capped below 400px. Other types retain their existing textareas. The default jsDelivr loader has an editable/copyable plain-text fallback when unavailable. Added type-specific creation buttons with correct initial/reset selections for snippets, prompts, commands, notes, and links; file/image buttons remain disabled pending upload support. Added Monaco dependencies and synchronized the lockfile; no schema migration.
 - 2026-11-03: Validation passed: all 81 Vitest tests, ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows permission/connectivity failures. Production browser checks verified live creation, edit/save, Cancel, readonly protection, full-content copying, type switching, preselection/reset across all five supported routes, disabled file/image buttons, Escape, Tab navigation, and responsive layouts at 390px/1440px. A 60-line sample capped the full editor at approximately 398px with no horizontal overflow; deliberately blocked CDN checks confirmed fallback editing/copying. Removed the temporary database item. Screenshots: [desktop](../artifacts/code-editor-desktop.png), [mobile](../artifacts/code-editor-mobile.png), [type-page add button](../artifacts/type-page-add-mobile.png).
 - 2026-11-03: Recorded one Monaco cancellation promise error during editor disposal and a Next.js crypto.getRandomValues prerender diagnostic on the type route; subsequent browser interactions and persistence passed. Existing auth integration scripts were not rerun because those flows were unchanged. Closed out at the user's completion request, cleared the active feature tracker, and preserved the unrelated local docs/testing.md edit outside feature commits.
+
+- 2026-11-03: Completed [Markdown Editor](features/markdown-editor-spec.md) on `feature/markdown-editor`, committed as `34c6195`, and merged into `main`; deleted the merged local branch. Added a shared MarkdownEditor with accessible Write/Preview tabs, GitHub Flavored Markdown via react-markdown and remark-gfm, readonly note/prompt drawer previews, copy feedback, dark typography/table/code styles, and fluid height capped below 400px. Integrated note/prompt creation and editing; existing snippet/command CodeEditor unchanged. Dependencies and lockfile synchronized; no schema changes. Review found no confirmed code defects.
+- 2026-11-03: Validation passed: all 81 Vitest tests, ESLint, standalone TypeScript, final production build, migration status, and staged whitespace checks. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Browser verification remains unconfirmed after Chrome localhost connection refusal and timeout; tab/copy/save interactions and desktop/mobile layouts need manual verification. No component unit tests added under project policy; existing auth integration scripts were not rerun because those flows were unchanged. Cleared the feature tracker at the user's completion request and preserved the unrelated local docs/testing.md edit outside feature commits.
