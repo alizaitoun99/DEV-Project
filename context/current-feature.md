@@ -1,32 +1,14 @@
-# Current Feature: Code Editor
+# Current Feature
 
-## Status: In Progress
+## Status: null
 
 ## Goals
 
-- Add type-specific creation buttons on item type pages and preselect the page's type when opening the dialog.
-- Create a reusable Monaco CodeEditor component with a dark theme.
-- Replace textareas for snippets and commands only; retain textareas for notes, prompts, and other non-code types.
-- Support readonly display and editable content.
-- Add macOS-style red, yellow, and green window dots to the editor header.
-- Show the language and a quick copy button in the editor header.
-- Use fluid editor height capped at 400px with a theme-matched scrollbar.
+<!-- No active feature. -->
 
 ## Notes
 
-- Specification: [Code Editor](features/code-editor-spec.md).
-- Apply the editor to snippet and command content in display and edit flows.
-- Implementation branch: `feature/code-editor`.
-- Follow-up: type pages reuse the create dialog with a type-specific add button and reset to that type each time it opens. File/image buttons are disabled with an upload availability message because those types are outside the current create action's supported inputs.
-- Type-page follow-up validation: all 81 tests, ESLint, TypeScript, production build, and whitespace checks passed. Browser checks confirmed preselection and reset on all five supported pages, link URL fields, disabled file/image buttons, and no mobile horizontal overflow. Screenshot: [type-page add button](../artifacts/type-page-add-mobile.png).
-- Production server logged a Next.js `crypto.getRandomValues()` prerender diagnostic for `/items/[type]`; the build and authenticated route interactions passed. Similar diagnostics were recorded during the earlier item-create feature.
-- Implemented shared lazy-loaded Monaco editing in the create dialog and item edit form, plus readonly code display in the drawer. Notes and prompts retain textareas.
-- Monaco uses the wrapper's default jsDelivr CDN loader. A controlled plain-text editor preserves access while Monaco loads or if the CDN is unavailable.
-- Browser verification with the CDN deliberately blocked confirmed fallback editing and copying.
-- Validation: all 81 Vitest tests, ESLint, TypeScript, production build, and whitespace checks passed. The build required an outside-sandbox retry after Windows EPERM. No Server Action or utility logic changed; existing auth integration scripts were not rerun.
-- Production browser checks passed for live snippet creation, persistence, edit/save, Cancel, readonly protection, full-content copying, snippet/command/note switching, Escape, keyboard Tab navigation, and responsive layouts at 390px and 1440px. A 60-line sample capped the full editor at approximately 398px without horizontal overflow. The temporary database item was deleted.
-- Observed one Monaco `Canceled` promise console error during editor disposal; subsequent interactions and persistence checks passed.
-- Screenshots: [desktop](../artifacts/code-editor-desktop.png), [mobile](../artifacts/code-editor-mobile.png).
+<!-- Load a feature specification to begin. -->
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -113,3 +95,7 @@
 
 - 2026-11-01: Completed [Item Create](features/item-create-spec.md) on feature/item-create, committed as 7d36462 and merged into main; deleted the merged local branch. Added the top-bar shadcn-style Dialog with snippet, prompt, command, note, and link selection, type-dependent fields, pending protection, validation feedback, success toast, modal dismissal, and dashboard refresh. Authenticated Zod validation and transactional persistence derive ownership from the session, restrict creation to system types, require HTTP(S) URLs for links, and deduplicate owner-scoped tags case-insensitively. No schema or dependency changes.
 - 2026-11-01: All 81 Vitest tests (24 new creation tests), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks passed. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Development browser checks verified live note creation and dashboard refresh, test-item cleanup, link-specific fields, reset on reopening, Escape/focus restoration, and no horizontal overflow at 390px and 1440px. Screenshots: [mobile](../artifacts/item-create-mobile.png), [desktop](../artifacts/item-create-desktop.png). A dashboard prerender crypto diagnostic appeared in development; the production build passed. Other types used mocked action/data tests; existing auth integration scripts were not rerun because auth behavior is unchanged. Cleared the active feature tracker at the user's completion request.
+
+- 2026-11-03: Completed [Code Editor](features/code-editor-spec.md) on `feature/code-editor`, committed as `34bbd3f`, and merged into `main`. Added a reusable lazy-loaded dark Monaco editor for snippet/command creation, editing, and readonly drawer display, with macOS window dots, language labels, copy feedback, theme-matched scrollbars, keyboard Tab navigation, and fluid height capped below 400px. Other types retain their existing textareas. The default jsDelivr loader has an editable/copyable plain-text fallback when unavailable. Added type-specific creation buttons with correct initial/reset selections for snippets, prompts, commands, notes, and links; file/image buttons remain disabled pending upload support. Added Monaco dependencies and synchronized the lockfile; no schema migration.
+- 2026-11-03: Validation passed: all 81 Vitest tests, ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows permission/connectivity failures. Production browser checks verified live creation, edit/save, Cancel, readonly protection, full-content copying, type switching, preselection/reset across all five supported routes, disabled file/image buttons, Escape, Tab navigation, and responsive layouts at 390px/1440px. A 60-line sample capped the full editor at approximately 398px with no horizontal overflow; deliberately blocked CDN checks confirmed fallback editing/copying. Removed the temporary database item. Screenshots: [desktop](../artifacts/code-editor-desktop.png), [mobile](../artifacts/code-editor-mobile.png), [type-page add button](../artifacts/type-page-add-mobile.png).
+- 2026-11-03: Recorded one Monaco cancellation promise error during editor disposal and a Next.js crypto.getRandomValues prerender diagnostic on the type route; subsequent browser interactions and persistence passed. Existing auth integration scripts were not rerun because those flows were unchanged. Closed out at the user's completion request, cleared the active feature tracker, and preserved the unrelated local docs/testing.md edit outside feature commits.
