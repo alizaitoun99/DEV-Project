@@ -45,7 +45,7 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
         <CreateItemDialog defaultType={slug} triggerLabel={`Add ${slug}`} />
       </div>
       {items.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className={slug === "image" ? "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" : "grid grid-cols-1 gap-4 md:grid-cols-2"}>
           {items.map((item) => <ItemCard key={item.id} item={item} />)}
         </div>
       ) : (

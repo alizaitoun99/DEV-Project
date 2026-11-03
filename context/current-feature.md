@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Image Gallery View
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Replace regular image item cards with image thumbnail cards.
+- Display images in a three-column grid/gallery.
+- Show thumbnails at a 16:9 aspect ratio using `aspect-video`.
+- Use `object-cover` to fill each thumbnail, allowing cropped edges.
+- Add a subtle 5% hover zoom with a 300ms transition.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Image Gallery View](features/image-display-spec.md).
+- Branch: `feature/image-gallery`.
+- Reuse the owner-authorized preview endpoint and preserve drawer interactions.
+- Responsive gallery: one column on phones, two on medium screens, three on wide screens.
+- Implemented thumbnail cards for image items across existing card surfaces, with 16:9 cropped previews, 5% hover/focus zoom over 300ms, reduced-motion support, and unavailable-preview placeholders. Image cards retain metadata and the existing drawer trigger.
+- Validation: all 134 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The final build passed outside the sandbox after earlier memory and Windows EPERM failures. No component unit tests added under project policy. Browser navigation failed with `ERR_ABORTED`, so visual and interaction verification remains unconfirmed. Existing auth integration scripts were not rerun because those flows are unchanged. No schema or dependency changes; no commits made.
 
 ## Testing infrastructure
 
