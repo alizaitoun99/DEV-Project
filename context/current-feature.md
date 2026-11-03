@@ -2,16 +2,15 @@
 
 ## Status
 
-Implemented — audit corrections on `fix/audit-storage-links`; ready for review.
+<!-- No active feature. -->
 
 ## Goals
 
-- Retire cleanup records after upload expiry (including the existing grace period) and successful final removal; retain failed removals for retry.
-- Require a valid HTTP(S) URL when updating an owned link, with server validation and form feedback.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-No schema or dependency changes. Preserved existing unrelated local changes. Validation: all 147 mocked Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The build passed outside the sandbox after Windows denied a generated-directory write. Browser verification remains unconfirmed: localhost navigation timed out even after the production server started. No live database/storage checks or unchanged auth integration scripts were run. No commit or merge performed.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -116,3 +115,6 @@ No schema or dependency changes. Preserved existing unrelated local changes. Val
 
 - 2026-11-03: Completed [File List View](features/file-display-spec.md) in the `file-display` worktree on `feature/file-list-view`. Added single-column file rows with extension icons, original filenames, formatted sizes, upload dates, hover/focus feedback, drawer access, separate direct downloads, and metadata stacking based on available width. Added an owner/type-scoped metadata query and regression test excluding private storage keys and contents. Integrated the completed Image Gallery changes from main, preserving its three-column layout. No schema or dependency changes.
 - 2026-11-03: Validation passed after integration: all 135 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks. Browser interaction/responsive verification remains unconfirmed after connection refusal and timeout. Dependency installation and production build required outside-sandbox retries; build settings were inherited from the source checkout in memory. Existing auth/storage integration scripts were not rerun because their behavior was unchanged. Dependency installation reported 23 advisories (3 low, 19 moderate, 1 critical); dependencies were unchanged. Closed out at the user's completion request and cleared the active tracker.
+
+- 2026-11-03: Completed code audit corrections on `fix/audit-storage-links`, committed as `6cec7e0` and merged into `main`; deleted the merged local branch. Successful storage cleanup retains early tombstones until the signed-upload lifetime plus the existing ten-minute grace period, then removes the ledger record after final successful object removal. Failed removals remain retryable. Link updates require a valid HTTP(S) URL based on the owned persisted item type; the edit form requires the destination and Server Actions return field-specific validation feedback. No schema or dependency changes.
+- 2026-11-03: Validation passed: all 147 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Build and migration checks required outside-sandbox retries after Windows write/connectivity failures. Browser verification remains unconfirmed after localhost timed out despite a running production server; live database/storage mutations and unchanged auth integration scripts were not run. Cleared the active tracker at the user completion request and preserved pre-existing local edits outside these commits.
