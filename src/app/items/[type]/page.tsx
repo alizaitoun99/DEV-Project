@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ItemCard } from "@/components/dashboard/ItemCard";
 import { CreateItemDialog } from "@/components/items/CreateItemDialog";
+import { FileListRow } from "@/components/items/FileListRow";
 import type { ItemCreateInput } from "@/lib/item-validation";
 import { getCurrentUser } from "@/lib/current-user";
-import { getItemsByType, getSystemItemTypes } from "@/lib/db/items";
+import { getFilesByType, getItemsByType, getSystemItemTypes } from "@/lib/db/items";
 
 const TYPE_ROUTES: Record<string, ItemCreateInput["type"] | "file" | "image"> = {
   snippets: "snippet",
@@ -33,18 +34,24 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
   const types = await getSystemItemTypes(user.id);
   const type = types.find((type) => type.slug === slug);
   if (!type) notFound();
-  const items = await getItemsByType(user.id, type.id);
+  const files = slug === "file" ? await getFilesByType(user.id, type.id) : null;
+  const items = files ? [] : await getItemsByType(user.id, type.id);
+  const count = files?.length ?? items.length;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">{type.name}</h1>
-          <p className="mt-2 text-muted-foreground">{items.length} {items.length === 1 ? "item" : "items"}</p>
+          <p className="mt-2 text-muted-foreground">{count} {count === 1 ? "item" : "items"}</p>
         </div>
         <CreateItemDialog defaultType={slug} triggerLabel={`Add ${slug}`} />
       </div>
-      {items.length > 0 ? (
+      {files && files.length > 0 ? (
+        <ul aria-label="Files" className="space-y-2">
+          {files.map((file) => <li key={file.id}><FileListRow {...file} fileSize={file.fileSize?.toString() ?? null} createdAt={file.createdAt.toISOString()} /></li>)}
+        </ul>
+      ) : items.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {items.map((item) => <ItemCard key={item.id} item={item} />)}
         </div>

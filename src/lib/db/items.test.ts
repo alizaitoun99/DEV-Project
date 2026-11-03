@@ -1,14 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { findFirst, auth } = vi.hoisted(() => ({ findFirst: vi.fn(), auth: vi.fn() }));
-vi.mock("@/lib/prisma", () => ({ prisma: { item: { findFirst } } }));
+const { findFirst, findMany, auth } = vi.hoisted(() => ({ findFirst: vi.fn(), findMany: vi.fn(), auth: vi.fn() }));
+vi.mock("@/lib/prisma", () => ({ prisma: { item: { findFirst, findMany } } }));
 vi.mock("@/auth", () => ({ auth }));
-import { getItemDetail } from "./items";
+import { getFilesByType, getItemDetail } from "./items";
 import { GET } from "@/app/api/items/[id]/route";
 
-beforeEach(() => { findFirst.mockReset(); auth.mockReset(); });
+beforeEach(() => { findFirst.mockReset(); findMany.mockReset(); auth.mockReset(); });
 const context = { params: Promise.resolve({ id: "item-1" }) };
 const request = new Request("http://localhost/api/items/item-1");
+
+it("limits file listings to the owner and type without exposing storage keys or contents", async () => {
+  findMany.mockResolvedValue([]);
+  expect(await getFilesByType("owner-1", "file-type")).toEqual([]);
+  const query = findMany.mock.calls[0][0];
+  expect(query.where).toEqual({ userId: "owner-1", typeId: "file-type" });
+  expect(query.orderBy).toEqual([{ updatedAt: "desc" }, { id: "asc" }]);
+  expect(query.select).toMatchObject({ fileName: true, fileSize: true, createdAt: true });
+  expect(query.select).not.toHaveProperty("fileKey");
+  expect(query.select).not.toHaveProperty("content");
+});
 
 describe("item details", () => {
   it("scopes the item and related records to the owner and excludes storage keys", async () => {

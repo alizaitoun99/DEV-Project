@@ -200,6 +200,14 @@ export async function getItemsByType(userId: string, typeId: string): Promise<It
   });
 }
 
+export async function getFilesByType(userId: string, typeId: string) {
+  return prisma.item.findMany({
+    where: { userId, typeId },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true },
+  });
+}
+
 export async function getRecentItems(userId: string, limit = 10): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId },

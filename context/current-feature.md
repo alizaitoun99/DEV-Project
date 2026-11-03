@@ -1,16 +1,26 @@
-# Current Feature
+# Current Feature: File List View
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Display `/items/files` as a single-column list of rows instead of grid cards.
+- Show an extension-based file icon, file name, file size, upload date, and download button in each row.
+- Highlight rows on hover and open ItemDrawer when a row is clicked.
+- Trigger a direct download from the download button without opening the drawer (stop propagation).
+- Stack file information vertically on mobile.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [File List View](features/file-display-spec.md).
+- Worktree: `file-display`; created from committed HEAD, preserving the separate Image Gallery work in the source checkout.
+- Branch: `feature/file-list-view`.
+- Implemented a file-only list with extension icons, original filename, formatted size, upload date, hover/focus feedback, existing drawer triggers, and direct download controls that stop propagation. Container queries stack metadata when the row is narrow.
+- Added an owner/type-scoped file metadata query and regression test excluding storage keys and contents. No schema or dependency changes.
+- Validation: all 135 Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. Initial dependency installation failed on sandbox DNS; installation and build required outside-sandbox retries. The final build inherited existing source-checkout environment settings in memory without copying environment files.
+- Browser interaction and responsive verification remain unconfirmed: localhost navigation failed with connection refusal and timeout. Existing integration scripts were not rerun because auth/storage behavior is unchanged. Dependency installation reported 23 advisories (3 low, 19 moderate, 1 critical); dependencies were unchanged.
 
 ## Testing infrastructure
 
