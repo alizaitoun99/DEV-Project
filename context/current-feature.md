@@ -2,15 +2,16 @@
 
 ## Status
 
-<!-- No active feature. -->
+Implemented — audit corrections on `fix/audit-storage-links`; ready for review.
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Retire cleanup records after upload expiry (including the existing grace period) and successful final removal; retain failed removals for retry.
+- Require a valid HTTP(S) URL when updating an owned link, with server validation and form feedback.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+No schema or dependency changes. Preserved existing unrelated local changes. Validation: all 147 mocked Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The build passed outside the sandbox after Windows denied a generated-directory write. Browser verification remains unconfirmed: localhost navigation timed out even after the production server started. No live database/storage checks or unchanged auth integration scripts were run. No commit or merge performed.
 
 ## Testing infrastructure
 

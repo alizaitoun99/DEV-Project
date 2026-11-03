@@ -10,6 +10,16 @@ beforeEach(() => {
 });
 
 describe("item update transaction", () => {
+  it.each([undefined, null, "", "   ", "not a URL", "javascript:alert(1)", "ftp://example.com"])("rejects invalid link destination %j before mutating anything", async (url) => {
+    findFirst.mockResolvedValueOnce({ type: { slug: "link" } });
+    await expect(updateItem("owner", "item", { title: "Title", url, tags: [] })).rejects.toThrow();
+    expect(update).not.toHaveBeenCalled();
+  });
+  it.each(["http://example.com/path", "https://example.com/path?q=1"])("persists a valid trimmed link destination %s", async (url) => {
+    findFirst.mockResolvedValueOnce({ type: { slug: "link" } }).mockResolvedValueOnce(null);
+    await updateItem("owner", "item", { title: "Title", url: `  ${url}  `, tags: [] });
+    expect(update.mock.calls[0][0].data.url).toBe(url);
+  });
   it("does not mutate foreign or missing items", async () => {
     findFirst.mockResolvedValue(null);
     expect(await updateItem("owner", "foreign", { title: "Title", tags: [] })).toBeNull();

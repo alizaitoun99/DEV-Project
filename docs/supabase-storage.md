@@ -79,11 +79,12 @@ its preview/explicit-execution behavior is unchanged.
 Database functions remain in `src/lib/db/items.ts`.
 
 The worker locks due rows with `FOR UPDATE SKIP LOCKED`, removes up to 20 objects
-per invocation, retries failures after five minutes, and retains successful
-cleanup tombstones for daily re-sweeping. This accounts for replayed or in-flight
-signed uploads after early deletion. It never discards the only cleanup record.
-Monitor ledger `lastError`, `attempts`, and overdue `retryAt`; tombstones increase
-worker demand as usage grows, so increase scheduling frequency before launch.
+per invocation and retries failures after five minutes. Early successful removal
+retains a tombstone until `expiresAt`, which includes the two-hour signed upload
+lifetime plus ten minutes for in-flight requests. A successful final removal at
+or after that deadline deletes the ledger record; failed removals remain queued.
+Monitor ledger `lastError`, `attempts`, and overdue `retryAt`, and increase
+scheduling frequency when the backlog grows.
 
 `vercel.json` schedules `/api/storage-cleanup` daily at 03:00 UTC. Set
 `CRON_SECRET` in Vercel before deployment; Vercel sends the bearer automatically.

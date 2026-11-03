@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { randomUUID } from "node:crypto";
 import { UploadError, type UploadIntent } from "@/lib/upload-validation";
 import type { StorageObject } from "@/generated/prisma/client";
+import { linkUpdateSchema } from "@/lib/item-validation";
 
 export async function lockStorageOwner(tx: Prisma.TransactionClient, userId: string) {
   const users = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
@@ -78,8 +79,12 @@ export async function cleanupStorageRecords(remove: (bucket: string, key: string
       if (!record || !["pending", "cleanup"].includes(record.state) || record.retryAt > new Date()) return;
       try {
         await remove(record.bucket, record.key);
-        // Retain tombstones and sweep again: a signed request may still be in flight.
-        await tx.storageObject.update({ where: { id }, data: { state: "cleanup", attempts: { increment: 1 }, lastError: null, retryAt: new Date(Date.now() + 86400000) } });
+        // expiresAt includes the signed URL lifetime and ten minutes for in-flight uploads.
+        if (record.expiresAt <= new Date()) {
+          await tx.storageObject.delete({ where: { id } });
+        } else {
+          await tx.storageObject.update({ where: { id }, data: { state: "cleanup", attempts: { increment: 1 }, lastError: null, retryAt: record.expiresAt } });
+        }
       } catch {
         failures++;
         await tx.storageObject.update({ where: { id }, data: { state: "cleanup", attempts: { increment: 1 }, lastError: "Storage removal failed", retryAt: new Date(Date.now() + 300000) } });
@@ -242,6 +247,8 @@ export async function updateItem(userId: string, id: string, input: import("@/li
     const existing = await tx.item.findFirst({ where: { id, userId }, select: { type: { select: { slug: true } } } });
     if (!existing) return null;
     const slug = existing.type.slug;
+    // Derive required fields from the owned item, never a client-supplied type.
+    if (slug === "link") input = linkUpdateSchema.parse(input);
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     await tx.item.update({
       where: { id, userId },

@@ -32,7 +32,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
         title: fields.title, description: fields.description || null,
         ...(textType ? { content: fields.content || null } : {}),
         ...(languageType ? { language: fields.language || null } : {}),
-        ...(item.type.slug === "link" ? { url: fields.url.trim() || null } : {}),
+        ...(item.type.slug === "link" ? { url: fields.url.trim() } : {}),
         tags: fields.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       });
       if (!result.success) { setError(result.error); toast.error(result.error); return; }
@@ -44,7 +44,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
   }
   function field(name: keyof typeof fields, label: string, multiline = false) {
     const className = "w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
-    return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span>{multiline ? <textarea className={className} rows={name === "content" ? 12 : 3} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} /> : <Input autoFocus={name === "title"} required={name === "title"} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} />}</label>;
+    return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span>{multiline ? <textarea className={className} rows={name === "content" ? 12 : 3} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} /> : <Input autoFocus={name === "title"} required={name === "title" || name === "url"} type={name === "url" ? "url" : "text"} pattern={name === "url" ? "[hH][tT][tT][pP][sS]?://.*" : undefined} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} />}</label>;
   }
   return <form action={save} className="flex min-h-0 flex-1 flex-col">
     <div className="flex gap-2 border-b p-4"><Button type="submit" disabled={pending || !fields.title.trim()}>{pending ? "Saving…" : "Save"}</Button><Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Cancel</Button></div>

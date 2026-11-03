@@ -57,7 +57,8 @@ export async function updateItem(itemId: string, input: unknown): Promise<Update
     if (!parsed.success) return { success: false, error: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("\n") };
     const item = await persistItem(session.user.id, id.data, parsed.data);
     return item ? { success: true, data: item } : { success: false, error: "Item not found." };
-  } catch {
+  } catch (error) {
+    if (error instanceof z.ZodError) return { success: false, error: error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("\n") };
     return { success: false, error: "Unable to save item. Please try again." };
   }
 }

@@ -4,11 +4,18 @@ const { auth, persist } = vi.hoisted(() => ({ auth: vi.fn(), persist: vi.fn() })
 vi.mock("@/auth", () => ({ auth }));
 vi.mock("@/lib/db/items", () => ({ updateItem: persist }));
 import { updateItem } from "./items";
+import { linkUpdateSchema } from "@/lib/item-validation";
 
 beforeEach(() => { auth.mockReset(); persist.mockReset(); auth.mockResolvedValue({ user: { id: "owner" } }); });
 const input = { title: "  Updated  ", tags: ["  React "] };
 
 describe("updateItem action", () => {
+  it("returns actionable URL feedback when persisted link validation fails", async () => {
+    const result = linkUpdateSchema.safeParse({ ...input, url: null });
+    if (result.success) throw new Error("Expected missing link URL to fail validation");
+    persist.mockRejectedValue(result.error);
+    expect(await updateItem("item", { ...input, url: null })).toEqual({ success: false, error: "url: URL is required for links." });
+  });
   it("requires authentication before querying", async () => {
     auth.mockResolvedValue(null);
     expect((await updateItem("item", input)).success).toBe(false);

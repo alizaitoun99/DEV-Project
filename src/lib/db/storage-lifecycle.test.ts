@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  query: vi.fn(), transaction: vi.fn(), findFirst: vi.fn(), findMany: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn(), type: vi.fn(), item: vi.fn(), items: vi.fn(),
+  query: vi.fn(), transaction: vi.fn(), findFirst: vi.fn(), findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), updateMany: vi.fn(), count: vi.fn(), type: vi.fn(), item: vi.fn(), items: vi.fn(),
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {
   $transaction: mocks.transaction,
@@ -23,7 +23,7 @@ beforeEach(() => {
   mocks.create.mockResolvedValue(record);
   mocks.transaction.mockImplementation((callback) => callback({
     $queryRaw: mocks.query,
-    storageObject: { findFirst: mocks.findFirst, findMany: mocks.findMany, create: mocks.create, update: mocks.update, updateMany: mocks.updateMany, count: mocks.count },
+    storageObject: { findFirst: mocks.findFirst, findMany: mocks.findMany, create: mocks.create, update: mocks.update, delete: mocks.delete, updateMany: mocks.updateMany, count: mocks.count },
     itemType: { findFirst: mocks.type }, item: { create: mocks.item, findMany: mocks.items },
   }));
 });
@@ -82,11 +82,23 @@ describe("cleanup recovery", () => {
     const remove = vi.fn().mockResolvedValue(undefined);
     expect(await cleanupStorageRecords(remove)).toEqual({ processed: 1, failures: 0 });
     expect(remove).toHaveBeenCalledWith("private", "owner/key");
-    expect(mocks.update).toHaveBeenCalledWith({ where: { id: "upload" }, data: expect.objectContaining({ state: "cleanup", lastError: null, retryAt: expect.any(Date) }) });
+    expect(mocks.update).toHaveBeenCalledWith({ where: { id: "upload" }, data: expect.objectContaining({ state: "cleanup", lastError: null, retryAt: record.expiresAt }) });
+    expect(mocks.delete).not.toHaveBeenCalled();
+  });
+  it.each(["pending", "cleanup"])("retires expired %s records only after successful final removal", async (state) => {
+    mocks.query.mockResolvedValue([{ ...record, state, expiresAt: new Date(0) }]);
+    const remove = vi.fn().mockResolvedValue(undefined);
+    expect(await cleanupStorageRecords(remove)).toEqual({ processed: 1, failures: 0 });
+    expect(remove).toHaveBeenCalledWith("private", "owner/key");
+    expect(mocks.delete).toHaveBeenCalledWith({ where: { id: "upload" } });
+    expect(remove.mock.invocationCallOrder[0]).toBeLessThan(mocks.delete.mock.invocationCallOrder[0]);
+    expect(mocks.update).not.toHaveBeenCalled();
   });
   it("retains failed removal and schedules a retry", async () => {
+    mocks.query.mockResolvedValue([{ ...record, state: "cleanup", expiresAt: new Date(0) }]);
     expect(await cleanupStorageRecords(vi.fn().mockRejectedValue(new Error("offline")))).toEqual({ processed: 1, failures: 1 });
     expect(mocks.update).toHaveBeenCalledWith({ where: { id: "upload" }, data: expect.objectContaining({ state: "cleanup", lastError: "Storage removal failed", attempts: { increment: 1 } }) });
+    expect(mocks.delete).not.toHaveBeenCalled();
   });
   it.each([[], [{ ...record, state: "attached" }], [{ ...record, retryAt: new Date(Date.now() + 100000) }]].map((locked) => ({ locked })))("does not remove locked, finalized, or not-yet-due records", async ({ locked }) => {
     mocks.query.mockResolvedValue(locked);
