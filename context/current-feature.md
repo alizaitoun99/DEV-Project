@@ -1,35 +1,17 @@
-# Current Feature: File and Image Upload with Supabase Storage
+# Current Feature
 
-## Status: In Progress
+## Status
+
+<!-- No active feature. -->
 
 ## Goals
 
-- Add authenticated signed direct uploads to the private Supabase Storage bucket, with server-side intent validation and verified finalization.
-- Add an accessible FileUpload component with selection, drag-and-drop, validation, progress, pending controls, and actionable errors.
-- Enable file/image creation and route-specific add buttons, with safe image previews and file metadata.
-- Persist private object keys and original file metadata through Prisma; provide authenticated, owner-scoped streamed downloads in the item drawer.
-- Implement discoverable, retryable cleanup for failed, rejected, or abandoned uploads and for item/account deletion.
-- Add meaningful mocked utility/Server Action tests and verify affected interactions and responsive layouts.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Implementation branch: `feature/file-image-upload`.
+<!-- Feature context and implementation notes. -->
 
-- Specification: [File and Image Upload](features/file-image-spec.md).
-- Use the existing server-only `src/lib/supabase-storage.ts` client and private `dev-stash` bucket. Keep Neon/Prisma, Auth.js, and database functions in `src/lib/db/items.ts`.
-- Existing setup work is on `feature/supabase-storage`; setup documentation: [Supabase Storage](../docs/supabase-storage.md). Previous setup validation recorded 81 unit tests and TypeScript passing, with the production build skipped at user request.
-- Keep credentials server-only. Authenticate and verify ownership for upload, preview, download, and deletion; generate user-scoped object keys on the server.
-- Upload directly to Supabase using short-lived, object-scoped signed URLs to accommodate Vercel request limits. Verify current platform/SDK limits before implementation.
-- Enforce binary limits of 5 MiB for images and 10 MiB for files, validating extension, actual content, and supported MIME types on the server and client. Configure the private bucket's 10 MiB limit and MIME allowlist; the last connection check found neither restriction configured.
-- Never persist public/expiring URLs. Downloads must be attachments with safely encoded names, `nosniff`, and non-cacheable responses. Use safe SVG previews or placeholders and revoke local object URLs.
-- Define cross-service deletion sequencing and recovery, including account deletion, before enabling stored-item deletion. Failed cleanup must remain discoverable and retryable.
-- Run unit tests, lint, and TypeScript checks during implementation. Do not run production builds under the current user instruction.
-- Implemented signed direct upload/finalization, file/image creation UI, safe bitmap previews, streamed downloads, and a durable cleanup ledger for upload failure and item/account deletion.
-- Applied migration `20261103073814_storage_object_lifecycle`; configured and confirmed the existing bucket private with a 10 MiB maximum and supported MIME allowlist.
-- No E2E tests are to be created or run, per the user's implementation instruction. Browser interaction verification remains outstanding.
-- Deployment requires `CRON_SECRET` and the cleanup schedule documented in [Supabase Storage](../docs/supabase-storage.md).
-- Validation: all 134 mocked unit tests, ESLint, standalone TypeScript after route type generation, migration status, and whitespace checks passed. Production build skipped as instructed. Browser navigation timed out before the no-E2E instruction; no E2E test was created or run. The pre-existing profile integration script was attempted earlier and failed on database connectivity; it was not rerun.
-- Dependency audit found eight existing production dependency advisories, including a critical DOMPurify advisory through Monaco; none are attributed to the new upload validation packages. Unrelated dependency remediation remains outside this feature.
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
@@ -123,3 +105,7 @@
 
 - 2026-11-03: Completed [Markdown Editor](features/markdown-editor-spec.md) on `feature/markdown-editor`, committed as `34c6195`, and merged into `main`; deleted the merged local branch. Added a shared MarkdownEditor with accessible Write/Preview tabs, GitHub Flavored Markdown via react-markdown and remark-gfm, readonly note/prompt drawer previews, copy feedback, dark typography/table/code styles, and fluid height capped below 400px. Integrated note/prompt creation and editing; existing snippet/command CodeEditor unchanged. Dependencies and lockfile synchronized; no schema changes. Review found no confirmed code defects.
 - 2026-11-03: Validation passed: all 81 Vitest tests, ESLint, standalone TypeScript, final production build, migration status, and staged whitespace checks. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Browser verification remains unconfirmed after Chrome localhost connection refusal and timeout; tab/copy/save interactions and desktop/mobile layouts need manual verification. No component unit tests added under project policy; existing auth integration scripts were not rerun because those flows were unchanged. Cleared the feature tracker at the user's completion request and preserved the unrelated local docs/testing.md edit outside feature commits.
+
+- 2026-11-03: Completed [File and Image Upload with Supabase Storage](features/file-image-spec.md) on `feature/file-image-upload`, committed as `ef4280a`, and merged into `main`; deleted the merged local feature branch. Added signed direct uploads with progress, file/image creation, server-side size/MIME/content verification, safe bitmap previews and SVG placeholders, and owner-authorized streamed downloads. Supabase remains Storage-only; Neon/Prisma and Auth.js remain in place. Added format-validation dependencies and synchronized the lockfile.
+- 2026-11-03: Applied migration `20261103073814_storage_object_lifecycle` and confirmed the private bucket's 10 MiB maximum and MIME allowlist. The durable storage ledger handles upload failures, abandonment, and item/account deletion; the existing bulk-user maintenance script also queues storage cleanup before cascading. Retryable cleanup retains records across failures and account deletion. Vercel cleanup is scheduled daily; deployment requires `CRON_SECRET`, with operational instructions in [Supabase Storage](../docs/supabase-storage.md).
+- 2026-11-03: Final validation passed: all 134 mocked Vitest tests, ESLint, standalone TypeScript, migration status, and staged whitespace checks. Production builds were explicitly skipped at the user's instruction. No E2E tests were created or run. Browser interaction/responsive verification remains unconfirmed after a navigation timeout. The existing profile integration script was attempted during implementation and failed on database connectivity; it was not rerun. Dependency audit reported eight existing production advisories, including critical DOMPurify through Monaco; unrelated remediation remains outstanding. Closed out at the user's completion request, cleared the tracker, and preserved unrelated testing documentation, ignore-rule, and environment-example edits outside the feature commits.
