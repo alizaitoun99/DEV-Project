@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { createItem } from "@/actions/items";
+import { CodeEditor } from "@/components/items/CodeEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -12,10 +13,15 @@ import type { ItemCreateInput } from "@/lib/item-validation";
 
 const initialFields = { title: "", description: "", content: "", language: "", url: "", tags: "" };
 
-export function CreateItemDialog() {
+interface CreateItemDialogProps {
+  defaultType?: ItemCreateInput["type"];
+  triggerLabel?: string;
+}
+
+export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New Item" }: CreateItemDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<ItemCreateInput["type"]>("snippet");
+  const [type, setType] = useState<ItemCreateInput["type"]>(defaultType);
   const [fields, setFields] = useState(initialFields);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +31,7 @@ export function CreateItemDialog() {
     if (saving.current) return;
     setOpen(value);
     setFields(initialFields);
-    setType("snippet");
+    setType(defaultType);
     setError(null);
   }
 
@@ -60,7 +66,7 @@ export function CreateItemDialog() {
   }
 
   return <Dialog open={open} onOpenChange={changeOpen}>
-    <DialogTrigger asChild><Button className="h-11 shrink-0 sm:ml-auto"><Plus aria-hidden="true" />New Item</Button></DialogTrigger>
+    <DialogTrigger asChild><Button className="h-11 shrink-0 sm:ml-auto"><Plus aria-hidden="true" />{triggerLabel}</Button></DialogTrigger>
     <DialogContent aria-busy={pending}>
       <DialogTitle className="text-xl font-semibold">New Item</DialogTitle>
       <DialogDescription className="mt-2 text-sm text-muted-foreground">Save a snippet, prompt, command, note, or link.</DialogDescription>
@@ -71,7 +77,7 @@ export function CreateItemDialog() {
             <option value="snippet">Snippet</option><option value="prompt">Prompt</option><option value="command">Command</option><option value="note">Note</option><option value="link">Link</option>
           </select></label>
           {field("title", "Title (required)")}{field("description", "Description", true)}
-          {type === "link" ? field("url", "URL (required)") : field("content", "Content", true)}
+          {type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : field("content", "Content", true)}
           {["snippet", "command"].includes(type) && field("language", "Language")}
           {field("tags", "Tags (comma-separated)")}
         </fieldset>

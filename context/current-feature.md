@@ -1,14 +1,32 @@
-# Current Feature
+# Current Feature: Code Editor
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Add type-specific creation buttons on item type pages and preselect the page's type when opening the dialog.
+- Create a reusable Monaco CodeEditor component with a dark theme.
+- Replace textareas for snippets and commands only; retain textareas for notes, prompts, and other non-code types.
+- Support readonly display and editable content.
+- Add macOS-style red, yellow, and green window dots to the editor header.
+- Show the language and a quick copy button in the editor header.
+- Use fluid editor height capped at 400px with a theme-matched scrollbar.
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Specification: [Code Editor](features/code-editor-spec.md).
+- Apply the editor to snippet and command content in display and edit flows.
+- Implementation branch: `feature/code-editor`.
+- Follow-up: type pages reuse the create dialog with a type-specific add button and reset to that type each time it opens. File/image buttons are disabled with an upload availability message because those types are outside the current create action's supported inputs.
+- Type-page follow-up validation: all 81 tests, ESLint, TypeScript, production build, and whitespace checks passed. Browser checks confirmed preselection and reset on all five supported pages, link URL fields, disabled file/image buttons, and no mobile horizontal overflow. Screenshot: [type-page add button](../artifacts/type-page-add-mobile.png).
+- Production server logged a Next.js `crypto.getRandomValues()` prerender diagnostic for `/items/[type]`; the build and authenticated route interactions passed. Similar diagnostics were recorded during the earlier item-create feature.
+- Implemented shared lazy-loaded Monaco editing in the create dialog and item edit form, plus readonly code display in the drawer. Notes and prompts retain textareas.
+- Monaco uses the wrapper's default jsDelivr CDN loader. A controlled plain-text editor preserves access while Monaco loads or if the CDN is unavailable.
+- Browser verification with the CDN deliberately blocked confirmed fallback editing and copying.
+- Validation: all 81 Vitest tests, ESLint, TypeScript, production build, and whitespace checks passed. The build required an outside-sandbox retry after Windows EPERM. No Server Action or utility logic changed; existing auth integration scripts were not rerun.
+- Production browser checks passed for live snippet creation, persistence, edit/save, Cancel, readonly protection, full-content copying, snippet/command/note switching, Escape, keyboard Tab navigation, and responsive layouts at 390px and 1440px. A 60-line sample capped the full editor at approximately 398px without horizontal overflow. The temporary database item was deleted.
+- Observed one Monaco `Canceled` promise console error during editor disposal; subsequent interactions and persistence checks passed.
+- Screenshots: [desktop](../artifacts/code-editor-desktop.png), [mobile](../artifacts/code-editor-mobile.png).
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.

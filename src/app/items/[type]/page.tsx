@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { Plus } from "lucide-react";
 import { ItemCard } from "@/components/dashboard/ItemCard";
+import { CreateItemDialog } from "@/components/items/CreateItemDialog";
+import { Button } from "@/components/ui/button";
+import type { ItemCreateInput } from "@/lib/item-validation";
 import { getCurrentUser } from "@/lib/current-user";
 import { getItemsByType, getSystemItemTypes } from "@/lib/db/items";
 
-const TYPE_ROUTES: Record<string, string> = {
+const TYPE_ROUTES: Record<string, ItemCreateInput["type"] | "file" | "image"> = {
   snippets: "snippet",
   prompts: "prompt",
   commands: "command",
@@ -35,9 +39,17 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">{type.name}</h1>
-        <p className="mt-2 text-muted-foreground">{items.length} {items.length === 1 ? "item" : "items"}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">{type.name}</h1>
+          <p className="mt-2 text-muted-foreground">{items.length} {items.length === 1 ? "item" : "items"}</p>
+        </div>
+        {slug === "file" || slug === "image" ? (
+          <div className="space-y-1">
+            <Button disabled className="h-11"><Plus aria-hidden="true" />Add {slug}</Button>
+            <p className="text-xs text-muted-foreground">Uploads coming soon</p>
+          </div>
+        ) : <CreateItemDialog defaultType={slug} triggerLabel={`Add ${slug}`} />}
       </div>
       {items.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
