@@ -114,7 +114,7 @@ model Item {
   description  String?          @db.Text
   content      String?          @db.Text
   url          String?          @db.Text
-  fileKey      String? // Private R2 object key; NOT a public URL
+  fileKey      String? // Private Supabase object key; NOT a public URL
   fileName     String?
   fileSize     BigInt?
   fileMimeType String?
@@ -182,4 +182,26 @@ model ItemTag {
 
   @@id([itemId, tagId])
   @@index([tagId])
+}
+
+// Deliberately independent of User: cleanup must survive account deletion.
+model StorageObject {
+  id          String   @id @default(cuid())
+  userId      String
+  bucket      String
+  key         String   @unique
+  fileName    String
+  size        Int
+  mime        String
+  type        String
+  state       String   @default("pending")
+  itemId      String?  @unique
+  expiresAt   DateTime
+  retryAt     DateTime
+  attempts    Int      @default(0)
+  lastError   String?
+  createdAt   DateTime @default(now())
+
+  @@index([state, retryAt])
+  @@index([userId])
 }

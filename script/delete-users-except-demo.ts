@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { Prisma } from "../src/generated/prisma/client";
 import { prisma } from "../src/lib/prisma";
+import { enqueueAccountStorage } from "../src/lib/db/items";
 
 const DEMO_EMAIL = "demo@devistage.io";
 const execute = process.argv.includes("--execute");
@@ -53,6 +54,7 @@ async function main() {
     console.table(counts);
     if (!execute || ids.length === 0) return;
     const before = snapshot(await protectedData(tx, demo.id));
+    for (const id of ids) await enqueueAccountStorage(tx, id);
     await tx.verificationToken.deleteMany({ where: { identifier: { in: identifiers } } });
     // Remove items before user-owned types, whose item foreign keys restrict deletion.
     await tx.item.deleteMany({ where: owner });

@@ -1,14 +1,35 @@
-# Current Feature
+# Current Feature: File and Image Upload with Supabase Storage
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Add authenticated signed direct uploads to the private Supabase Storage bucket, with server-side intent validation and verified finalization.
+- Add an accessible FileUpload component with selection, drag-and-drop, validation, progress, pending controls, and actionable errors.
+- Enable file/image creation and route-specific add buttons, with safe image previews and file metadata.
+- Persist private object keys and original file metadata through Prisma; provide authenticated, owner-scoped streamed downloads in the item drawer.
+- Implement discoverable, retryable cleanup for failed, rejected, or abandoned uploads and for item/account deletion.
+- Add meaningful mocked utility/Server Action tests and verify affected interactions and responsive layouts.
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Implementation branch: `feature/file-image-upload`.
+
+- Specification: [File and Image Upload](features/file-image-spec.md).
+- Use the existing server-only `src/lib/supabase-storage.ts` client and private `dev-stash` bucket. Keep Neon/Prisma, Auth.js, and database functions in `src/lib/db/items.ts`.
+- Existing setup work is on `feature/supabase-storage`; setup documentation: [Supabase Storage](../docs/supabase-storage.md). Previous setup validation recorded 81 unit tests and TypeScript passing, with the production build skipped at user request.
+- Keep credentials server-only. Authenticate and verify ownership for upload, preview, download, and deletion; generate user-scoped object keys on the server.
+- Upload directly to Supabase using short-lived, object-scoped signed URLs to accommodate Vercel request limits. Verify current platform/SDK limits before implementation.
+- Enforce binary limits of 5 MiB for images and 10 MiB for files, validating extension, actual content, and supported MIME types on the server and client. Configure the private bucket's 10 MiB limit and MIME allowlist; the last connection check found neither restriction configured.
+- Never persist public/expiring URLs. Downloads must be attachments with safely encoded names, `nosniff`, and non-cacheable responses. Use safe SVG previews or placeholders and revoke local object URLs.
+- Define cross-service deletion sequencing and recovery, including account deletion, before enabling stored-item deletion. Failed cleanup must remain discoverable and retryable.
+- Run unit tests, lint, and TypeScript checks during implementation. Do not run production builds under the current user instruction.
+- Implemented signed direct upload/finalization, file/image creation UI, safe bitmap previews, streamed downloads, and a durable cleanup ledger for upload failure and item/account deletion.
+- Applied migration `20261103073814_storage_object_lifecycle`; configured and confirmed the existing bucket private with a 10 MiB maximum and supported MIME allowlist.
+- No E2E tests are to be created or run, per the user's implementation instruction. Browser interaction verification remains outstanding.
+- Deployment requires `CRON_SECRET` and the cleanup schedule documented in [Supabase Storage](../docs/supabase-storage.md).
+- Validation: all 134 mocked unit tests, ESLint, standalone TypeScript after route type generation, migration status, and whitespace checks passed. Production build skipped as instructed. Browser navigation timed out before the no-E2E instruction; no E2E test was created or run. The pre-existing profile integration script was attempted earlier and failed on database connectivity; it was not rerun.
+- Dependency audit found eight existing production dependency advisories, including a critical DOMPurify advisory through Monaco; none are attributed to the new upload validation packages. Unrelated dependency remediation remains outside this feature.
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.

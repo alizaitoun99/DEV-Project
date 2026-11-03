@@ -32,7 +32,13 @@ export async function deleteItem(itemId: unknown): Promise<DeleteResult> {
     const id = z.string().trim().min(1).max(200).safeParse(itemId);
     if (!id.success) return { success: false, error: "Invalid item ID." };
     const result = await removeItem(session.user.id, id.data);
-    if (result === "stored-file") return { success: false, error: "Items with uploaded files cannot be deleted until file cleanup is available." };
+    if (result === "stored-file") return { success: false, error: "This item has no file cleanup record. Contact the administrator before deleting it." };
+    if (result === "deleted") {
+      try {
+        const { cleanupDeletedItem } = await import("@/lib/storage-uploads");
+        await cleanupDeletedItem(session.user.id, id.data);
+      } catch { console.error("Item storage cleanup deferred; durable record retained."); }
+    }
     return result === "deleted" ? { success: true } : { success: false, error: "Item not found." };
   } catch {
     return { success: false, error: "Unable to delete item. Please try again." };

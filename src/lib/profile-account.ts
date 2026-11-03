@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { credentialsSchema } from "@/lib/auth-validation";
 import { AuthRateLimitError, consumeAuthLimit } from "@/lib/auth-rate-limit";
+import { enqueueAccountStorage } from "@/lib/db/items";
 
 interface AccountResult {
   success: boolean;
@@ -53,7 +54,8 @@ export async function deleteAccountForUser(userId: string, input: unknown): Prom
       await tx.verificationToken.deleteMany({ where: { identifier: { in: [
         `password-reset:${userId}:${user.email}`, `email-verification:${userId}:${user.email}`,
       ] } } });
-      // Cascades remove owned data, memberships, and linked authentication records.
+      await enqueueAccountStorage(tx, userId);
+      // Cleanup ledger survives the cascaded owned records.
       await tx.user.delete({ where: { id: userId, passwordHash: user.passwordHash } });
     });
     return { success: true };

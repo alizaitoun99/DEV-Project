@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Copy, Pencil, Pin, Star } from "lucide-react";
 import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
@@ -91,11 +93,13 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
       <Button variant="ghost" disabled title="Favorite changes coming later" className={item.isFavorite ? "text-yellow-400" : ""}><Star className={item.isFavorite ? "fill-yellow-400" : ""} />Favorite</Button>
       <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
       <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
+      {item.fileName && <Button variant="ghost" asChild><a href={`/api/items/${encodeURIComponent(item.id)}/download`}>Download</a></Button>}
       <Button variant="ghost" onClick={() => setEditing(true)}><Pencil />Edit</Button>
       <DeleteItemDialog id={item.id} title={item.title} onDeleted={onDeleted} />
     </div>
     <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
       <section><h3 className="mb-3 text-sm text-muted-foreground">Description</h3><p className="whitespace-pre-wrap text-sm">{item.description || "No description"}</p></section>
+      {item.type.slug === "image" && item.fileName && (["image/png", "image/jpeg", "image/gif", "image/webp"].includes(item.fileMimeType ?? "") ? <Image unoptimized src={`/api/items/${encodeURIComponent(item.id)}/download?preview=1`} width={1000} height={750} alt={item.title} className="max-h-80 w-full rounded-lg object-contain" /> : <p className="rounded-lg border p-4 text-sm text-muted-foreground">Preview unavailable for this format. Download the original above.</p>)}
       {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3>{["snippet", "command"].includes(item.type.slug) ? <CodeEditor value={item.content} language={item.language ?? ""} readOnly /> : ["note", "prompt"].includes(item.type.slug) ? <MarkdownEditor value={item.content} readOnly /> : <pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre>}</section>}
       {item.url && <section><h3 className="mb-3 text-sm text-muted-foreground">URL</h3>{safeUrl ? <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{item.url}</a> : <p className="text-sm">{item.url}</p>}</section>}
       {item.fileName && <section><h3 className="mb-3 text-sm text-muted-foreground">File</h3><p className="text-sm">{item.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{[item.fileMimeType, item.fileSize !== null ? `${item.fileSize} bytes` : null].filter(Boolean).join(" · ")}</p></section>}

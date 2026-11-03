@@ -2,6 +2,101 @@ import "server-only";
 
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "node:crypto";
+import { UploadError, type UploadIntent } from "@/lib/upload-validation";
+import type { StorageObject } from "@/generated/prisma/client";
+
+export async function lockStorageOwner(tx: Prisma.TransactionClient, userId: string) {
+  const users = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+  if (!users.length) throw new Error("Account no longer exists.");
+}
+
+export async function createUploadRecord(userId: string, bucket: string, input: UploadIntent) {
+  return prisma.$transaction(async (tx) => {
+    await lockStorageOwner(tx, userId);
+    const outstanding = await tx.storageObject.count({ where: { userId, state: "pending" } });
+    if (outstanding >= 20) throw new UploadError("Too many pending uploads. Try again after cleanup.");
+    const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000 + 10 * 60 * 1000);
+    return tx.storageObject.create({ data: {
+      ...input, userId, bucket, key: `${userId}/${randomUUID()}`, expiresAt, retryAt: expiresAt,
+    } });
+  });
+}
+
+export async function finalizeUploadRecord(userId: string, id: string, input: import("@/lib/item-validation").ItemUpdateInput, verify: (record: StorageObject) => Promise<string>) {
+  return prisma.$transaction(async (tx) => {
+    await lockStorageOwner(tx, userId);
+    await tx.$queryRaw`SELECT id FROM "StorageObject" WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
+    const record = await tx.storageObject.findFirst({ where: { id, userId } });
+    if (!record) throw new UploadError("Upload not found.");
+    if (record.state === "attached" && record.itemId) return { id: record.itemId };
+    if (record.state !== "pending" || record.expiresAt <= new Date()) throw new UploadError("Upload expired. Select the file again.");
+    const mime = await verify(record);
+    const type = await tx.itemType.findFirst({ where: { slug: record.type, kind: "FILE", isSystem: true, userId: null }, select: { id: true } });
+    if (!type) throw new Error("Item type unavailable.");
+    const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
+    const item = await tx.item.create({ data: {
+      userId, typeId: type.id, title: input.title, description: input.description,
+      fileKey: record.key, fileName: record.fileName, fileSize: record.size, fileMimeType: mime,
+      tags: { create: tags.map(([slug, name]) => ({ tag: { connectOrCreate: {
+        where: { userId_slug: { userId, slug } }, create: { userId, slug, name },
+      } } })) },
+    }, select: { id: true } });
+    await tx.storageObject.update({ where: { id }, data: { state: "attached", itemId: item.id, mime } });
+    return item;
+  }, { timeout: 45000 });
+}
+
+export async function abandonUploadRecord(userId: string, id: string) {
+  // The same row lock used by finalization prevents cleanup of a committed item.
+  return prisma.storageObject.updateMany({ where: { id, userId, state: "pending" }, data: { state: "cleanup", retryAt: new Date() } });
+}
+
+export async function getStoredItem(userId: string, id: string) {
+  return prisma.item.findFirst({ where: { id, userId, fileKey: { not: null } }, select: {
+    fileKey: true, fileName: true, fileMimeType: true,
+  } });
+}
+
+export async function getStorageRecord(userId: string, key: string) {
+  return prisma.storageObject.findFirst({ where: { key, userId, state: "attached" }, select: { bucket: true } });
+}
+
+export async function getItemCleanupRecord(userId: string, itemId: string) {
+  return prisma.storageObject.findFirst({ where: { userId, itemId, state: "cleanup" }, select: { id: true } });
+}
+
+export async function cleanupStorageRecords(remove: (bucket: string, key: string) => Promise<void>, id?: string) {
+  const records = await prisma.storageObject.findMany({ where: {
+    ...(id ? { id } : {}), state: { in: ["pending", "cleanup"] }, retryAt: { lte: new Date() },
+  }, orderBy: { retryAt: "asc" }, take: 20, select: { id: true } });
+  let failures = 0;
+  for (const { id } of records) {
+    await prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<StorageObject[]>`SELECT * FROM "StorageObject" WHERE id = ${id} FOR UPDATE SKIP LOCKED`;
+      const record = locked[0];
+      if (!record || !["pending", "cleanup"].includes(record.state) || record.retryAt > new Date()) return;
+      try {
+        await remove(record.bucket, record.key);
+        // Retain tombstones and sweep again: a signed request may still be in flight.
+        await tx.storageObject.update({ where: { id }, data: { state: "cleanup", attempts: { increment: 1 }, lastError: null, retryAt: new Date(Date.now() + 86400000) } });
+      } catch {
+        failures++;
+        await tx.storageObject.update({ where: { id }, data: { state: "cleanup", attempts: { increment: 1 }, lastError: "Storage removal failed", retryAt: new Date(Date.now() + 300000) } });
+      }
+    }, { timeout: 30000 });
+  }
+  return { processed: records.length, failures };
+}
+
+export async function enqueueAccountStorage(tx: Prisma.TransactionClient, userId: string) {
+  await lockStorageOwner(tx, userId);
+  // Reject unknown legacy keys rather than cascading away their only reference.
+  const items = await tx.item.findMany({ where: { userId, fileKey: { not: null } }, select: { fileKey: true } });
+  const records = await tx.storageObject.findMany({ where: { userId }, select: { key: true } });
+  if (items.some((item) => !records.some((record) => record.key === item.fileKey))) throw new Error("Untracked storage requires recovery before account deletion.");
+  await tx.storageObject.updateMany({ where: { userId }, data: { state: "cleanup", retryAt: new Date() } });
+}
 
 export async function createItem(userId: string, input: import("@/lib/item-validation").ItemCreateInput) {
   return prisma.$transaction(async (tx) => {
@@ -53,7 +148,16 @@ export async function deleteItem(userId: string, id: string) {
   const result = await prisma.item.deleteMany({ where: { id, userId, fileKey: null } });
   if (result.count > 0) return "deleted";
   const remaining = await prisma.item.findFirst({ where: { id, userId }, select: { fileKey: true } });
-  return remaining?.fileKey != null ? "stored-file" : "not-found";
+  if (!remaining?.fileKey) return "not-found";
+  return prisma.$transaction(async (tx) => {
+    await lockStorageOwner(tx, userId);
+    const item = await tx.item.findFirst({ where: { id, userId }, select: { fileKey: true } });
+    if (!item?.fileKey) return "not-found";
+    const record = await tx.storageObject.updateMany({ where: { userId, key: item.fileKey, state: "attached", itemId: id }, data: { state: "cleanup", retryAt: new Date() } });
+    if (!record.count) return "stored-file";
+    await tx.item.delete({ where: { id, userId } });
+    return "deleted";
+  });
 }
 
 export interface ItemSummary {

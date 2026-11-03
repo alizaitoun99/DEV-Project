@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { auth, remove } = vi.hoisted(() => ({ auth: vi.fn(), remove: vi.fn() }));
 vi.mock("@/auth", () => ({ auth }));
 vi.mock("@/lib/db/items", () => ({ deleteItem: remove }));
+vi.mock("@/lib/storage-uploads", () => ({ cleanupDeletedItem: vi.fn() }));
 import { deleteItem } from "./items";
 
 beforeEach(() => { vi.resetAllMocks(); auth.mockResolvedValue({ user: { id: "owner" } }); });
