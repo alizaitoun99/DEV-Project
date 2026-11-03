@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { createItem } from "@/actions/items";
 import { CodeEditor } from "@/components/items/CodeEditor";
+import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -77,7 +78,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
             <option value="snippet">Snippet</option><option value="prompt">Prompt</option><option value="command">Command</option><option value="note">Note</option><option value="link">Link</option>
           </select></label>
           {field("title", "Title (required)")}{field("description", "Description", true)}
-          {type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : field("content", "Content", true)}
+          {type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : <MarkdownEditor key={type} value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}
           {["snippet", "command"].includes(type) && field("language", "Language")}
           {field("tags", "Tags (comma-separated)")}
         </fieldset>

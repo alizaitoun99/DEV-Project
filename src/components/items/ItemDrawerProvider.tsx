@@ -8,6 +8,7 @@ import type { ItemDetail } from "@/lib/db/items";
 import { ItemEditForm } from "@/components/items/ItemEditForm";
 import { TypeIcon } from "@/components/dashboard/TypeIcon";
 import { CodeEditor } from "@/components/items/CodeEditor";
+import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 
@@ -95,7 +96,7 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
     </div>
     <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
       <section><h3 className="mb-3 text-sm text-muted-foreground">Description</h3><p className="whitespace-pre-wrap text-sm">{item.description || "No description"}</p></section>
-      {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3>{["snippet", "command"].includes(item.type.slug) ? <CodeEditor value={item.content} language={item.language ?? ""} readOnly /> : <pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre>}</section>}
+      {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3>{["snippet", "command"].includes(item.type.slug) ? <CodeEditor value={item.content} language={item.language ?? ""} readOnly /> : ["note", "prompt"].includes(item.type.slug) ? <MarkdownEditor value={item.content} readOnly /> : <pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre>}</section>}
       {item.url && <section><h3 className="mb-3 text-sm text-muted-foreground">URL</h3>{safeUrl ? <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{item.url}</a> : <p className="text-sm">{item.url}</p>}</section>}
       {item.fileName && <section><h3 className="mb-3 text-sm text-muted-foreground">File</h3><p className="text-sm">{item.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{[item.fileMimeType, item.fileSize !== null ? `${item.fileSize} bytes` : null].filter(Boolean).join(" · ")}</p></section>}
       <section className="border-t pt-6"><h3 className="mb-3 text-sm text-muted-foreground">Tags</h3><div className="flex flex-wrap gap-2">{item.tags.length ? item.tags.map(({ tag }) => <span key={tag.name} className="rounded bg-muted px-2 py-1 text-xs">{tag.name}</span>) : <p className="text-sm">No tags</p>}</div></section>

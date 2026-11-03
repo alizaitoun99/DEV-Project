@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { updateItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
 import { CodeEditor } from "@/components/items/CodeEditor";
+import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -50,7 +51,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
     <fieldset disabled={pending} className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
       {error && <p role="alert" className="whitespace-pre-wrap text-sm text-destructive">{error}</p>}
       {field("title", "Title")}{field("description", "Description", true)}
-      {languageType ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : textType && field("content", "Content", true)}{languageType && field("language", "Language")}
+      {languageType ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : textType && <MarkdownEditor value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}{languageType && field("language", "Language")}
       {item.type.slug === "link" && field("url", "URL")}{field("tags", "Tags (comma-separated)")}
       <section className="space-y-2 text-sm [overflow-wrap:anywhere]"><h3 className="text-muted-foreground">Collections</h3><p>{item.collections.map(({ collection }) => collection.name).join(", ") || "No collections"}</p></section>
       <dl className="space-y-2 text-sm"><dt className="text-muted-foreground">Created</dt><dd>{new Date(item.createdAt).toLocaleString()}</dd><dt className="text-muted-foreground">Updated</dt><dd>{new Date(item.updatedAt).toLocaleString()}</dd></dl>

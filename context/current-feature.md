@@ -1,14 +1,24 @@
-# Current Feature
+# Current Feature: Markdown Editor
 
-## Status: null
+## Status: In Progress
 
 ## Goals
 
-<!-- No active feature. -->
+- Create a reusable MarkdownEditor for notes and prompts with Write/Preview tabs using react-markdown and remark-gfm.
+- Integrate the editor into NewItemDialog and ItemDrawer edit mode for note and prompt content.
+- Render note and prompt content in ItemDrawer using readonly Preview mode.
+- Provide a header copy button matching CodeEditor and fluid height capped at 400px.
+- Style headings, code blocks, inline code, lists, blockquotes, links, and tables for the existing dark theme.
 
 ## Notes
 
-<!-- Load a feature specification to begin. -->
+- Specification: [Markdown Editor Spec](features/markdown-editor-spec.md).
+- Edit mode defaults to Write with Preview available; readonly mode shows only Preview.
+- Use a `bg-[#1e1e1e]` container and `bg-[#2d2d2d]` header, with a custom `.markdown-preview` CSS class for reliable styling.
+- Keep the existing CodeEditor for snippets and commands unchanged; MarkdownEditor applies only to notes and prompts.
+- Implemented on `feature/markdown-editor`: shared MarkdownEditor, create/edit integration, readonly drawer preview, GitHub Flavored Markdown, copy feedback, and dark preview styles. Added react-markdown and remark-gfm with synchronized lockfile; no schema changes.
+- Validation: all 81 Vitest tests, ESLint, standalone TypeScript, and whitespace checks passed. Production build passed outside the sandbox after a Windows EPERM error. No component unit tests added under the project testing policy; Server Actions and utilities are unchanged, so existing auth integration scripts were not rerun.
+- Browser verification remains unconfirmed: Chrome reported connection refused, then timed out reaching the running localhost production server. Desktop/mobile layout, tab interaction, copy, and live persistence need manual verification. Preserved the unrelated local docs/testing.md edit; no commit made.
 ## Testing infrastructure
 
 - 2026-11-01: Set up Vitest for Server Actions and utilities only. Preserved the active Items List View work and existing Node regression scripts. Validation passed: 12 unit tests, lint, standalone TypeScript, whitespace checks, and production build. The final build passed outside the sandbox after a Windows EPERM error during page generation. Existing integration scripts were not run because their code was unchanged.
