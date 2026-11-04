@@ -1,9 +1,10 @@
 "use client";
 
+import { FavoriteButton } from "@/components/FavoriteButton";
 import Image from "next/image";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Copy, Pencil, Pin, Star } from "lucide-react";
+import { Copy, Pencil, Pin } from "lucide-react";
 import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
@@ -93,7 +94,7 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
   const safeUrl = item.url && /^https?:\/\//i.test(item.url) ? item.url : null;
   return <>
     <div aria-label="Item actions" className="flex flex-wrap items-center gap-1 border-b px-4 py-4">
-      <Button variant="ghost" disabled title="Favorite changes coming later" className={item.isFavorite ? "text-yellow-400" : ""}><Star className={item.isFavorite ? "fill-yellow-400" : ""} />Favorite</Button>
+      <FavoriteButton kind="item" id={item.id} isFavorite={item.isFavorite} onSaved={(isFavorite) => onSaved({ ...item, isFavorite })} />
       <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
       <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
       {item.fileName && <Button variant="ghost" asChild><a href={`/api/items/${encodeURIComponent(item.id)}/download`}>Download</a></Button>}

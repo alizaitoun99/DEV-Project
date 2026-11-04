@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: Favorite Toggles
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add a favorite toggle to the item drawer.
+- Add a favorite toggle to the collection detail page.
+- Add favorite toggles to item and collection cards wherever they appear.
+- Allow users to add and remove favorites, with a clear active state and accessible button labels.
+- Persist changes for the authenticated owner and refresh the Favorites page, sidebar, and affected views.
+- Show pending and error feedback, and prevent favorite clicks on cards from opening the drawer or navigating.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Loaded from the inline request on 2026-11-04; implementation started on `feature/favorite-toggles`.
+- Use the existing item and collection `isFavorite` fields and the existing Favorites page; no schema change is expected.
+- Replace collection favorite placeholders with working controls and reuse shared controls where practical.
+- Validate and authorize mutations on the server. Add meaningful Server Action/utility tests under the existing testing policy.
+- Verify toggling in both directions, persistence after reload, card click behavior, and responsive layouts.
+- Implemented shared accessible star buttons in the item drawer, collection detail actions, item/image/collection cards, and file rows. Collection card stars replace the disabled menu placeholder. Owner-scoped validated Server Actions set the requested favorite state and revalidate the root layout to refresh lists and sidebar data. Drawer state updates after successful saves; pending controls and toast feedback handle requests and failures.
+- Validation: all 236 mocked Vitest tests, ESLint, standalone TypeScript, production build, and feature whitespace checks passed. Added 14 favorite mutation tests and updated the collection detail query regression. Build required an outside-sandbox retry after Windows EPERM. No schema or dependency changes.
+- Browser verification was attempted but blocked by Playwright's shared Chrome profile being in use. Authenticated interactions, reload persistence, and responsive layouts remain unverified. Unchanged auth/storage integration scripts were not rerun. Changes are uncommitted; unrelated local edits were preserved.
 
 ## Testing infrastructure
 

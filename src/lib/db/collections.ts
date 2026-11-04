@@ -102,7 +102,7 @@ export async function getRecentCollections(userId: string, limit = DASHBOARD_COL
 export async function getCollection(userId: string, id: string) {
   return prisma.collection.findFirst({
     where: { id, userId },
-    select: { id: true, name: true, description: true },
+    select: { id: true, name: true, description: true, isFavorite: true },
   });
 }
 

@@ -1,4 +1,5 @@
-import { Pin, Star } from "lucide-react";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { Pin } from "lucide-react";
 import { ImageThumbnail } from "@/components/items/ImageThumbnail";
 import { ItemDrawerTrigger } from "@/components/items/ItemDrawerProvider";
 import type { ItemSummary } from "@/lib/db/items";
@@ -20,7 +21,7 @@ export function ItemCard({ item }: ItemCardProps) {
         <div className="flex items-start gap-2">
           <h3 className="min-w-0 flex-1 break-words font-medium">{item.title}</h3>
           {item.isPinned && <Pin aria-label="Pinned item" className="mt-1 size-3.5 shrink-0 text-muted-foreground" />}
-          {item.isFavorite && <Star aria-label="Favorite item" className="mt-1 size-4 shrink-0 fill-yellow-400 text-yellow-400" />}
+          <FavoriteButton kind="item" id={item.id} isFavorite={item.isFavorite} />
         </div>
         {item.description && <p className="line-clamp-2 break-words text-sm text-muted-foreground">{item.description}</p>}
         {item.tags.length > 0 && <ul aria-label="Tags" className="flex flex-wrap gap-2">
@@ -41,7 +42,7 @@ export function ItemCard({ item }: ItemCardProps) {
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <h3 className="break-words font-medium">{item.title}</h3>
             {item.isPinned && <Pin aria-label="Pinned item" className="size-3.5 shrink-0 text-muted-foreground" />}
-            {item.isFavorite && <Star aria-label="Favorite item" className="size-4 shrink-0 fill-yellow-400 text-yellow-400" />}
+            <FavoriteButton kind="item" id={item.id} isFavorite={item.isFavorite} />
           </div>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
           <ul aria-label="Tags" className="mt-3 flex flex-wrap gap-2">

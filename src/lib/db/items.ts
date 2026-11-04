@@ -239,7 +239,7 @@ export async function getFilesByType(userId: string, typeId: string, skip = 0) {
     where: { userId, typeId },
     take: ITEMS_PER_PAGE, skip,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true },
+    select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true, isFavorite: true },
   });
 }
 

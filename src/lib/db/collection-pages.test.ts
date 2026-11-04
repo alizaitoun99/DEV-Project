@@ -40,7 +40,7 @@ it("keeps recent collections limited and skips aggregation for empty lists", asy
 it("returns null for missing or inaccessible collection details", async () => {
   findFirst.mockResolvedValue(null);
   expect(await getCollection("owner", "foreign")).toBeNull();
-  expect(findFirst).toHaveBeenCalledWith({ where: { id: "foreign", userId: "owner" }, select: { id: true, name: true, description: true } });
+  expect(findFirst).toHaveBeenCalledWith({ where: { id: "foreign", userId: "owner" }, select: { id: true, name: true, description: true, isFavorite: true } });
 });
 
 it("restricts collection items and tags to the owner without exposing private contents", async () => {

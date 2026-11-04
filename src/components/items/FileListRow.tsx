@@ -1,5 +1,6 @@
 "use client";
 
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { Download, File, FileArchive, FileCode, FileImage, FileSpreadsheet, FileText } from "lucide-react";
 import { ItemDrawerTrigger } from "@/components/items/ItemDrawerProvider";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ interface FileListRowProps {
   fileName: string | null;
   fileSize: string | null;
   createdAt: string;
+  isFavorite: boolean;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
@@ -24,7 +26,7 @@ function fileIcon(name: string) {
   return <File aria-hidden="true" className="size-8 shrink-0 text-muted-foreground" />;
 }
 
-export function FileListRow({ id, title, fileName, fileSize, createdAt }: FileListRowProps) {
+export function FileListRow({ id, title, fileName, fileSize, createdAt, isFavorite }: FileListRowProps) {
   const name = fileName || title;
 
   const size = fileSize === null ? null : Number(fileSize);
@@ -39,6 +41,7 @@ export function FileListRow({ id, title, fileName, fileSize, createdAt }: FileLi
         <span className="shrink-0 text-sm text-muted-foreground @min-[560px]:w-24">{sizeLabel}</span>
         <time dateTime={createdAt} className="shrink-0 text-xs text-muted-foreground @min-[560px]:w-36">Uploaded {dateFormat.format(new Date(createdAt))}</time>
       </div>
+      <FavoriteButton kind="item" id={id} isFavorite={isFavorite} />
       <Button variant="ghost" size="icon" asChild className="relative z-20 shrink-0">
         <a href={`/api/items/${encodeURIComponent(id)}/download`} download aria-label={`Download ${name}`} onClick={(event) => event.stopPropagation()}><Download aria-hidden="true" /></a>
       </Button>

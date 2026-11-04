@@ -1,9 +1,12 @@
 "use client";
 
+import { FavoriteButton } from "@/components/FavoriteButton";
+
+
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AlertDialog, DropdownMenu } from "radix-ui";
-import { Ellipsis, Pencil, Star, Trash2 } from "lucide-react";
+import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { updateCollection, deleteCollection } from "@/actions/collections";
 import { Button } from "@/components/ui/button";
@@ -11,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 interface CollectionActionsProps {
-  collection: { id: string; name: string; description: string | null };
+  collection: { id: string; name: string; description: string | null; isFavorite: boolean };
   menu?: boolean;
 }
 
@@ -62,12 +65,11 @@ export function CollectionActions({ collection, menu = false }: CollectionAction
       <DropdownMenu.Portal><DropdownMenu.Content align="end" sideOffset={4} className="z-50 min-w-48 rounded-lg border bg-popover p-1 text-popover-foreground shadow-xl" onCloseAutoFocus={(event) => { if (mode) event.preventDefault(); }}>
         <DropdownMenu.Item className={itemClass} onSelect={() => open("edit")}><Pencil aria-hidden="true" className="size-4" />Edit</DropdownMenu.Item>
         <DropdownMenu.Item className={`${itemClass} text-destructive`} onSelect={() => open("delete")}><Trash2 aria-hidden="true" className="size-4" />Delete</DropdownMenu.Item>
-        <DropdownMenu.Item disabled className={itemClass}><Star aria-hidden="true" className="size-4" />Favorite (coming soon)</DropdownMenu.Item>
       </DropdownMenu.Content></DropdownMenu.Portal>
     </DropdownMenu.Root> : <div className="flex shrink-0 gap-1">
       <Button ref={trigger} variant="outline" size="icon" aria-label="Edit collection" onClick={() => open("edit")}><Pencil aria-hidden="true" /></Button>
       <Button variant="outline" size="icon" aria-label="Delete collection" onClick={() => open("delete")}><Trash2 aria-hidden="true" className="text-destructive" /></Button>
-      <Button variant="outline" size="icon" disabled aria-label="Favorite collection (coming soon)" title="Favorites coming soon"><Star aria-hidden="true" /></Button>
+      <FavoriteButton kind="collection" id={collection.id} isFavorite={collection.isFavorite} />
     </div>}
     <Dialog open={mode === "edit"} onOpenChange={(value) => { if (!value) open(null); }}>
       <DialogContent aria-busy={pending} onCloseAutoFocus={restoreFocus}>
