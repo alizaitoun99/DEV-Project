@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { DropdownMenu } from "radix-ui";
-import { ChevronsUpDown, LogOut, UserRound } from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings, UserRound } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -46,6 +46,7 @@ export function UserMenu({ user }: UserMenuProps) {
           <DropdownMenu.Content side="top" align="start" sideOffset={8} className="z-[60] w-60 max-w-[calc(100vw-2rem)] rounded-lg border bg-popover p-1 text-popover-foreground shadow-xl">
             <DropdownMenu.Label className="px-3 py-2 text-xs text-muted-foreground">{user.plan} plan</DropdownMenu.Label>
             <DropdownMenu.Item asChild><Link href="/profile" className={itemClass}><UserRound aria-hidden="true" className="size-4" />Profile</Link></DropdownMenu.Item>
+            <DropdownMenu.Item asChild><Link href="/settings" className={itemClass}><Settings aria-hidden="true" className="size-4" />Settings</Link></DropdownMenu.Item>
             <DropdownMenu.Separator className="my-1 h-px bg-border" />
             <DropdownMenu.Item disabled={pending} onSelect={() => void logout()} className={itemClass}><LogOut aria-hidden="true" className="size-4" />{pending ? "Signing out…" : "Sign out"}</DropdownMenu.Item>
           </DropdownMenu.Content>

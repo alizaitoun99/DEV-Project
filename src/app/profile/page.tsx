@@ -4,7 +4,6 @@ import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { UserAvatar } from "@/components/auth/UserAvatar";
-import { ProfileActions } from "@/components/auth/ProfileActions";
 
 export const metadata = { title: "Profile | DevStash" };
 
@@ -12,7 +11,7 @@ async function Profile() {
   await connection();
   const user = await getCurrentUser();
   const [details, totalItems, totalCollections, types] = await Promise.all([
-    prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { createdAt: true, passwordHash: true } }),
+    prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { createdAt: true } }),
     prisma.item.count({ where: { userId: user.id } }),
     prisma.collection.count({ where: { userId: user.id } }),
     prisma.itemType.findMany({
@@ -37,7 +36,6 @@ async function Profile() {
       <h3 className="font-medium">Items by type</h3>
       <dl className="grid gap-3 sm:grid-cols-2">{types.map((type) => <div key={type.id} className="flex justify-between gap-4 rounded-lg border px-4 py-3"><dt className="break-words">{type.name}</dt><dd className="font-semibold">{type._count.items}</dd></div>)}</dl>
     </section>
-    <ProfileActions hasPassword={Boolean(details.passwordHash)} />
   </div>;
 }
 

@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: Settings Page
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Create a settings page at `/settings`, accessible only to authenticated users.
+- Add a Settings link to the user icon dropdown at the bottom of the sidebar.
+- Move the Account actions section, including account deletion and password recovery, from `/profile` to `/settings`.
+- Preserve the existing account-action validation, authorization, confirmation, and authentication-method restrictions.
+- Keep settings navigation and account actions usable on desktop and mobile.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Loaded from the user's inline description on 2026-11-04.
+- Follow the existing application shell, styling, and protected-route patterns.
+- Check the existing profile password controls during implementation and move the relevant Account actions together, preserving their current behavior.
+- Keep profile information and usage details on `/profile`.
+- No additional settings capabilities are included in this feature.
+- Implementation on `feature/settings-page`: added `/settings` with server-side authentication and proxy protection, linked Settings in the shared sidebar account menu, and moved the existing Account actions section out of Profile. Profile retains identity and usage details and no longer fetches the password hash.
+- The existing section contained password changes and account deletion; added a Forgot password link to the existing recovery page for credentials accounts. Existing Server Actions, throttling, validation, and deletion confirmation remain unchanged.
+- Validation: all 203 mocked Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The build passed with filesystem escalation after a sandbox EPERM error. No new component tests were added under project policy; unchanged auth/storage integration scripts were not rerun.
+- Manual verification remains unconfirmed: Playwright navigation timed out on port 3100 despite the production server reporting ready, and local HTTP checks could not connect. Authenticated settings/menu interactions and responsive layouts still require browser verification. No schema or dependency changes; no commit made.
 
 ## Testing infrastructure
 

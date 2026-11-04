@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { AlertDialog } from "radix-ui";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ export function ProfileActions({ hasPassword }: ProfileActionsProps) {
       <p className="text-xs text-muted-foreground">Use at least 8 characters, up to 72 bytes.</p>
       <label className="block space-y-2 text-sm"><span>Confirm new password</span><Input name="confirmPassword" type="password" autoComplete="new-password" required maxLength={72} disabled={pending} /></label>
       <Button disabled={pending} type="submit">{pending ? "Saving…" : "Change password"}</Button>
+      <p className="text-sm"><Link href="/forgot-password" className="text-primary underline underline-offset-4">Forgot password?</Link></p>
     </form>}
     {!open && error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     <div className="space-y-3 border-t pt-6">
