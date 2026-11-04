@@ -4,6 +4,7 @@ const { auth, persist } = vi.hoisted(() => ({ auth: vi.fn(), persist: vi.fn() })
 vi.mock("@/auth", () => ({ auth }));
 vi.mock("@/lib/db/items", () => ({ createItem: persist }));
 import { createItem } from "./items";
+import { z } from "zod";
 
 beforeEach(() => { auth.mockReset(); persist.mockReset(); auth.mockResolvedValue({ user: { id: "owner" } }); });
 const input = { type: "note", title: "  Example  ", tags: [" React "] };
@@ -40,4 +41,14 @@ describe("createItem action", () => {
     auth.mockRejectedValue(new Error("private auth"));
     expect(JSON.stringify(await createItem(input))).not.toContain("private");
   });
+});
+
+it("passes normalized collection choices to persistence with session ownership", async () => {
+  persist.mockResolvedValue({ id: "created" });
+  await createItem({ ...input, collectionIds: [" a ", "a", "b"], userId: "foreign" });
+  expect(persist).toHaveBeenCalledWith("owner", expect.objectContaining({ collectionIds: ["a", "b"] }));
+});
+it("reports unavailable collection selections as actionable validation errors", async () => {
+  persist.mockRejectedValue(new z.ZodError([{ code: "custom", path: ["collectionIds"], message: "Selected collection is unavailable." }]));
+  expect(await createItem({ ...input, collectionIds: ["missing"] })).toEqual({ success: false, error: "Selected collection is unavailable." });
 });

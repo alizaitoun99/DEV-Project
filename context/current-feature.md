@@ -1,4 +1,4 @@
-# Current Feature: Collection Create
+# Current Feature: Item Collection Membership
 
 ## Status
 
@@ -6,22 +6,29 @@ In Progress
 
 ## Goals
 
-- Add a top-bar button that opens a collection creation modal, following the existing item creation UI patterns.
-- Provide a required collection name and an optional description, with validation and pending submission feedback.
-- Persist collections for the authenticated user only; derive ownership from the server session and validate inputs with Zod.
-- Fetch initial collection data in Server Components through `lib/db` functions and use API routes for client-side calls.
-- Show a toast on success or failure, close and reset the modal after success, and refresh collection lists, sidebar entries, and dashboard counts after saving.
-- Add meaningful mocked utility tests for validation, ownership, persistence, and error handling; run the project checks and manually verify the modal and responsive layout.
+- Add a collection selection input to both the new item form and the edit item form.
+- Allow an item to belong to zero, one, or multiple available collections.
+- Populate options with collections owned by the authenticated user.
+- Preselect existing memberships when editing and allow adding or removing memberships when saving.
+- Persist selected memberships alongside item creation and updates, including file and image items.
+- Validate collection IDs and enforce item and collection ownership on the server; reject unavailable or foreign collections.
+- Follow existing form styling, accessible keyboard interactions, pending states, validation feedback, and success/error notifications.
+- Add meaningful mocked Server Action and utility tests for membership persistence, replacement, empty selection, and ownership checks; run the required project checks and manually verify affected forms.
 
 ## Notes
 
-- Loaded from the user's inline specification on 2026-11-04.
-- Follow existing item creation patterns and shared dialog, field, button, and toast components.
-- Client-side API routes are explicitly requested for this feature and take precedence over the general Server Action preference.
-- Scope covers creating collections with a name and description; collection editing, deletion, favorites, and item membership management are outside this feature.
-- Reused the existing Collection model; no schema or dependency changes.
-- Implemented on `feature/collection-create`: shared top-bar dialog, authenticated same-origin POST `/api/collections`, Zod validation, owner-scoped `lib/db` persistence, and route refresh for existing server-rendered dashboard/sidebar queries.
-- Validation: all 158 mocked Vitest tests, ESLint, standalone TypeScript, and whitespace checks passed. Browser verification timed out; live persistence and desktop/mobile interactions remain unverified. Production build passed outside the sandbox after the initial Windows EPERM failure. Unchanged auth/storage integration scripts were not rerun; no live services were used by the unit tests.
+- Loaded from the user's inline specification on 2026-11-04 using the feature skill's load action.
+- Work in the dedicated item-collections Git worktree.
+- Collection pages and collection-page display are explicitly outside scope.
+- Reuse the existing many-to-many ItemCollection model where possible.
+- Collection creation is separate work; preserve the original checkout's uncommitted changes.
+- Implemented on `feature/item-collection-membership`: shared accessible checkbox selector with loading, empty, error/retry, and disabled states; authenticated non-cacheable collection options; selection reset on creation and existing membership preselection on editing.
+- Creation, editing, and file/image finalization validate collection ownership and save memberships transactionally. Deselection removes memberships; retained memberships preserve their added date. Callers omitting collection IDs preserve memberships.
+- Reused the existing schema; no migration or dependency changes.
+- Validation: all 175 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks passed. The first standalone TypeScript check lacked generated Next.js route types; rerun passed after the build generated them.
+- Installation required network access after sandbox DNS failure. Production build passed outside the sandbox after a Windows EPERM failure; existing source-checkout environment configuration was loaded in memory without copying secrets.
+- Browser access to the production app on port 3100 verified the protected dashboard redirect to sign-in. Authenticated create/edit interactions, live membership persistence, and desktop/mobile layouts remain unverified because no authenticated browser session was available. Unchanged auth/storage integration scripts were not rerun.
+- Publishing the feature branch to GitHub at the user's request; implementation remains available for review without merging to main.
 
 ## Testing infrastructure
 

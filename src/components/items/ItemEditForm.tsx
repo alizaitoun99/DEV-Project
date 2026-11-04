@@ -7,6 +7,7 @@ import { updateItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
 import { CodeEditor } from "@/components/items/CodeEditor";
 import { MarkdownEditor } from "@/components/items/MarkdownEditor";
+import { CollectionSelector } from "@/components/items/CollectionSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -15,6 +16,7 @@ interface ItemEditFormProps { item: ItemDetail; onCancel: () => void; onSaved: (
 export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
   const router = useRouter();
   const [fields, setFields] = useState({ title: item.title, description: item.description ?? "", content: item.content ?? "", language: item.language ?? "", url: item.url ?? "", tags: item.tags.map(({ tag }) => tag.name).join(", ") });
+  const [collectionIds, setCollectionIds] = useState<string[]>(item.collections.map(({ collection }) => collection.id));
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const saving = useRef(false);
@@ -33,6 +35,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
         ...(textType ? { content: fields.content || null } : {}),
         ...(languageType ? { language: fields.language || null } : {}),
         ...(item.type.slug === "link" ? { url: fields.url.trim() } : {}),
+        collectionIds,
         tags: fields.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       });
       if (!result.success) { setError(result.error); toast.error(result.error); return; }
@@ -53,7 +56,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
       {field("title", "Title")}{field("description", "Description", true)}
       {languageType ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : textType && <MarkdownEditor value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}{languageType && field("language", "Language")}
       {item.type.slug === "link" && field("url", "URL")}{field("tags", "Tags (comma-separated)")}
-      <section className="space-y-2 text-sm [overflow-wrap:anywhere]"><h3 className="text-muted-foreground">Collections</h3><p>{item.collections.map(({ collection }) => collection.name).join(", ") || "No collections"}</p></section>
+      <CollectionSelector value={collectionIds} onChange={setCollectionIds} disabled={pending} />
       <dl className="space-y-2 text-sm"><dt className="text-muted-foreground">Created</dt><dd>{new Date(item.createdAt).toLocaleString()}</dd><dt className="text-muted-foreground">Updated</dt><dd>{new Date(item.updatedAt).toLocaleString()}</dd></dl>
     </fieldset>
   </form>;

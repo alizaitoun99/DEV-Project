@@ -18,7 +18,8 @@ export async function createItem(input: unknown): Promise<CreateResult> {
     if (!parsed.success) return { success: false, error: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("\n") };
     const item = await insertItem(session.user.id, parsed.data);
     return item ? { success: true, data: item } : { success: false, error: "This item type is unavailable." };
-  } catch {
+  } catch (error) {
+    if (error instanceof z.ZodError) return { success: false, error: error.issues.map((issue) => issue.message).join(" ") };
     return { success: false, error: "Unable to create item. Please try again." };
   }
 }

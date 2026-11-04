@@ -1,10 +1,10 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-const { create, auth } = vi.hoisted(() => ({ create: vi.fn(), auth: vi.fn() }));
-vi.mock("@/lib/prisma", () => ({ prisma: { collection: { create } } }));
+const { create, auth, findMany } = vi.hoisted(() => ({ create: vi.fn(), auth: vi.fn(), findMany: vi.fn() }));
+vi.mock("@/lib/prisma", () => ({ prisma: { collection: { create, findMany } } }));
 vi.mock("@/auth", () => ({ auth }));
 import { createCollection } from "./collections";
-import { POST } from "@/app/api/collections/route";
+import { POST, GET } from "@/app/api/collections/route";
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -70,4 +70,24 @@ it("returns a safe retryable error when persistence fails", async () => {
   const response = await POST(request({ name: "Notes" }));
   expect(response.status).toBe(500);
   expect(await response.json()).toEqual({ success: false, error: "Unable to create collection. Please try again." });
+});
+
+it("returns only the current owner's collection options without caching", async () => {
+  findMany.mockResolvedValue([{ id: "a", name: "Notes" }]);
+  const response = await GET();
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({ success: true, data: [{ id: "a", name: "Notes" }] });
+  expect(findMany).toHaveBeenCalledWith({ where: { userId: "owner" }, orderBy: [{ name: "asc" }, { id: "asc" }], select: { id: true, name: true } });
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+});
+it("rejects unauthenticated collection option requests", async () => {
+  auth.mockResolvedValue(null);
+  expect((await GET()).status).toBe(401);
+  expect(findMany).not.toHaveBeenCalled();
+});
+it("hides collection option query failures", async () => {
+  findMany.mockRejectedValue(new Error("private database detail"));
+  const response = await GET();
+  expect(response.status).toBe(500);
+  expect(await response.text()).not.toContain("private database detail");
 });

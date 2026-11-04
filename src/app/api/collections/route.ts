@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { collectionCreateSchema } from "@/lib/collection-validation";
-import { createCollection } from "@/lib/db/collections";
+import { createCollection, getCollectionOptions } from "@/lib/db/collections";
 
 const headers = { "Cache-Control": "private, no-store" };
 
@@ -29,5 +29,16 @@ export async function POST(request: Request) {
     return Response.json({ success: true, data }, { status: 201, headers });
   } catch {
     return Response.json({ success: false, error: "Unable to create collection. Please try again." }, { status: 500, headers });
+  }
+}
+
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user.id) return Response.json({ success: false, error: "Please sign in again." }, { status: 401, headers });
+    const data = await getCollectionOptions(session.user.id);
+    return Response.json({ success: true, data }, { headers });
+  } catch {
+    return Response.json({ success: false, error: "Unable to load collections. Please try again." }, { status: 500, headers });
   }
 }

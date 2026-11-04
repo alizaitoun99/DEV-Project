@@ -5,7 +5,18 @@ import { prisma } from "@/lib/prisma";
 import { randomUUID } from "node:crypto";
 import { UploadError, type UploadIntent } from "@/lib/upload-validation";
 import type { StorageObject } from "@/generated/prisma/client";
+import { z } from "zod";
 import { linkUpdateSchema } from "@/lib/item-validation";
+
+async function validateCollections(tx: Prisma.TransactionClient, userId: string, ids?: string[]) {
+  if (ids === undefined) return undefined;
+  const collectionIds = [...new Set(ids)];
+  if (collectionIds.length) {
+    const owned = await tx.collection.count({ where: { userId, id: { in: collectionIds } } });
+    if (owned !== collectionIds.length) throw new z.ZodError([{ code: "custom", path: ["collectionIds"], message: "One or more selected collections are unavailable. Reload the form and try again." }]);
+  }
+  return collectionIds;
+}
 
 export async function lockStorageOwner(tx: Prisma.TransactionClient, userId: string) {
   const users = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
@@ -35,10 +46,12 @@ export async function finalizeUploadRecord(userId: string, id: string, input: im
     const mime = await verify(record);
     const type = await tx.itemType.findFirst({ where: { slug: record.type, kind: "FILE", isSystem: true, userId: null }, select: { id: true } });
     if (!type) throw new Error("Item type unavailable.");
+    const collectionIds = await validateCollections(tx, userId, input.collectionIds);
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     const item = await tx.item.create({ data: {
       userId, typeId: type.id, title: input.title, description: input.description,
       fileKey: record.key, fileName: record.fileName, fileSize: record.size, fileMimeType: mime,
+      ...(collectionIds ? { collections: { create: collectionIds.map((collectionId) => ({ collectionId })) } } : {}),
       tags: { create: tags.map(([slug, name]) => ({ tag: { connectOrCreate: {
         where: { userId_slug: { userId, slug } }, create: { userId, slug, name },
       } } })) },
@@ -110,6 +123,7 @@ export async function createItem(userId: string, input: import("@/lib/item-valid
       select: { id: true },
     });
     if (!type) return null;
+    const collectionIds = await validateCollections(tx, userId, input.collectionIds);
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     return tx.item.create({
       data: {
@@ -117,6 +131,7 @@ export async function createItem(userId: string, input: import("@/lib/item-valid
         content: input.type === "link" ? null : input.content ?? null,
         language: ["snippet", "command"].includes(input.type) ? input.language ?? null : null,
         url: input.type === "link" ? input.url : null,
+        ...(collectionIds ? { collections: { create: collectionIds.map((collectionId) => ({ collectionId })) } } : {}),
         tags: { create: tags.map(([slug, name]) => ({ tag: { connectOrCreate: {
           where: { userId_slug: { userId, slug } }, create: { userId, slug, name },
         } } })) },
@@ -249,6 +264,7 @@ export async function updateItem(userId: string, id: string, input: import("@/li
     const slug = existing.type.slug;
     // Derive required fields from the owned item, never a client-supplied type.
     if (slug === "link") input = linkUpdateSchema.parse(input);
+    const collectionIds = await validateCollections(tx, userId, input.collectionIds);
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     await tx.item.update({
       where: { id, userId },
@@ -257,6 +273,10 @@ export async function updateItem(userId: string, id: string, input: import("@/li
         ...(["snippet", "prompt", "command", "note"].includes(slug) ? { content: input.content } : {}),
         ...(["snippet", "command"].includes(slug) ? { language: input.language } : {}),
         ...(slug === "link" ? { url: input.url } : {}),
+        ...(collectionIds ? { collections: {
+          deleteMany: { collectionId: { notIn: collectionIds } },
+          createMany: { data: collectionIds.map((collectionId) => ({ collectionId })), skipDuplicates: true },
+        } } : {}),
         tags: {
           deleteMany: {},
           create: tags.map(([tagSlug, name]) => ({ tag: { connectOrCreate: {

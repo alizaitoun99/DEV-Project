@@ -86,3 +86,10 @@ export async function getFavoriteCollections(userId: string) {
     select: { id: true, name: true },
   });
 }
+
+export async function getCollectionOptions(userId: string) {
+  return prisma.collection.findMany({
+    where: { userId }, orderBy: [{ name: "asc" }, { id: "asc" }],
+    select: { id: true, name: true },
+  });
+}

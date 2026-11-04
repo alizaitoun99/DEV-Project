@@ -8,6 +8,7 @@ export const itemUpdateSchema = z.object({
   content: z.string().max(500000).nullable().optional(),
   language: z.string().trim().max(100).nullable().optional(),
   url: requiredUrlSchema.nullable().optional(),
+  collectionIds: z.array(z.string().trim().min(1).max(200)).max(100).transform((ids) => [...new Set(ids)]).optional(),
   tags: z.array(z.string().trim().min(1).max(100)).max(50),
 });
 

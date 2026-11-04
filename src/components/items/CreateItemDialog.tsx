@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { createItem } from "@/actions/items";
 import { CodeEditor } from "@/components/items/CodeEditor";
 import { MarkdownEditor } from "@/components/items/MarkdownEditor";
+import { CollectionSelector } from "@/components/items/CollectionSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -30,6 +31,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [fields, setFields] = useState(initialFields);
+  const [collectionIds, setCollectionIds] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const saving = useRef(false);
@@ -38,6 +40,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
     if (saving.current) return;
     setOpen(value);
     setFields(initialFields);
+    setCollectionIds([]);
     setType(defaultType);
     setError(null);
     setFile(null);
@@ -54,6 +57,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
         type, title: fields.title, description: fields.description || null,
         ...(type === "link" ? { url: fields.url.trim() || null } : { content: fields.content || null }),
         ...(["snippet", "command"].includes(type) ? { language: fields.language || null } : {}),
+        collectionIds,
         tags: fields.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       };
       let result;
@@ -106,6 +110,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
           {type === "file" || type === "image" ? <FileUpload type={type} file={file} onChange={setFile} disabled={pending} progress={progress} /> : type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : <MarkdownEditor key={type} value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}
           {["snippet", "command"].includes(type) && field("language", "Language")}
           {field("tags", "Tags (comma-separated)")}
+          {open && <CollectionSelector value={collectionIds} onChange={setCollectionIds} disabled={pending} />}
         </fieldset>
         <div className="flex flex-wrap justify-end gap-3">
           <DialogClose asChild><Button type="button" variant="outline" disabled={pending}>Cancel</Button></DialogClose>
