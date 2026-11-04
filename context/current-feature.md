@@ -1,28 +1,16 @@
-# Current Feature: Collection Pages
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Create `/collections` to show all collections belonging to the signed-in user using the existing collection cards.
-- Create `/collections/[id]` to show the items in the selected collection using the existing item cards.
-- Link the sidebar's "View all collections" to `/collections`.
-- Link every collection card to its corresponding `/collections/[id]` page.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Reuse the existing dashboard shell and card components.
-- Scope collection and item queries to the authenticated owner; return not found for missing or inaccessible collections.
-- Include loading and empty states consistent with existing list pages.
-- Preserve existing item drawer behavior when opening items from a collection.
-- Group collection items into labeled type sections (Files, Images, Snippets, etc.), with icons and per-section counts; reuse existing cards and the image gallery column layout.
-- No collection editing, deletion, or schema changes are requested.
-
-- Implemented on `feature/collection-pages`: both protected routes reuse the dashboard shell, existing collection/item cards, and item drawer. Existing sidebar/card links already target these routes. Owner-scoped queries include loading/empty states and not-found handling for unavailable collections. No schema or dependency changes.
-- Validation: all 179 mocked Vitest tests passed, ESLint passed, standalone TypeScript passed after development route-type regeneration, and production build passed after an outside-sandbox retry for Windows EPERM. Browser navigation timed out and local HTTP verification failed; authenticated interactions and responsive layouts remain unverified. Unchanged auth/storage integration scripts were not run. No commit made; unrelated local edits preserved.
-- Collection detail UI now groups items by type with labeled headings, icons, counts, and existing item cards. Images retain the three-column gallery layout on wide screens. No component unit tests added under project policy. All 179 tests, ESLint, standalone TypeScript, and whitespace checks passed; browser navigation timed out, so authenticated responsive verification remains unconfirmed.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -140,3 +128,7 @@ In Progress
 - 2026-11-04: Repaired confirmed duplicate React Patterns development data: merged memberships into the favorite collection (8 distinct items), preserved all items, and replaced four demo-prefixed collection IDs with UUIDs. Updated seed to reuse owner/name collections and generate ordinary IDs; updated seed verification to identify collections through seeded item memberships. Repair script previews by default and applies transactionally with membership/item-preservation checks. Old demo-prefixed bookmarks must be reopened from the refreshed collection list.
 - Repair validation: 179 Vitest tests, ESLint, standalone TypeScript, production build, live db:check, and live collection-summary verification passed (11 collections, 31 memberships across two users). Authenticated browser verification remains unconfirmed; no auth/storage integration suites rerun.
 - Collection type-section production build passed.
+
+- 2026-11-04: Completed Collection Pages on `feature/collection-pages`, committed as `40dc06e` and merged into `main`; deleted the merged local branch. Added authenticated owner-scoped `/collections` and `/collections/[id]` pages using existing cards, dashboard shell, and item drawer, with loading/empty/not-found states. Detail pages group items under type headings with icons and counts; images use the responsive gallery layout. Existing sidebar and card links now reach implemented routes. No schema or dependency changes.
+- 2026-11-04: Corrected duplicate seeded React Patterns collections by preserving all items, merging memberships into the favorite collection, and normalizing four demo-prefixed collection IDs. Seed reuses existing owner/name collections; the preview-first transactional repair checks item and membership preservation. Live database and collection-summary checks passed.
+- 2026-11-04: Validation passed: all 179 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Production build required filesystem escalation; stale development route types were regenerated. Authenticated browser/responsive verification remains unconfirmed after connection timeouts; unchanged auth/storage integration suites were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
