@@ -1,28 +1,16 @@
-# Current Feature: Favorite Toggles
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add a favorite toggle to the item drawer.
-- Add a favorite toggle to the collection detail page.
-- Add favorite toggles to item and collection cards wherever they appear.
-- Allow users to add and remove favorites, with a clear active state and accessible button labels.
-- Persist changes for the authenticated owner and refresh the Favorites page, sidebar, and affected views.
-- Show pending and error feedback, and prevent favorite clicks on cards from opening the drawer or navigating.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Loaded from the inline request on 2026-11-04; implementation started on `feature/favorite-toggles`.
-- Use the existing item and collection `isFavorite` fields and the existing Favorites page; no schema change is expected.
-- Replace collection favorite placeholders with working controls and reuse shared controls where practical.
-- Validate and authorize mutations on the server. Add meaningful Server Action/utility tests under the existing testing policy.
-- Verify toggling in both directions, persistence after reload, card click behavior, and responsive layouts.
-- Implemented shared accessible star buttons in the item drawer, collection detail actions, item/image/collection cards, and file rows. Collection card stars replace the disabled menu placeholder. Owner-scoped validated Server Actions set the requested favorite state and revalidate the root layout to refresh lists and sidebar data. Drawer state updates after successful saves; pending controls and toast feedback handle requests and failures.
-- Validation: all 236 mocked Vitest tests, ESLint, standalone TypeScript, production build, and feature whitespace checks passed. Added 14 favorite mutation tests and updated the collection detail query regression. Build required an outside-sandbox retry after Windows EPERM. No schema or dependency changes.
-- Browser verification was attempted but blocked by Playwright's shared Chrome profile being in use. Authenticated interactions, reload persistence, and responsive layouts remain unverified. Unchanged auth/storage integration scripts were not rerun. Changes are uncommitted; unrelated local edits were preserved.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -163,3 +151,6 @@ In Progress
 
 - 2026-11-04: Completed [Favorites Page](features/favorites-spec.md) on `feature/favorites`, committed as `0908bdd` and merged into `main`; deleted the merged local feature branch. Added a protected `/favorites` route and shared-header star link, owner-scoped minimal metadata queries, compact monospace item and collection lists with counts, creation dates, drawer access, collection navigation, and loading/empty states. Lists sort by updatedAt descending with stable ID tie-breaking. No schema or dependency changes.
 - Favorites validation passed: all 222 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build required an outside-sandbox retry after Windows EPERM; migration status required network access. Authenticated browser and responsive verification remain unconfirmed because Playwright's shared Chrome profile was locked. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed Favorite Toggles on `feature/favorite-toggles`, committed as `3b4d6ff` and merged into `main`. Added shared accessible star buttons to the item drawer, collection detail page, item/image/collection cards, and file rows. Validated owner-scoped mutations persist both favorite states and refresh affected views and sidebar data. Pending protection and toast feedback handle saves and errors; card stars act independently of drawer/navigation triggers. Collection card stars replace the disabled menu placeholder. No schema or dependency changes.
+- Favorite toggle validation passed: all 236 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Added 14 favorite mutation regressions and updated the collection detail query regression. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Browser interaction, reload-persistence, and responsive verification remain unconfirmed because Playwright reported its shared Chrome profile in use. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user completion request and preserved unrelated local edits outside feature commits.
