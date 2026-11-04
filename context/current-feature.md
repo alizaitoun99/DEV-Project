@@ -1,26 +1,16 @@
-# Current Feature: Pinned Items
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Create a `toggleItemPin` Server Action.
-- Make the existing Pin button in ItemDrawer functional.
-- Provide optimistic UI updates and success/error toast notifications.
-- Sort pinned items to the top of listings and show them in the dashboard pinned items section.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Pinned Items](features/pinned-spec.md).
-- Follow the existing Favorite Button pattern.
-- Pinning applies to items only, not collections.
-- Keep the Pin icon on ItemCard as a static indicator.
-- Implementation: `feature/pinned-items` adds an authenticated, validated, owner-scoped `toggleItemPin` action accepting the desired pin state, following the favorite mutation pattern. The drawer control updates optimistically, rolls back on failure, prevents duplicate submissions, and displays success/error toasts. Layout revalidation refreshes listings and the existing dashboard pinned section.
-- Item type, file, and collection queries sort pins first before pagination, then updated date and ID. Collection pages preserve type sections with pins first within each section. Recent items and explicit Favorites sorting retain their existing ordering. No schema or dependency changes.
-- Validation: 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, and feature whitespace checks passed. Initial TypeScript ran during Prisma regeneration and was rerun successfully. Build required an outside-sandbox retry after Windows EPERM while creating prerender output.
-- Browser interaction, persistence, and responsive verification remain unconfirmed because Playwright's shared Chrome profile was in use. Unchanged auth/storage integration scripts were not rerun. Changes are uncommitted; unrelated existing local edits are preserved.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -167,3 +157,6 @@ In Progress
 
 - 2026-11-04: Completed Favorites Client-Side Sorting on feature/favorites-client-side-sorting, committed as ab8c756 and merged into main. Added independent accessible sort dropdowns for favorite items (name, creation date, item type) and collections (name, creation date), ascending/descending options, newest-first defaults, and deterministic name/ID ties. Sorting runs on the loaded client data without additional requests; drawer access, navigation, counts, and empty states are preserved. No schema or dependency changes.
 - Favorites sorting validation passed: all 240 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Browser interaction and responsive verification remain unconfirmed after localhost connection refusal/timeout. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed [Pinned Items](features/pinned-spec.md) on `feature/pinned-items`, committed as `dede6bd` and merged into `main`; deleted the merged local branch. Added an authenticated, validated, owner-scoped `toggleItemPin` action and accessible drawer control with optimistic updates, failure rollback, pending protection, and success/error toasts. Layout revalidation refreshes the existing dashboard pinned section and listings. Item type, file, and collection queries sort pins first before pagination, then updated date and ID; collection pages preserve type sections with pins first within each section. Recent items and explicit Favorites sorting retain their ordering. Card pin icons remain static. No schema or dependency changes.
+- Pinned Items validation passed: all 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Initial TypeScript overlapped Prisma generation; rerun passed. Browser interaction, persistence, and responsive verification remain unconfirmed because Playwright's shared Chrome profile was in use. Unchanged auth/storage integration scripts were not rerun. Cleared the tracker at the user's completion request and preserved unrelated local edits outside feature commits.
