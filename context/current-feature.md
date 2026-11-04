@@ -1,28 +1,16 @@
-# Current Feature: Favorites Page
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add a star icon button in TopBar linking to the protected `/favorites` route.
-- Fetch the signed-in user's favorited items and collections, scoped to their ownership.
-- Display compact list sections for items and collections, each with a count.
-- Show each row's type icon, title, type badge, and date added.
-- Open items in ItemDrawer and navigate collections to `/collections/[id]`.
-- Show an empty state when there are no favorites.
-- Sort favorites by `updatedAt` descending, as specified.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Favorites Page](features/favorites-spec.md).
-- Use a dense VS Code/terminal-inspired layout with monospace or semi-monospace text, minimal padding, subtle hover states, and clean lines without cards or heavy borders.
-- The spec uses `updatedAt` as the proxy for most recently favorited; it does not request a dedicated favorite timestamp or favorite-toggle mutations.
-- Started on `feature/favorites`.
-- Implemented the protected route and shared-header star link, owner-scoped minimal metadata queries, dense responsive item/collection lists with counts, creation dates, drawer/navigation actions, and loading/empty states. Ordering uses `updatedAt` descending with ID tie-breaking.
-- Validation: all 222 Vitest tests, ESLint, standalone TypeScript, and feature whitespace checks passed. Browser verification was blocked by Playwright's shared Chrome-profile lock; authenticated interactions and responsive layouts remain unverified. Unchanged auth/storage integration scripts were not rerun.
-- Production build passed on an outside-sandbox retry after Windows EPERM prevented creation of generated Next.js output in the initial run. No schema or dependency changes.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -160,3 +148,6 @@ In Progress
 - 2026-11-04: Completed [Editor Preferences Settings](features/editor-settings-spec.md) on `feature/editor-preferences`, committed as `7dc2e7a` and merged into `main`; deleted the merged local feature branch. Added font/tab size dropdowns, word wrap and minimap switches, vs-dark/Monokai/GitHub Dark themes, owner-scoped validated automatic saves with toast feedback, pending protection, failure rollback, and shared EditorPreferencesContext applied to Monaco. Defaults preserve 13px text, two-space tabs, word wrap on, minimap off, and vs-dark. No dependency changes.
 - 2026-11-04: Created and applied development migration `20261104170046_editor_preferences` adding nullable User.editorPreferences JSONB. All four migrations are applied in development. Production uses a separate database and still requires `prisma migrate deploy` before deployment; production schema was left unchanged. Browser verification used process-only development credentials after identifying the environment mismatch.
 - 2026-11-04: Validation passed: all 219 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks. Build required an outside-sandbox retry after Windows EPERM. Production-mode browser checks confirmed Settings protection, sign-in, font/theme auto-save and full-reload persistence, pending protection, and Monaco displaying saved 18px text with the Monokai background. Settings verified at 390px/1440px with no mobile horizontal overflow. Restored demo defaults. Screenshots: [mobile](../artifacts/editor-preferences-mobile.png), [desktop](../artifacts/editor-preferences-desktop.png). Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed [Favorites Page](features/favorites-spec.md) on `feature/favorites`, committed as `0908bdd` and merged into `main`; deleted the merged local feature branch. Added a protected `/favorites` route and shared-header star link, owner-scoped minimal metadata queries, compact monospace item and collection lists with counts, creation dates, drawer access, collection navigation, and loading/empty states. Lists sort by updatedAt descending with stable ID tie-breaking. No schema or dependency changes.
+- Favorites validation passed: all 222 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build required an outside-sandbox retry after Windows EPERM; migration status required network access. Authenticated browser and responsive verification remain unconfirmed because Playwright's shared Chrome profile was locked. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
