@@ -49,9 +49,9 @@ async function checkDemoData(): Promise<void> {
     select: {
       id: true, name: true, email: true, plan: true, emailVerified: true, passwordHash: true,
       collections: {
-        where: { id: { startsWith: "demo-" } },
+        where: { items: { some: { item: { id: { startsWith: "demo-" } } } } },
         orderBy: { name: "asc" },
-        select: { id: true, name: true, description: true, items: { select: { itemId: true } } },
+        select: { id: true, name: true, description: true, items: { where: { item: { id: { startsWith: "demo-" } } }, select: { itemId: true } } },
       },
       items: {
         where: { id: { startsWith: "demo-" } },

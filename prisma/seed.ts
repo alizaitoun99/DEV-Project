@@ -148,11 +148,16 @@ async function main(): Promise<void> {
       typeIds.set(type.slug, record.id);
     }
     for (const collection of COLLECTIONS) {
-      const id = `demo-${user.id}-${collection.key}`;
-      const existing = await tx.collection.findUnique({ where: { id } });
+      const existing = await tx.collection.findFirst({
+        where: { userId: user.id, name: collection.name },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      });
       if (existing && existing.userId !== user.id) throw new Error("Demo collection ownership conflict.");
       const data = { name: collection.name, description: collection.description, userId: user.id };
-      await tx.collection.upsert({ where: { id }, create: { id, ...data }, update: data });
+      const record = existing
+        ? await tx.collection.update({ where: { id: existing.id }, data })
+        : await tx.collection.create({ data });
+      const id = record.id;
       for (const item of collection.items) {
         const itemId = `demo-${user.id}-${collection.key}-${item.key}`;
         const existingItem = await tx.item.findUnique({ where: { id: itemId } });

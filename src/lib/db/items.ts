@@ -229,6 +229,14 @@ export async function getFilesByType(userId: string, typeId: string) {
   });
 }
 
+export async function getItemsByCollection(userId: string, collectionId: string): Promise<ItemSummary[]> {
+  return prisma.item.findMany({
+    where: { userId, collections: { some: { collectionId, collection: { userId } } } },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: itemSelect(userId),
+  });
+}
+
 export async function getRecentItems(userId: string, limit = 10): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId },

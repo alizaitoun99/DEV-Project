@@ -31,11 +31,11 @@ interface CollectionTypeCount {
   count: bigint;
 }
 
-export async function getRecentCollections(userId: string, limit = 6): Promise<CollectionSummary[]> {
+export async function getCollections(userId: string, limit?: number): Promise<CollectionSummary[]> {
   const collections = await prisma.collection.findMany({
     where: { userId },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    take: limit,
+    ...(limit === undefined ? {} : { take: limit }),
     select: {
       id: true, name: true, description: true, isFavorite: true,
     },
@@ -77,6 +77,17 @@ export async function getCollectionStats(userId: string) {
     prisma.collection.count({ where: { userId, isFavorite: true } }),
   ]);
   return { total, favorites };
+}
+
+export async function getRecentCollections(userId: string, limit = 6): Promise<CollectionSummary[]> {
+  return getCollections(userId, limit);
+}
+
+export async function getCollection(userId: string, id: string) {
+  return prisma.collection.findFirst({
+    where: { id, userId },
+    select: { id: true, name: true, description: true },
+  });
 }
 
 export async function getFavoriteCollections(userId: string) {
