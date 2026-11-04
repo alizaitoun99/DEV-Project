@@ -1,32 +1,16 @@
-# Current Feature: Global Search / Command Palette
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Open the global command palette with Cmd+K on Mac or Ctrl+K on Windows.
-- Open the palette from the TopBar search input and display a ⌘K placeholder hint.
-- Provide client-side fuzzy search across all owned items and collections without search-time server round-trips.
-- Group results into Items and Collections, showing item type icons and collection item counts.
-- Support arrow-key navigation and Enter to select a result.
-- Open the item drawer or navigate to the collection page when a result is selected.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Global Search / Command Palette](features/global-search-spec.md).
-- Use the shadcn Command component backed by `cmdk`.
-- Pre-fetch searchable data on app load and reuse existing data fetching functions.
-- Item search data includes id, title, type, and content preview; collection search data includes id, name, and itemCount.
-- Scope searchable data to the authenticated owner, consistent with project authorization rules.
-- This feature specifies client-side fuzzy search; the broader project's PostgreSQL full-text search remains outside this feature's scope.
-- Implementation branch: `feature/global-search`.
-- Added a shared `cmdk` Command palette with grouped results, type icons, collection counts, keyboard navigation, close/focus handling, and search-load retry feedback.
-- The dashboard layout preloads authenticated owner-scoped data for dashboard, item, and collection routes. Search uses titles, item types, and normalized content previews capped at 240 characters; full content and private storage keys are not sent in search props. Existing item details still load on selection through the authorized drawer endpoint.
-- Reused collection queries and the item drawer provider; route refreshes after mutations also refresh search data. No database migration.
-- 2026-11-04 validation: all 197 mocked Vitest tests (four new search regressions), ESLint, standalone TypeScript, production build, and feature whitespace checks passed. The production build required an outside-sandbox retry after a Windows EPERM error creating generated page directories. Dependency installation also required network access outside the sandbox.
-- Browser verification reached the protected dashboard on port 3100 and confirmed the sign-in redirect. Authenticated palette keyboard/selection interactions and desktop/mobile layouts remain unverified without an authenticated session. Unchanged auth/storage integration scripts were not rerun. No component unit tests under project policy.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -151,3 +135,6 @@ In Progress
 
 - 2026-11-04: Completed Collection Edit and Delete Controls on feature/collection-edit-delete, committed as 5c5fa0c and merged into main; deleted the merged local branch. Added shared name/description edit modals, confirmed collection deletion, detail-page action buttons, and three-dot card menus on collections and dashboard. Card bodies navigate independently of action menus. Favorite controls are disabled placeholders. Owner-scoped validated mutations preserve all items and memberships in other collections; existing collection foreign-key cascades remove only the deleted collection's memberships. No schema or dependency changes.
 - 2026-11-04: Validation passed: all 193 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and feature whitespace checks. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Authenticated browser and responsive verification remain unconfirmed after a shared Chrome-profile lock and alternate browser timeout. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed [Global Search / Command Palette](features/global-search-spec.md) on feature/global-search, committed as d7955e8 and merged into main; deleted the merged local branch. Added the shared cmdk Command palette with Cmd/Ctrl+K and header triggers, client-side fuzzy search, grouped item/collection results, type icons, collection counts, arrow/Enter navigation, item drawer selection, and collection navigation. The shared layout preloads authenticated owner-scoped search data using existing collection queries and a minimal item query; normalized previews are capped at 240 characters and private storage keys/full content are excluded from search props. No schema migration.
+- 2026-11-04: Validation passed: all 197 mocked Vitest tests (four new search regressions), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks. Installation, build, and migration status required outside-sandbox retries after network/Windows filesystem restrictions. Browser verification confirmed the protected dashboard sign-in redirect on port 3100; authenticated palette interactions and responsive layouts remain unverified without an authenticated session. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
