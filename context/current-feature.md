@@ -1,16 +1,29 @@
-# Current Feature
+# Current Feature: Homepage Mockup
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Create a standalone marketing homepage prototype in `prototypes/homepage/` with `index.html`, `styles.css`, and `script.js`.
+- Build the chaos-to-order hero with eight floating source icons, a pulsing transformation arrow, and a simplified DevStash dashboard preview.
+- Add fixed navigation, gradient hero copy and CTAs, six feature cards, an AI capabilities section with a code/tag demo, pricing, a closing CTA, and footer.
+- Show Free pricing ($0, 50 items, 3 collections) and highlighted Pro pricing ($8/month or $72/year) with a working billing toggle.
+- Implement drifting, bouncing, rotating, pulsing, cursor-repelling chaos icons with requestAnimationFrame, scroll reveals, and navbar opacity changes.
+- Make the layout responsive with vertically stacked hero visuals, a downward arrow, and single-column grids on mobile.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Homepage Mockup Spec](features/homepage-mockup-spec.md).
+- Deliver a standalone HTML/CSS/JavaScript prototype on `feature/homepage-mockup`.
+- Use a dark theme and the spec's prototype item accents: snippet blue `#3b82f6`, prompt amber `#f59e0b`, command cyan `#06b6d4`, note green `#22c55e`, file slate `#64748b`, image pink `#ec4899`, and URL indigo `#6366f1`.
+- Chaos sources: Notion, GitHub, Slack, VS Code, browser tabs, terminal, text file, and bookmark. Dashboard preview includes sidebar navigation and item cards with colored top borders.
+- AI section includes a Pro Feature badge, capabilities checklist, and AI Generated Tags demo. Highlight Pro pricing with a Most Popular badge; footer copyright uses the current year.
+- Implemented all three prototype files with responsive dark styling, hero/dashboard illustrations, all marketing sections, billing toggle, scroll reveals, and navbar scroll treatment. Chaos animation supports cursor repulsion, reduced-motion preferences, and pauses while offscreen or the document is hidden.
+- CTA links target the application's `/register` and `/sign-in` routes; pricing is a demonstration and does not initiate checkout. Fonts load from Google Fonts with local system fallbacks.
+- Validation (2026-11-04): all 251 Vitest tests, ESLint, standalone TypeScript, production build, JavaScript syntax, CSS parsing, and prototype smoke checks passed. Smoke checks covered both billing directions, pressed states, current year, reduced motion, eight icons, and internal anchors. Build required an outside-sandbox retry after Windows EPERM.
+- Browser preview was blocked by the browser tool's policy against local `file:` URLs; visual, cursor, keyboard, and responsive browser verification remain unconfirmed. Unchanged auth/storage integration scripts were not rerun. No commits created; unrelated local edits preserved.
 
 ## Testing infrastructure
 
