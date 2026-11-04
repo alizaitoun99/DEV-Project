@@ -1,28 +1,16 @@
-# Current Feature: Pagination
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add pagination to `/items/[type]` and `/collections/[id]` pages.
-- Show numbered page links and previous/next controls at the bottom of listings.
-- Disable and grey out previous/next controls when unavailable.
-- Fetch only the resources required for the requested page.
-- Use `ITEMS_PER_PAGE = 21` and `COLLECTIONS_PER_PAGE = 21`.
-- Use dashboard limits of `DASHBOARD_COLLECTIONS_LIMIT = 6` and `DASHBOARD_RECENT_ITEMS_LIMIT = 10`.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Pagination](features/pagination-spec.md).
-- Started on 2026-11-04 on `feature/pagination`.
-- Implemented `?page=` navigation for type listings, collection contents, and the collections index. Queries fetch at most 21 records with stable updated-date/ID ordering; collection summaries aggregate only the selected page.
-- Shared pagination preserves other query parameters, marks the current page, disables unavailable previous/next controls, and uses ellipses for large page counts.
-- Invalid or repeated page parameters default to page 1; requests past the last page display the last available page, including after deletions. Header counts remain totals; collection type groups describe the current page.
-- Dashboard collection/recent-item limits use shared constants (6 and 10).
-- Validation: 203 unit tests, lint, standalone TypeScript, whitespace checks, and production build passed. Build succeeded outside the sandbox after a Windows EPERM error creating generated prerender files.
-- Browser verification remains blocked: Playwright reports its Chrome profile is already in use. Affected route, keyboard, and responsive checks remain unverified. Existing authentication regression scripts were not run because authentication code is unchanged.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -150,3 +138,6 @@ In Progress
 
 - 2026-11-04: Completed [Global Search / Command Palette](features/global-search-spec.md) on feature/global-search, committed as d7955e8 and merged into main; deleted the merged local branch. Added the shared cmdk Command palette with Cmd/Ctrl+K and header triggers, client-side fuzzy search, grouped item/collection results, type icons, collection counts, arrow/Enter navigation, item drawer selection, and collection navigation. The shared layout preloads authenticated owner-scoped search data using existing collection queries and a minimal item query; normalized previews are capped at 240 characters and private storage keys/full content are excluded from search props. No schema migration.
 - 2026-11-04: Validation passed: all 197 mocked Vitest tests (four new search regressions), ESLint, standalone TypeScript, production build, migration status, and staged whitespace checks. Installation, build, and migration status required outside-sandbox retries after network/Windows filesystem restrictions. Browser verification confirmed the protected dashboard sign-in redirect on port 3100; authenticated palette interactions and responsive layouts remain unverified without an authenticated session. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed [Pagination](features/pagination-spec.md) on `feature/pagination`, committed as `46f1b3f`, and merged into `main`; deleted the merged local branch. Added numbered `?page=` navigation for item types, collection contents, and the collections index, with disabled boundary controls, current-page indicators, bounded page-number links, and preserved query parameters. Owner-scoped queries fetch 21 records per page with stable ordering; collection summaries aggregate only the selected page. Dashboard limits use shared constants (6 collections and 10 recent items). Invalid/repeated page parameters default to the first page; out-of-range pages clamp to the last page.
+- 2026-11-04: Pagination validation passed: 203 unit tests, lint, standalone TypeScript, whitespace checks, production build, and migration status (three migrations, database up to date). Build required execution outside the sandbox after Windows EPERM during prerendering. Browser route, keyboard, and responsive checks remain unverified because Playwright reported its Chrome profile in use. Authentication regression scripts were not run because authentication code was unchanged. Closed out at the user request and cleared the active feature, goals, and notes; preserved unrelated local edits.
