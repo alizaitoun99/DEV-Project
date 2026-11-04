@@ -1,27 +1,16 @@
-# Current Feature: Favorites Client-Side Sorting
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add client-side sorting controls to the Favorites page.
-- Allow favorite items to be sorted by name, date, and item type.
-- Allow favorite collections to be sorted by name and date.
-- Update the displayed order immediately without a page reload or server request.
-- Preserve item drawer access, collection navigation, favorite controls, counts, and empty states.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Scope: the existing `/favorites` page; sort the already-loaded favorites in the browser.
-- Use item titles and collection names for name sorting, creation dates for date sorting, and display type names for item-type sorting.
-- Provide ascending and descending order with deterministic tie-breaking. Default to date, newest first.
-- Item type sorting applies only to items because collections can contain multiple item types.
-- Keep sorting state local to the page; persistence across reloads is outside this request.
-- Implemented on `feature/favorites-client-side-sorting`: server-authenticated data loading with a client list, independent labeled item/collection sort dropdowns, and immutable sorting with name/ID tie-breaking.
-- Validation: all 240 Vitest tests, ESLint, standalone TypeScript, whitespace checks, and production build passed. Four sorting utility tests cover both directions, type labels, date/name ties, collections, empty input, and source preservation. Build required an outside-sandbox retry after Windows EPERM while writing generated Favorites files.
-- Browser interaction and responsive verification remain unconfirmed after localhost connection refusal/timeout. Unchanged auth/storage integration scripts were not rerun. No schema or dependency changes; unrelated local edits preserved.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -165,3 +154,6 @@ In Progress
 
 - 2026-11-04: Completed Favorite Toggles on `feature/favorite-toggles`, committed as `3b4d6ff` and merged into `main`. Added shared accessible star buttons to the item drawer, collection detail page, item/image/collection cards, and file rows. Validated owner-scoped mutations persist both favorite states and refresh affected views and sidebar data. Pending protection and toast feedback handle saves and errors; card stars act independently of drawer/navigation triggers. Collection card stars replace the disabled menu placeholder. No schema or dependency changes.
 - Favorite toggle validation passed: all 236 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Added 14 favorite mutation regressions and updated the collection detail query regression. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Browser interaction, reload-persistence, and responsive verification remain unconfirmed because Playwright reported its shared Chrome profile in use. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed Favorites Client-Side Sorting on feature/favorites-client-side-sorting, committed as ab8c756 and merged into main. Added independent accessible sort dropdowns for favorite items (name, creation date, item type) and collections (name, creation date), ascending/descending options, newest-first defaults, and deterministic name/ID ties. Sorting runs on the loaded client data without additional requests; drawer access, navigation, counts, and empty states are preserved. No schema or dependency changes.
+- Favorites sorting validation passed: all 240 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Browser interaction and responsive verification remain unconfirmed after localhost connection refusal/timeout. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
