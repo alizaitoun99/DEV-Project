@@ -1,3 +1,5 @@
+import { Pagination } from "@/components/Pagination";
+import { getPagination, parsePage, ITEMS_PER_PAGE, type PaginationSearchParams } from "@/lib/pagination";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,10 +8,11 @@ import { ItemCard } from "@/components/dashboard/ItemCard";
 import { TypeIcon } from "@/components/dashboard/TypeIcon";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCollection } from "@/lib/db/collections";
-import { getItemsByCollection } from "@/lib/db/items";
+import { getItemsByCollection, countItemsByCollection } from "@/lib/db/items";
 import { CollectionActions } from "@/components/collections/CollectionActions";
 
 interface CollectionPageProps {
+  searchParams: Promise<PaginationSearchParams>;
   params: Promise<{ id: string }>;
 }
 
@@ -20,13 +23,16 @@ const TYPE_LABELS: Record<string, string> = {
   file: "Files", image: "Images", link: "Links",
 };
 
-export default async function CollectionPage({ params }: CollectionPageProps) {
+export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
   await connection();
   const user = await getCurrentUser();
   const { id } = await params;
   const collection = await getCollection(user.id, id);
   if (!collection) notFound();
-  const items = await getItemsByCollection(user.id, collection.id);
+  const query = await searchParams;
+  const count = await countItemsByCollection(user.id, collection.id);
+  const pagination = getPagination(count, parsePage(query.page), ITEMS_PER_PAGE);
+  const items = await getItemsByCollection(user.id, collection.id, pagination.skip);
   const slugs = [...new Set(items.map((item) => item.type.slug))];
   const typeOrder = Object.keys(TYPE_LABELS);
   slugs.sort((a, b) => {
@@ -43,7 +49,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <CollectionActions collection={collection} />
         </div>
         {collection.description && <p className="mt-2 whitespace-pre-wrap break-words text-muted-foreground">{collection.description}</p>}
-        <p className="mt-2 text-sm text-muted-foreground">{items.length} {items.length === 1 ? "item" : "items"}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{count} {count === 1 ? "item" : "items"}</p>
       </div>
       {items.length > 0 ? (
         <div className="space-y-8">
@@ -67,6 +73,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       ) : (
         <p className="text-sm text-muted-foreground">This collection has no items yet. Add items using the collection selector when creating or editing an item.</p>
       )}
+      <Pagination {...pagination} pathname={`/collections/${encodeURIComponent(id)}`} searchParams={query} />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { Pagination } from "@/components/Pagination";
+import { getPagination, parsePage, ITEMS_PER_PAGE, type PaginationSearchParams } from "@/lib/pagination";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -19,12 +21,13 @@ const TYPE_ROUTES: Record<string, ItemCreateInput["type"] | "file" | "image"> = 
 };
 
 interface ItemsPageProps {
+  searchParams: Promise<PaginationSearchParams>;
   params: Promise<{ type: string }>;
 }
 
 export const metadata: Metadata = { title: "Items | DevStash" };
 
-export default async function ItemsPage({ params }: ItemsPageProps) {
+export default async function ItemsPage({ params, searchParams }: ItemsPageProps) {
   await connection();
   const user = await getCurrentUser();
   const { type: route } = await params;
@@ -34,9 +37,11 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
   const types = await getSystemItemTypes(user.id);
   const type = types.find((type) => type.slug === slug);
   if (!type) notFound();
-  const files = slug === "file" ? await getFilesByType(user.id, type.id) : null;
-  const items = files ? [] : await getItemsByType(user.id, type.id);
-  const count = files?.length ?? items.length;
+  const query = await searchParams;
+  const count = type._count.items;
+  const pagination = getPagination(count, parsePage(query.page), ITEMS_PER_PAGE);
+  const files = slug === "file" ? await getFilesByType(user.id, type.id, pagination.skip) : null;
+  const items = files ? [] : await getItemsByType(user.id, type.id, pagination.skip);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -58,6 +63,7 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
       ) : (
         <p className="text-sm text-muted-foreground">Your saved {route} will appear here.</p>
       )}
+      <Pagination {...pagination} pathname={`/items/${route}`} searchParams={query} />
     </div>
   );
 }

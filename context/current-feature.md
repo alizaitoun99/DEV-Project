@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: Pagination
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add pagination to `/items/[type]` and `/collections/[id]` pages.
+- Show numbered page links and previous/next controls at the bottom of listings.
+- Disable and grey out previous/next controls when unavailable.
+- Fetch only the resources required for the requested page.
+- Use `ITEMS_PER_PAGE = 21` and `COLLECTIONS_PER_PAGE = 21`.
+- Use dashboard limits of `DASHBOARD_COLLECTIONS_LIMIT = 6` and `DASHBOARD_RECENT_ITEMS_LIMIT = 10`.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Pagination](features/pagination-spec.md).
+- Started on 2026-11-04 on `feature/pagination`.
+- Implemented `?page=` navigation for type listings, collection contents, and the collections index. Queries fetch at most 21 records with stable updated-date/ID ordering; collection summaries aggregate only the selected page.
+- Shared pagination preserves other query parameters, marks the current page, disables unavailable previous/next controls, and uses ellipses for large page counts.
+- Invalid or repeated page parameters default to page 1; requests past the last page display the last available page, including after deletions. Header counts remain totals; collection type groups describe the current page.
+- Dashboard collection/recent-item limits use shared constants (6 and 10).
+- Validation: 203 unit tests, lint, standalone TypeScript, whitespace checks, and production build passed. Build succeeded outside the sandbox after a Windows EPERM error creating generated prerender files.
+- Browser verification remains blocked: Playwright reports its Chrome profile is already in use. Affected route, keyboard, and responsive checks remain unverified. Existing authentication regression scripts were not run because authentication code is unchanged.
 
 ## Testing infrastructure
 

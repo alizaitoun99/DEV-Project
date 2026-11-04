@@ -1,4 +1,5 @@
 import "server-only";
+import { ITEMS_PER_PAGE, DASHBOARD_RECENT_ITEMS_LIMIT } from "@/lib/pagination";
 
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -224,31 +225,34 @@ export async function getSearchItems(userId: string): Promise<import("@/types/se
   }));
 }
 
-export async function getItemsByType(userId: string, typeId: string): Promise<ItemSummary[]> {
+export async function getItemsByType(userId: string, typeId: string, skip = 0): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId, typeId },
+    take: ITEMS_PER_PAGE, skip,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: itemSelect(userId),
   });
 }
 
-export async function getFilesByType(userId: string, typeId: string) {
+export async function getFilesByType(userId: string, typeId: string, skip = 0) {
   return prisma.item.findMany({
     where: { userId, typeId },
+    take: ITEMS_PER_PAGE, skip,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true },
   });
 }
 
-export async function getItemsByCollection(userId: string, collectionId: string): Promise<ItemSummary[]> {
+export async function getItemsByCollection(userId: string, collectionId: string, skip = 0): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId, collections: { some: { collectionId, collection: { userId } } } },
+    take: ITEMS_PER_PAGE, skip,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: itemSelect(userId),
   });
 }
 
-export async function getRecentItems(userId: string, limit = 10): Promise<ItemSummary[]> {
+export async function getRecentItems(userId: string, limit = DASHBOARD_RECENT_ITEMS_LIMIT): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
@@ -306,4 +310,8 @@ export async function updateItem(userId: string, id: string, input: import("@/li
     });
     return getItemDetail(userId, id, tx);
   });
+}
+
+export async function countItemsByCollection(userId: string, collectionId: string) {
+  return prisma.item.count({ where: { userId, collections: { some: { collectionId, collection: { userId } } } } });
 }
