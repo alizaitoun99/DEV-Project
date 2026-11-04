@@ -1,16 +1,27 @@
-# Current Feature
+# Current Feature: Favorites Client-Side Sorting
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add client-side sorting controls to the Favorites page.
+- Allow favorite items to be sorted by name, date, and item type.
+- Allow favorite collections to be sorted by name and date.
+- Update the displayed order immediately without a page reload or server request.
+- Preserve item drawer access, collection navigation, favorite controls, counts, and empty states.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Scope: the existing `/favorites` page; sort the already-loaded favorites in the browser.
+- Use item titles and collection names for name sorting, creation dates for date sorting, and display type names for item-type sorting.
+- Provide ascending and descending order with deterministic tie-breaking. Default to date, newest first.
+- Item type sorting applies only to items because collections can contain multiple item types.
+- Keep sorting state local to the page; persistence across reloads is outside this request.
+- Implemented on `feature/favorites-client-side-sorting`: server-authenticated data loading with a client list, independent labeled item/collection sort dropdowns, and immutable sorting with name/ID tie-breaking.
+- Validation: all 240 Vitest tests, ESLint, standalone TypeScript, whitespace checks, and production build passed. Four sorting utility tests cover both directions, type labels, date/name ties, collections, empty input, and source preservation. Build required an outside-sandbox retry after Windows EPERM while writing generated Favorites files.
+- Browser interaction and responsive verification remain unconfirmed after localhost connection refusal/timeout. Unchanged auth/storage integration scripts were not rerun. No schema or dependency changes; unrelated local edits preserved.
 
 ## Testing infrastructure
 
