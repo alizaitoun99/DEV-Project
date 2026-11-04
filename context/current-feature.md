@@ -1,16 +1,27 @@
-# Current Feature
+# Current Feature: Collection Create
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add a top-bar button that opens a collection creation modal, following the existing item creation UI patterns.
+- Provide a required collection name and an optional description, with validation and pending submission feedback.
+- Persist collections for the authenticated user only; derive ownership from the server session and validate inputs with Zod.
+- Fetch initial collection data in Server Components through `lib/db` functions and use API routes for client-side calls.
+- Show a toast on success or failure, close and reset the modal after success, and refresh collection lists, sidebar entries, and dashboard counts after saving.
+- Add meaningful mocked utility tests for validation, ownership, persistence, and error handling; run the project checks and manually verify the modal and responsive layout.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Loaded from the user's inline specification on 2026-11-04.
+- Follow existing item creation patterns and shared dialog, field, button, and toast components.
+- Client-side API routes are explicitly requested for this feature and take precedence over the general Server Action preference.
+- Scope covers creating collections with a name and description; collection editing, deletion, favorites, and item membership management are outside this feature.
+- Reused the existing Collection model; no schema or dependency changes.
+- Implemented on `feature/collection-create`: shared top-bar dialog, authenticated same-origin POST `/api/collections`, Zod validation, owner-scoped `lib/db` persistence, and route refresh for existing server-rendered dashboard/sidebar queries.
+- Validation: all 158 mocked Vitest tests, ESLint, standalone TypeScript, and whitespace checks passed. Browser verification timed out; live persistence and desktop/mobile interactions remain unverified. Production build passed outside the sandbox after the initial Windows EPERM failure. Unchanged auth/storage integration scripts were not rerun; no live services were used by the unit tests.
 
 ## Testing infrastructure
 

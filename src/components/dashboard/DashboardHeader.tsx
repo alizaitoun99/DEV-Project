@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 
 import { CreateItemDialog } from "@/components/items/CreateItemDialog";
+import { CreateCollectionDialog } from "@/components/collections/CreateCollectionDialog";
 import { Input } from "@/components/ui/input";
 
 interface DashboardHeaderProps {
@@ -9,7 +10,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ sidebarToggle }: DashboardHeaderProps) {
   return (
-    <header className="flex flex-wrap items-center gap-3 border-b px-4 py-3 sm:flex-nowrap sm:px-6">
+    <header className="flex flex-wrap items-center gap-3 border-b px-4 py-3 lg:flex-nowrap sm:px-6">
       {sidebarToggle}
       <div className="relative min-w-0 flex-1 sm:max-w-lg">
         <Search
@@ -24,7 +25,10 @@ export function DashboardHeader({ sidebarToggle }: DashboardHeaderProps) {
           readOnly
         />
       </div>
-      <CreateItemDialog />
+      <div className="flex flex-wrap gap-3 sm:ml-auto">
+        <CreateCollectionDialog />
+        <CreateItemDialog />
+      </div>
     </header>
   );
 }

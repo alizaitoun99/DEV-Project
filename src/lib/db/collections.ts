@@ -2,6 +2,15 @@ import "server-only";
 
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { collectionCreateSchema, type CollectionCreateInput } from "@/lib/collection-validation";
+
+export async function createCollection(userId: string, input: CollectionCreateInput) {
+  const fields = collectionCreateSchema.parse(input);
+  return prisma.collection.create({
+    data: { userId, name: fields.name, description: fields.description || null },
+    select: { id: true, name: true, description: true },
+  });
+}
 
 export interface CollectionSummary {
   id: string;
