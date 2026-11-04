@@ -1,28 +1,16 @@
-# Current Feature: Settings Page
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Create a settings page at `/settings`, accessible only to authenticated users.
-- Add a Settings link to the user icon dropdown at the bottom of the sidebar.
-- Move the Account actions section, including account deletion and password recovery, from `/profile` to `/settings`.
-- Preserve the existing account-action validation, authorization, confirmation, and authentication-method restrictions.
-- Keep settings navigation and account actions usable on desktop and mobile.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Loaded from the user's inline description on 2026-11-04.
-- Follow the existing application shell, styling, and protected-route patterns.
-- Check the existing profile password controls during implementation and move the relevant Account actions together, preserving their current behavior.
-- Keep profile information and usage details on `/profile`.
-- No additional settings capabilities are included in this feature.
-- Implementation on `feature/settings-page`: added `/settings` with server-side authentication and proxy protection, linked Settings in the shared sidebar account menu, and moved the existing Account actions section out of Profile. Profile retains identity and usage details and no longer fetches the password hash.
-- The existing section contained password changes and account deletion; added a Forgot password link to the existing recovery page for credentials accounts. Existing Server Actions, throttling, validation, and deletion confirmation remain unchanged.
-- Validation: all 203 mocked Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks passed. The build passed with filesystem escalation after a sandbox EPERM error. No new component tests were added under project policy; unchanged auth/storage integration scripts were not rerun.
-- Manual verification remains unconfirmed: Playwright navigation timed out on port 3100 despite the production server reporting ready, and local HTTP checks could not connect. Authenticated settings/menu interactions and responsive layouts still require browser verification. No schema or dependency changes; no commit made.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -153,3 +141,6 @@ In Progress
 
 - 2026-11-04: Completed [Pagination](features/pagination-spec.md) on `feature/pagination`, committed as `46f1b3f`, and merged into `main`; deleted the merged local branch. Added numbered `?page=` navigation for item types, collection contents, and the collections index, with disabled boundary controls, current-page indicators, bounded page-number links, and preserved query parameters. Owner-scoped queries fetch 21 records per page with stable ordering; collection summaries aggregate only the selected page. Dashboard limits use shared constants (6 collections and 10 recent items). Invalid/repeated page parameters default to the first page; out-of-range pages clamp to the last page.
 - 2026-11-04: Pagination validation passed: 203 unit tests, lint, standalone TypeScript, whitespace checks, production build, and migration status (three migrations, database up to date). Build required execution outside the sandbox after Windows EPERM during prerendering. Browser route, keyboard, and responsive checks remain unverified because Playwright reported its Chrome profile in use. Authentication regression scripts were not run because authentication code was unchanged. Closed out at the user request and cleared the active feature, goals, and notes; preserved unrelated local edits.
+
+- 2026-11-04: Completed Settings Page on feature/settings-page, committed as 3a017e4 and merged into main; deleted the merged local branch. Added protected /settings with server-side authentication and proxy redirects, plus Settings in the sidebar account dropdown. Moved password changes and confirmed account deletion from Profile to Settings and added a Forgot password link for credentials accounts. Profile retains identity and usage details. Existing account-action authorization, validation, throttling, and deletion safeguards remain unchanged. No schema or dependency changes.
+- Settings validation passed: all 203 mocked Vitest tests, ESLint, standalone TypeScript, production build, and whitespace checks. Build required filesystem escalation after Windows EPERM. Browser and responsive verification remain unconfirmed after browser navigation timed out and local HTTP checks failed to connect to the production server. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
