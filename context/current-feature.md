@@ -1,27 +1,16 @@
-# Current Feature: Collection Edit and Delete Controls
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add edit, delete, and favorite icon buttons to `/collections/[id]`.
-- Open an edit modal for collection metadata and persist valid changes.
-- Require confirmation before deleting a collection. Delete its memberships while preserving all items and their memberships in other collections.
-- Add a three-dot dropdown with Edit, Delete, and Favorite to collection cards on `/collections` and `/dashboard`.
-- Clicking elsewhere on a collection card navigates to its detail page; menu interactions do not trigger navigation.
-- Display favorite controls only; do not implement favorite mutations yet.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Reuse existing collection metadata fields and UI patterns for editing.
-- Clearly explain in the delete confirmation that items are retained and only the collection and its memberships are removed.
-- Scope edit and delete operations to the authenticated owner, validate inputs, and refresh affected collection lists, details, sidebar entries, and counts after successful changes.
-- Include accessible labels, keyboard interaction, pending protection, and success/error feedback for the modal, confirmation, and menus.
-- Favorite controls must not change persisted favorite state; present their unavailable behavior clearly.
-- Implementation on `feature/collection-edit-delete`: shared collection edit/delete dialogs and card dropdowns, detail-page action buttons, and disabled favorite controls. Edits support name and description; owner-scoped Server Actions validate metadata and refresh application data. Collection deletion relies on the existing membership cascade and performs no item deletion. No schema or dependency changes.
-- Validation: all 193 mocked Vitest tests, ESLint, standalone TypeScript, and feature whitespace checks passed. Authenticated browser and responsive verification remain unconfirmed: Playwright's Chrome profile was already in use and the alternate browser connection timed out. Unchanged auth/storage integration scripts were not rerun. Production build passed on an outside-sandbox retry after a Windows EPERM failure.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -143,3 +132,6 @@ In Progress
 - 2026-11-04: Completed Collection Pages on `feature/collection-pages`, committed as `40dc06e` and merged into `main`; deleted the merged local branch. Added authenticated owner-scoped `/collections` and `/collections/[id]` pages using existing cards, dashboard shell, and item drawer, with loading/empty/not-found states. Detail pages group items under type headings with icons and counts; images use the responsive gallery layout. Existing sidebar and card links now reach implemented routes. No schema or dependency changes.
 - 2026-11-04: Corrected duplicate seeded React Patterns collections by preserving all items, merging memberships into the favorite collection, and normalizing four demo-prefixed collection IDs. Seed reuses existing owner/name collections; the preview-first transactional repair checks item and membership preservation. Live database and collection-summary checks passed.
 - 2026-11-04: Validation passed: all 179 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Production build required filesystem escalation; stale development route types were regenerated. Authenticated browser/responsive verification remains unconfirmed after connection timeouts; unchanged auth/storage integration suites were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed Collection Edit and Delete Controls on feature/collection-edit-delete, committed as 5c5fa0c and merged into main; deleted the merged local branch. Added shared name/description edit modals, confirmed collection deletion, detail-page action buttons, and three-dot card menus on collections and dashboard. Card bodies navigate independently of action menus. Favorite controls are disabled placeholders. Owner-scoped validated mutations preserve all items and memberships in other collections; existing collection foreign-key cascades remove only the deleted collection's memberships. No schema or dependency changes.
+- 2026-11-04: Validation passed: all 193 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and feature whitespace checks. Build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Authenticated browser and responsive verification remain unconfirmed after a shared Chrome-profile lock and alternate browser timeout. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
