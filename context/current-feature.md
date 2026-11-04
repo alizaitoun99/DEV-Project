@@ -1,27 +1,16 @@
-# Current Feature: Collection Create
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add a top-bar button that opens a collection creation modal, following the existing item creation UI patterns.
-- Provide a required collection name and an optional description, with validation and pending submission feedback.
-- Persist collections for the authenticated user only; derive ownership from the server session and validate inputs with Zod.
-- Fetch initial collection data in Server Components through `lib/db` functions and use API routes for client-side calls.
-- Show a toast on success or failure, close and reset the modal after success, and refresh collection lists, sidebar entries, and dashboard counts after saving.
-- Add meaningful mocked utility tests for validation, ownership, persistence, and error handling; run the project checks and manually verify the modal and responsive layout.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Loaded from the user's inline specification on 2026-11-04.
-- Follow existing item creation patterns and shared dialog, field, button, and toast components.
-- Client-side API routes are explicitly requested for this feature and take precedence over the general Server Action preference.
-- Scope covers creating collections with a name and description; collection editing, deletion, favorites, and item membership management are outside this feature.
-- Reused the existing Collection model; no schema or dependency changes.
-- Implemented on `feature/collection-create`: shared top-bar dialog, authenticated same-origin POST `/api/collections`, Zod validation, owner-scoped `lib/db` persistence, and route refresh for existing server-rendered dashboard/sidebar queries.
-- Validation: all 158 mocked Vitest tests, ESLint, standalone TypeScript, and whitespace checks passed. Browser verification timed out; live persistence and desktop/mobile interactions remain unverified. Production build passed outside the sandbox after the initial Windows EPERM failure. Unchanged auth/storage integration scripts were not rerun; no live services were used by the unit tests.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -129,3 +118,6 @@ In Progress
 
 - 2026-11-03: Completed code audit corrections on `fix/audit-storage-links`, committed as `6cec7e0` and merged into `main`; deleted the merged local branch. Successful storage cleanup retains early tombstones until the signed-upload lifetime plus the existing ten-minute grace period, then removes the ledger record after final successful object removal. Failed removals remain retryable. Link updates require a valid HTTP(S) URL based on the owned persisted item type; the edit form requires the destination and Server Actions return field-specific validation feedback. No schema or dependency changes.
 - 2026-11-03: Validation passed: all 147 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Build and migration checks required outside-sandbox retries after Windows write/connectivity failures. Browser verification remains unconfirmed after localhost timed out despite a running production server; live database/storage mutations and unchanged auth integration scripts were not run. Cleared the active tracker at the user completion request and preserved pre-existing local edits outside these commits.
+
+- 2026-11-04: Completed Collection Create on `feature/collection-create`, committed as `6b5036c` and merged into `main`; deleted the merged local feature branch. Added a shared top-bar creation dialog with required name, optional description, pending protection, validation and toast feedback, modal reset, and route refresh for dashboard collections, sidebar entries, and counts. Authenticated same-origin POST `/api/collections` validates with Zod and derives ownership from the session; persistence and initial collection queries use `lib/db`. No schema or dependency changes.
+- 2026-11-04: All 158 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks passed. Production build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Browser verification timed out; live creation and responsive interactions remain unverified. Unchanged auth/storage integration scripts were not rerun. Cleared the tracker at the user's completion request and preserved unrelated local edits outside the feature commits.
