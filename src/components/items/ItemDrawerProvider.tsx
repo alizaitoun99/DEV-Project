@@ -17,6 +17,9 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 interface Selection { id: string; title: string; }
 interface ItemDrawerProviderProps { children: ReactNode; }
 const DrawerContext = createContext<((item: Selection, trigger: HTMLButtonElement) => void) | null>(null);
+export function useItemDrawer() {
+  return useContext(DrawerContext);
+}
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "long", timeZone: "UTC" });
 
 export function ItemDrawerTrigger({ id, title }: Selection) {

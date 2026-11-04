@@ -3,12 +3,39 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { findFirst, findMany, auth } = vi.hoisted(() => ({ findFirst: vi.fn(), findMany: vi.fn(), auth: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({ prisma: { item: { findFirst, findMany } } }));
 vi.mock("@/auth", () => ({ auth }));
-import { getFilesByType, getItemDetail } from "./items";
+import { getFilesByType, getItemDetail, getSearchItems } from "./items";
 import { GET } from "@/app/api/items/[id]/route";
 
 beforeEach(() => { findFirst.mockReset(); findMany.mockReset(); auth.mockReset(); });
 const context = { params: Promise.resolve({ id: "item-1" }) };
 const request = new Request("http://localhost/api/items/item-1");
+
+describe("search items", () => {
+  it("loads all owned item types without storage keys or unrelated metadata", async () => {
+    findMany.mockResolvedValue([]);
+    expect(await getSearchItems("owner")).toEqual([]);
+    expect(findMany).toHaveBeenCalledWith({
+      where: { userId: "owner" },
+      orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+      select: { id: true, title: true, type: { select: { slug: true, name: true } }, content: true, description: true },
+    });
+  });
+
+  it("returns bounded plain previews without serializing full content or description", async () => {
+    findMany.mockResolvedValue([
+      { id: "1", title: "Note", type: { slug: "note", name: "Notes" }, content: `  hello\n${"x".repeat(300)}`, description: "unused" },
+      { id: "2", title: "File", type: { slug: "file", name: "Files" }, content: null, description: "  file\n description " },
+      { id: "3", title: "Empty", type: { slug: "link", name: "Links" }, content: null, description: null },
+    ]);
+    const result = await getSearchItems("owner");
+    expect(result[0].preview).toHaveLength(240);
+    expect(result[0].preview).toMatch(/^hello x/);
+    expect(result[0]).not.toHaveProperty("content");
+    expect(result[0]).not.toHaveProperty("description");
+    expect(result[1].preview).toBe("file description");
+    expect(result[2].preview).toBe("");
+  });
+});
 
 it("limits file listings to the owner and type without exposing storage keys or contents", async () => {
   findMany.mockResolvedValue([]);

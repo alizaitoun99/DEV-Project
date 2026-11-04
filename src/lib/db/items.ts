@@ -213,6 +213,17 @@ export async function getPinnedItems(userId: string): Promise<ItemSummary[]> {
   });
 }
 
+export async function getSearchItems(userId: string): Promise<import("@/types/search").SearchItem[]> {
+  const items = await prisma.item.findMany({
+    where: { userId },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: { id: true, title: true, type: { select: { slug: true, name: true } }, content: true, description: true },
+  });
+  return items.map(({ content, description, ...item }) => ({
+    ...item, preview: (content || description || "").replace(/\s+/g, " ").trim().slice(0, 240),
+  }));
+}
+
 export async function getItemsByType(userId: string, typeId: string): Promise<ItemSummary[]> {
   return prisma.item.findMany({
     where: { userId, typeId },

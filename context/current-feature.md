@@ -1,16 +1,32 @@
-# Current Feature
+# Current Feature: Global Search / Command Palette
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Open the global command palette with Cmd+K on Mac or Ctrl+K on Windows.
+- Open the palette from the TopBar search input and display a ⌘K placeholder hint.
+- Provide client-side fuzzy search across all owned items and collections without search-time server round-trips.
+- Group results into Items and Collections, showing item type icons and collection item counts.
+- Support arrow-key navigation and Enter to select a result.
+- Open the item drawer or navigate to the collection page when a result is selected.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Global Search / Command Palette](features/global-search-spec.md).
+- Use the shadcn Command component backed by `cmdk`.
+- Pre-fetch searchable data on app load and reuse existing data fetching functions.
+- Item search data includes id, title, type, and content preview; collection search data includes id, name, and itemCount.
+- Scope searchable data to the authenticated owner, consistent with project authorization rules.
+- This feature specifies client-side fuzzy search; the broader project's PostgreSQL full-text search remains outside this feature's scope.
+- Implementation branch: `feature/global-search`.
+- Added a shared `cmdk` Command palette with grouped results, type icons, collection counts, keyboard navigation, close/focus handling, and search-load retry feedback.
+- The dashboard layout preloads authenticated owner-scoped data for dashboard, item, and collection routes. Search uses titles, item types, and normalized content previews capped at 240 characters; full content and private storage keys are not sent in search props. Existing item details still load on selection through the authorized drawer endpoint.
+- Reused collection queries and the item drawer provider; route refreshes after mutations also refresh search data. No database migration.
+- 2026-11-04 validation: all 197 mocked Vitest tests (four new search regressions), ESLint, standalone TypeScript, production build, and feature whitespace checks passed. The production build required an outside-sandbox retry after a Windows EPERM error creating generated page directories. Dependency installation also required network access outside the sandbox.
+- Browser verification reached the protected dashboard on port 3100 and confirmed the sign-in redirect. Authenticated palette keyboard/selection interactions and desktop/mobile layouts remain unverified without an authenticated session. Unchanged auth/storage integration scripts were not rerun. No component unit tests under project policy.
 
 ## Testing infrastructure
 
