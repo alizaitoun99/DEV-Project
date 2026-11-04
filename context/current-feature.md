@@ -1,29 +1,16 @@
-# Current Feature: Homepage Mockup
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Create a standalone marketing homepage prototype in `prototypes/homepage/` with `index.html`, `styles.css`, and `script.js`.
-- Build the chaos-to-order hero with eight floating source icons, a pulsing transformation arrow, and a simplified DevStash dashboard preview.
-- Add fixed navigation, gradient hero copy and CTAs, six feature cards, an AI capabilities section with a code/tag demo, pricing, a closing CTA, and footer.
-- Show Free pricing ($0, 50 items, 3 collections) and highlighted Pro pricing ($8/month or $72/year) with a working billing toggle.
-- Implement drifting, bouncing, rotating, pulsing, cursor-repelling chaos icons with requestAnimationFrame, scroll reveals, and navbar opacity changes.
-- Make the layout responsive with vertically stacked hero visuals, a downward arrow, and single-column grids on mobile.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Specification: [Homepage Mockup Spec](features/homepage-mockup-spec.md).
-- Deliver a standalone HTML/CSS/JavaScript prototype on `feature/homepage-mockup`.
-- Use a dark theme and the spec's prototype item accents: snippet blue `#3b82f6`, prompt amber `#f59e0b`, command cyan `#06b6d4`, note green `#22c55e`, file slate `#64748b`, image pink `#ec4899`, and URL indigo `#6366f1`.
-- Chaos sources: Notion, GitHub, Slack, VS Code, browser tabs, terminal, text file, and bookmark. Dashboard preview includes sidebar navigation and item cards with colored top borders.
-- AI section includes a Pro Feature badge, capabilities checklist, and AI Generated Tags demo. Highlight Pro pricing with a Most Popular badge; footer copyright uses the current year.
-- Implemented all three prototype files with responsive dark styling, hero/dashboard illustrations, all marketing sections, billing toggle, scroll reveals, and navbar scroll treatment. Chaos animation supports cursor repulsion, reduced-motion preferences, and pauses while offscreen or the document is hidden.
-- CTA links target the application's `/register` and `/sign-in` routes; pricing is a demonstration and does not initiate checkout. Fonts load from Google Fonts with local system fallbacks.
-- Validation (2026-11-04): all 251 Vitest tests, ESLint, standalone TypeScript, production build, JavaScript syntax, CSS parsing, and prototype smoke checks passed. Smoke checks covered both billing directions, pressed states, current year, reduced motion, eight icons, and internal anchors. Build required an outside-sandbox retry after Windows EPERM.
-- Browser preview was blocked by the browser tool's policy against local `file:` URLs; visual, cursor, keyboard, and responsive browser verification remain unconfirmed. Unchanged auth/storage integration scripts were not rerun. No commits created; unrelated local edits preserved.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -173,3 +160,6 @@ In Progress
 
 - 2026-11-04: Completed [Pinned Items](features/pinned-spec.md) on `feature/pinned-items`, committed as `dede6bd` and merged into `main`; deleted the merged local branch. Added an authenticated, validated, owner-scoped `toggleItemPin` action and accessible drawer control with optimistic updates, failure rollback, pending protection, and success/error toasts. Layout revalidation refreshes the existing dashboard pinned section and listings. Item type, file, and collection queries sort pins first before pagination, then updated date and ID; collection pages preserve type sections with pins first within each section. Recent items and explicit Favorites sorting retain their ordering. Card pin icons remain static. No schema or dependency changes.
 - Pinned Items validation passed: all 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status (four migrations, database up to date), and staged whitespace checks. Build and migration checks required outside-sandbox retries after Windows EPERM/connectivity restrictions. Initial TypeScript overlapped Prisma generation; rerun passed. Browser interaction, persistence, and responsive verification remain unconfirmed because Playwright's shared Chrome profile was in use. Unchanged auth/storage integration scripts were not rerun. Cleared the tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-04: Completed [Homepage Mockup](features/homepage-mockup-spec.md) on `feature/homepage-mockup`, committed as `54743f8` and merged into `main`. Added the standalone `prototypes/homepage/` HTML/CSS/JavaScript prototype with a dark responsive layout, animated chaos-to-order hero, dashboard preview, feature cards, AI demo, monthly/yearly pricing toggle, closing CTA, and footer. Includes reduced-motion support, cursor repulsion, scroll reveals, and offscreen/background animation pauses. CTA links target the application authentication routes; pricing remains a demonstration. No dependencies, schema, or application routes changed.
+- Homepage validation passed: all 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, JavaScript syntax, CSS parsing, prototype smoke checks, staged whitespace checks, and migration status (four migrations, database up to date). Build and migration checks required outside-sandbox retries after Windows filesystem/connectivity restrictions. Browser visual, cursor, keyboard, and responsive verification remain unconfirmed because browser policy blocked local file URLs. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
