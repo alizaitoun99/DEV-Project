@@ -7,6 +7,7 @@ import { TypeIcon } from "@/components/dashboard/TypeIcon";
 import { getCurrentUser } from "@/lib/current-user";
 import { getCollection } from "@/lib/db/collections";
 import { getItemsByCollection } from "@/lib/db/items";
+import { CollectionActions } from "@/components/collections/CollectionActions";
 
 interface CollectionPageProps {
   params: Promise<{ id: string }>;
@@ -37,7 +38,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
     <div className="mx-auto max-w-7xl space-y-6">
       <Link href="/collections" className="inline-block rounded-sm text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">← All collections</Link>
       <div>
-        <h1 className="break-words text-3xl font-semibold tracking-tight">{collection.name}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h1 className="min-w-0 break-words text-3xl font-semibold tracking-tight">{collection.name}</h1>
+          <CollectionActions collection={collection} />
+        </div>
         {collection.description && <p className="mt-2 whitespace-pre-wrap break-words text-muted-foreground">{collection.description}</p>}
         <p className="mt-2 text-sm text-muted-foreground">{items.length} {items.length === 1 ? "item" : "items"}</p>
       </div>

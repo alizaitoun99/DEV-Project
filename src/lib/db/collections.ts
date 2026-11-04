@@ -12,6 +12,21 @@ export async function createCollection(userId: string, input: CollectionCreateIn
   });
 }
 
+export async function updateCollection(userId: string, id: string, input: CollectionCreateInput) {
+  const fields = collectionCreateSchema.parse(input);
+  const result = await prisma.collection.updateMany({
+    where: { id, userId },
+    data: { name: fields.name, description: fields.description || null },
+  });
+  return result.count > 0;
+}
+
+export async function deleteCollection(userId: string, id: string) {
+  // The collection foreign key cascades to memberships only, never to items.
+  const result = await prisma.collection.deleteMany({ where: { id, userId } });
+  return result.count > 0;
+}
+
 export interface CollectionSummary {
   id: string;
   name: string;
