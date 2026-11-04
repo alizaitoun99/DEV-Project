@@ -1,34 +1,16 @@
-# Current Feature: Item Collection Membership
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add a collection selection input to both the new item form and the edit item form.
-- Allow an item to belong to zero, one, or multiple available collections.
-- Populate options with collections owned by the authenticated user.
-- Preselect existing memberships when editing and allow adding or removing memberships when saving.
-- Persist selected memberships alongside item creation and updates, including file and image items.
-- Validate collection IDs and enforce item and collection ownership on the server; reject unavailable or foreign collections.
-- Follow existing form styling, accessible keyboard interactions, pending states, validation feedback, and success/error notifications.
-- Add meaningful mocked Server Action and utility tests for membership persistence, replacement, empty selection, and ownership checks; run the required project checks and manually verify affected forms.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Loaded from the user's inline specification on 2026-11-04 using the feature skill's load action.
-- Work in the dedicated item-collections Git worktree.
-- Collection pages and collection-page display are explicitly outside scope.
-- Reuse the existing many-to-many ItemCollection model where possible.
-- Collection creation is separate work; preserve the original checkout's uncommitted changes.
-- Implemented on `feature/item-collection-membership`: shared accessible checkbox selector with loading, empty, error/retry, and disabled states; authenticated non-cacheable collection options; selection reset on creation and existing membership preselection on editing.
-- Creation, editing, and file/image finalization validate collection ownership and save memberships transactionally. Deselection removes memberships; retained memberships preserve their added date. Callers omitting collection IDs preserve memberships.
-- Reused the existing schema; no migration or dependency changes.
-- Validation: all 175 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks passed. The first standalone TypeScript check lacked generated Next.js route types; rerun passed after the build generated them.
-- Installation required network access after sandbox DNS failure. Production build passed outside the sandbox after a Windows EPERM failure; existing source-checkout environment configuration was loaded in memory without copying secrets.
-- Browser access to the production app on port 3100 verified the protected dashboard redirect to sign-in. Authenticated create/edit interactions, live membership persistence, and desktop/mobile layouts remain unverified because no authenticated browser session was available. Unchanged auth/storage integration scripts were not rerun.
-- Publishing the feature branch to GitHub at the user's request; implementation remains available for review without merging to main.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -136,3 +118,9 @@ In Progress
 
 - 2026-11-03: Completed code audit corrections on `fix/audit-storage-links`, committed as `6cec7e0` and merged into `main`; deleted the merged local branch. Successful storage cleanup retains early tombstones until the signed-upload lifetime plus the existing ten-minute grace period, then removes the ledger record after final successful object removal. Failed removals remain retryable. Link updates require a valid HTTP(S) URL based on the owned persisted item type; the edit form requires the destination and Server Actions return field-specific validation feedback. No schema or dependency changes.
 - 2026-11-03: Validation passed: all 147 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Build and migration checks required outside-sandbox retries after Windows write/connectivity failures. Browser verification remains unconfirmed after localhost timed out despite a running production server; live database/storage mutations and unchanged auth integration scripts were not run. Cleared the active tracker at the user completion request and preserved pre-existing local edits outside these commits.
+
+- 2026-11-04: Completed Collection Create on `feature/collection-create`, committed as `6b5036c` and merged into `main`; deleted the merged local feature branch. Added a shared top-bar creation dialog with required name, optional description, pending protection, validation and toast feedback, modal reset, and route refresh for dashboard collections, sidebar entries, and counts. Authenticated same-origin POST `/api/collections` validates with Zod and derives ownership from the session; persistence and initial collection queries use `lib/db`. No schema or dependency changes.
+- 2026-11-04: All 158 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks passed. Production build and migration status required outside-sandbox retries after Windows EPERM/connectivity failures. Browser verification timed out; live creation and responsive interactions remain unverified. Unchanged auth/storage integration scripts were not rerun. Cleared the tracker at the user's completion request and preserved unrelated local edits outside the feature commits.
+
+- 2026-11-04: Completed Item Collection Membership in the item-collections worktree on `feature/item-collection-membership`, implemented in `d16c3b2`. Added a shared accessible collection checkbox selector to new/edit item forms, with owner-scoped options, preselected memberships, loading/empty/error/retry states, selection reset on creation, and pending protection. Text/link creation, file/image finalization, and item editing persist zero, one, or multiple memberships transactionally after ownership validation. Deselection removes only memberships; retained memberships preserve added dates. Callers omitting collection IDs preserve existing memberships. Collection pages remain outside scope; no schema or dependency changes.
+- 2026-11-04: Validation passed: all 175 mocked Vitest tests, ESLint, standalone TypeScript, production build, migration status, and whitespace checks. Installation required network access; production build required an outside-sandbox retry after Windows EPERM. Initial standalone TypeScript lacked generated Next.js route types; rerun passed after generation. Browser verification confirmed the protected dashboard redirect to sign-in on port 3100; authenticated form interactions, live membership persistence, and responsive layouts remain unverified without an authenticated session. Unchanged auth/storage integration scripts were not rerun. Integrated main's collection-creation closeout and preserved its history; resolved the tracker-only merge conflict. Preserved unrelated edits in the main checkout.
