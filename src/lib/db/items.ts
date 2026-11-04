@@ -229,7 +229,7 @@ export async function getItemsByType(userId: string, typeId: string, skip = 0): 
   return prisma.item.findMany({
     where: { userId, typeId },
     take: ITEMS_PER_PAGE, skip,
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }],
     select: itemSelect(userId),
   });
 }
@@ -238,7 +238,7 @@ export async function getFilesByType(userId: string, typeId: string, skip = 0) {
   return prisma.item.findMany({
     where: { userId, typeId },
     take: ITEMS_PER_PAGE, skip,
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }],
     select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true, isFavorite: true },
   });
 }
@@ -247,7 +247,7 @@ export async function getItemsByCollection(userId: string, collectionId: string,
   return prisma.item.findMany({
     where: { userId, collections: { some: { collectionId, collection: { userId } } } },
     take: ITEMS_PER_PAGE, skip,
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }],
     select: itemSelect(userId),
   });
 }

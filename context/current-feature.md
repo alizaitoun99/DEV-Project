@@ -1,16 +1,26 @@
-# Current Feature
+# Current Feature: Pinned Items
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Create a `toggleItemPin` Server Action.
+- Make the existing Pin button in ItemDrawer functional.
+- Provide optimistic UI updates and success/error toast notifications.
+- Sort pinned items to the top of listings and show them in the dashboard pinned items section.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Pinned Items](features/pinned-spec.md).
+- Follow the existing Favorite Button pattern.
+- Pinning applies to items only, not collections.
+- Keep the Pin icon on ItemCard as a static indicator.
+- Implementation: `feature/pinned-items` adds an authenticated, validated, owner-scoped `toggleItemPin` action accepting the desired pin state, following the favorite mutation pattern. The drawer control updates optimistically, rolls back on failure, prevents duplicate submissions, and displays success/error toasts. Layout revalidation refreshes listings and the existing dashboard pinned section.
+- Item type, file, and collection queries sort pins first before pagination, then updated date and ID. Collection pages preserve type sections with pins first within each section. Recent items and explicit Favorites sorting retain their existing ordering. No schema or dependency changes.
+- Validation: 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, and feature whitespace checks passed. Initial TypeScript ran during Prisma regeneration and was rerun successfully. Build required an outside-sandbox retry after Windows EPERM while creating prerender output.
+- Browser interaction, persistence, and responsive verification remain unconfirmed because Playwright's shared Chrome profile was in use. Unchanged auth/storage integration scripts were not rerun. Changes are uncommitted; unrelated existing local edits are preserved.
 
 ## Testing infrastructure
 

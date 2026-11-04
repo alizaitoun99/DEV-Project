@@ -42,7 +42,7 @@ it("limits file listings to the owner and type without exposing storage keys or 
   expect(await getFilesByType("owner-1", "file-type")).toEqual([]);
   const query = findMany.mock.calls[0][0];
   expect(query.where).toEqual({ userId: "owner-1", typeId: "file-type" });
-  expect(query.orderBy).toEqual([{ updatedAt: "desc" }, { id: "asc" }]);
+  expect(query.orderBy).toEqual([{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }]);
   expect(query.select).toMatchObject({ fileName: true, fileSize: true, createdAt: true });
   expect(query.select).not.toHaveProperty("fileKey");
   expect(query.select).not.toHaveProperty("content");
@@ -122,4 +122,14 @@ describe("item details", () => {
     expect(response.status).toBe(500);
     expect(await response.text()).not.toContain("private database");
   });
+});
+
+it("loads only the owner's pinned items for the dashboard", async () => {
+  findMany.mockResolvedValue([]);
+  const { getPinnedItems } = await import("./items");
+  expect(await getPinnedItems("owner")).toEqual([]);
+  expect(findMany).toHaveBeenCalledWith(expect.objectContaining({
+    where: { userId: "owner", isPinned: true },
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+  }));
 });

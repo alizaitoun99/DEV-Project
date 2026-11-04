@@ -1,10 +1,11 @@
 "use client";
 
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { PinButton } from "@/components/PinButton";
 import Image from "next/image";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Copy, Pencil, Pin } from "lucide-react";
+import { Copy, Pencil } from "lucide-react";
 import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
@@ -95,7 +96,7 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
   return <>
     <div aria-label="Item actions" className="flex flex-wrap items-center gap-1 border-b px-4 py-4">
       <FavoriteButton kind="item" id={item.id} isFavorite={item.isFavorite} onSaved={(isFavorite) => onSaved({ ...item, isFavorite })} />
-      <Button variant="ghost" disabled title="Pin changes coming later"><Pin className={item.isPinned ? "fill-current" : ""} />Pin</Button>
+      <PinButton id={item.id} isPinned={item.isPinned} onSaved={(isPinned) => onSaved({ ...item, isPinned })} />
       <Button variant="ghost" disabled={!text} onClick={copy}><Copy />Copy</Button>
       {item.fileName && <Button variant="ghost" asChild><a href={`/api/items/${encodeURIComponent(item.id)}/download`}>Download</a></Button>}
       <Button variant="ghost" onClick={() => setEditing(true)}><Pencil />Edit</Button>

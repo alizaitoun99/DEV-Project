@@ -48,7 +48,7 @@ it("restricts collection items and tags to the owner without exposing private co
   expect(await getItemsByCollection("owner", "collection")).toEqual([]);
   const query = itemFindMany.mock.calls[0][0];
   expect(query.where).toEqual({ userId: "owner", collections: { some: { collectionId: "collection", collection: { userId: "owner" } } } });
-  expect(query.orderBy).toEqual([{ updatedAt: "desc" }, { id: "asc" }]);
+  expect(query.orderBy).toEqual([{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }]);
   expect(query.select.tags.where).toEqual({ tag: { userId: "owner" } });
   expect(query.select).not.toHaveProperty("fileKey");
   expect(query.select).not.toHaveProperty("content");
@@ -62,7 +62,7 @@ it("bounds item and file pages with stable ordering and owner filters", async ()
   for (const [index, skip] of [21, 42, 63].entries()) {
     expect(itemFindMany.mock.calls[index][0]).toMatchObject({
       take: 21, skip, where: { userId: "owner" },
-      orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+      orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }, { id: "asc" }],
     });
   }
 });
