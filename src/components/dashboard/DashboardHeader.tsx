@@ -1,5 +1,8 @@
 import { CreateItemDialog } from "@/components/items/CreateItemDialog";
 import { CreateCollectionDialog } from "@/components/collections/CreateCollectionDialog";
+import Link from "next/link";
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DashboardHeaderProps {
   sidebarToggle: React.ReactNode;
@@ -14,6 +17,9 @@ export function DashboardHeader({ sidebarToggle, search }: DashboardHeaderProps)
         {search}
       </div>
       <div className="flex flex-wrap gap-3 sm:ml-auto">
+        <Button asChild variant="ghost" size="icon" className="size-11">
+          <Link href="/favorites" aria-label="Favorites"><Star aria-hidden="true" /></Link>
+        </Button>
         <CreateCollectionDialog />
         <CreateItemDialog />
       </div>

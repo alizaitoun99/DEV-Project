@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: Favorites Page
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add a star icon button in TopBar linking to the protected `/favorites` route.
+- Fetch the signed-in user's favorited items and collections, scoped to their ownership.
+- Display compact list sections for items and collections, each with a count.
+- Show each row's type icon, title, type badge, and date added.
+- Open items in ItemDrawer and navigate collections to `/collections/[id]`.
+- Show an empty state when there are no favorites.
+- Sort favorites by `updatedAt` descending, as specified.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Favorites Page](features/favorites-spec.md).
+- Use a dense VS Code/terminal-inspired layout with monospace or semi-monospace text, minimal padding, subtle hover states, and clean lines without cards or heavy borders.
+- The spec uses `updatedAt` as the proxy for most recently favorited; it does not request a dedicated favorite timestamp or favorite-toggle mutations.
+- Started on `feature/favorites`.
+- Implemented the protected route and shared-header star link, owner-scoped minimal metadata queries, dense responsive item/collection lists with counts, creation dates, drawer/navigation actions, and loading/empty states. Ordering uses `updatedAt` descending with ID tie-breaking.
+- Validation: all 222 Vitest tests, ESLint, standalone TypeScript, and feature whitespace checks passed. Browser verification was blocked by Playwright's shared Chrome-profile lock; authenticated interactions and responsive layouts remain unverified. Unchanged auth/storage integration scripts were not rerun.
+- Production build passed on an outside-sandbox retry after Windows EPERM prevented creation of generated Next.js output in the initial run. No schema or dependency changes.
 
 ## Testing infrastructure
 
