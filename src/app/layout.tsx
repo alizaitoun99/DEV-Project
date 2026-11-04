@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { EditorPreferencesLoader } from "@/components/items/EditorPreferencesLoader";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -14,7 +16,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         className="min-h-dvh bg-background font-sans text-foreground antialiased"
         suppressHydrationWarning
       >
-        {children}
+        <Suspense fallback={<p role="status" className="p-6">Loading workspace…</p>}>
+          <EditorPreferencesLoader>{children}</EditorPreferencesLoader>
+        </Suspense>
         <Toaster />
       </body>
     </html>

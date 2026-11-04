@@ -35,6 +35,7 @@ model User {
   emailVerified        DateTime?
   image                String?
   passwordHash         String? // Credentials auth; never plaintext
+  editorPreferences    Json?
   plan                 Plan         @default(FREE)
   stripeCustomerId     String?      @unique
   stripeSubscriptionId String?      @unique

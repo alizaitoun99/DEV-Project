@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { ProfileActions } from "@/components/auth/ProfileActions";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { EditorPreferencesSettings } from "@/components/items/EditorPreferencesSettings";
 
 export const metadata = { title: "Settings | DevStash" };
 
@@ -20,8 +21,9 @@ async function Settings() {
       <Link href="/dashboard" className="text-sm text-primary underline underline-offset-4">Back to dashboard</Link>
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your account and security.</p>
+        <p className="text-sm text-muted-foreground">Manage your editor preferences, account, and security.</p>
       </header>
+      <EditorPreferencesSettings />
       <ProfileActions hasPassword={Boolean(details.passwordHash)} />
     </div>
   );

@@ -1,16 +1,34 @@
-# Current Feature
+# Current Feature: Editor Preferences Settings
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add font size and tab size dropdowns to an editor preferences section on Settings.
+- Add word wrap (default on) and minimap (default off) toggles.
+- Offer vs-dark, monokai, and github-dark themes, defaulting to vs-dark.
+- Persist preferences in a JSON `editorPreferences` column on User through a versioned database migration; never use db push.
+- Create a server action that automatically saves preference changes and shows a success toast.
+- Create EditorPreferencesContext for client components and apply preferences to Monaco.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Specification: [Editor Preferences Settings](features/editor-settings-spec.md).
+- Auto-save on change; no save button.
+- Create and run the database migration during implementation.
+- Font size/tab size options and their defaults are not specified in the source spec.
+- Implementation branch: `feature/editor-preferences`.
+- Preserve existing defaults: font size 13px and tab size 2.
+- Implemented Settings controls with automatic saves, pending protection, success/error toasts, and rollback on failure.
+- Root client context loads only the authenticated user's stored preferences; Monaco applies all five settings, including registered Monokai and GitHub Dark palettes.
+- Font sizes: 12, 13, 14, 16, 18, 20, 24px; tab sizes: 2, 4, 8 spaces.
+- Created and applied migration `20261104170046_editor_preferences`; migration status confirms all four migrations are applied. No dependency changes.
+- Validation passed: all 219 Vitest tests, ESLint, standalone TypeScript, production build, and migration status. Build required a retry outside the sandbox after Windows EPERM. An initial concurrent type check encountered regenerated route types; a subsequent check caught and resolved dropdown literal types, and the final standalone check passed.
+- Production-mode browser checks against the development database passed: protected Settings redirect, seeded-account sign-in, automatic font/theme saves, pending protection, full-reload persistence, and Monaco displaying 18px text with the Monokai background. Settings checked at 390px and 1440px; no horizontal overflow at 390px. Restored the demo account's default preferences after verification. Screenshots: [mobile](../artifacts/editor-preferences-mobile.png), [desktop](../artifacts/editor-preferences-desktop.png).
+- `.env.production` uses a separate database without this new column; the first local production-server check exposed that mismatch. Production schema was left unchanged. Apply the committed migration with `prisma migrate deploy` before deployment. Local browser verification used process-only `.env` development credentials.
+- Unchanged auth/storage integration scripts were not rerun. Changes remain uncommitted; feature closeout has not been requested.
 
 ## Testing infrastructure
 

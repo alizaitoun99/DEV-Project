@@ -2,10 +2,36 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import type { OnMount } from "@monaco-editor/react";
+import type { BeforeMount, OnMount } from "@monaco-editor/react";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useEditorPreferences } from "./EditorPreferencesContext";
+
+const registerThemes: BeforeMount = (monaco) => {
+  monaco.editor.defineTheme("monokai", {
+    base: "vs-dark", inherit: true,
+    rules: [
+      { token: "comment", foreground: "88846F", fontStyle: "italic" },
+      { token: "keyword", foreground: "F92672" },
+      { token: "string", foreground: "E6DB74" },
+      { token: "number", foreground: "AE81FF" },
+      { token: "type", foreground: "66D9EF" },
+    ],
+    colors: { "editor.background": "#272822", "editor.foreground": "#F8F8F2", "editorCursor.foreground": "#F8F8F0", "editor.selectionBackground": "#49483E" },
+  });
+  monaco.editor.defineTheme("github-dark", {
+    base: "vs-dark", inherit: true,
+    rules: [
+      { token: "comment", foreground: "8B949E" },
+      { token: "keyword", foreground: "FF7B72" },
+      { token: "string", foreground: "A5D6FF" },
+      { token: "number", foreground: "79C0FF" },
+      { token: "type", foreground: "FFA657" },
+    ],
+    colors: { "editor.background": "#0D1117", "editor.foreground": "#C9D1D9", "editorCursor.foreground": "#C9D1D9", "editor.selectionBackground": "#264F78" },
+  });
+};
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -17,6 +43,7 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ value, language = "", readOnly = false, onChange }: CodeEditorProps) {
+  const { preferences } = useEditorPreferences();
   const subscription = useRef<{ dispose: () => void } | null>(null);
   const [ready, setReady] = useState(false);
   const [height, setHeight] = useState(120);
@@ -25,12 +52,7 @@ export function CodeEditor({ value, language = "", readOnly = false, onChange }:
 
   useEffect(() => () => subscription.current?.dispose(), []);
 
-  const mount: OnMount = (editor, monaco) => {
-    monaco.editor.defineTheme("devstash-dark", {
-      base: "vs-dark", inherit: true, rules: [],
-      colors: { "editor.background": "#18181b", "scrollbarSlider.background": "#71717a55", "scrollbarSlider.hoverBackground": "#a1a1aa88", "scrollbarSlider.activeBackground": "#a1a1aaaa" },
-    });
-    monaco.editor.setTheme("devstash-dark");
+  const mount: OnMount = (editor) => {
     const resize = () => {
       setHeight(Math.min(352, Math.max(120, editor.getContentHeight())));
     };
@@ -53,10 +75,10 @@ export function CodeEditor({ value, language = "", readOnly = false, onChange }:
     </div>
     {!ready && <textarea aria-label="Code content" value={value} readOnly={readOnly} onChange={(event) => onChange?.(event.target.value)} className="block h-32 w-full resize-none bg-zinc-900 p-3 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />}
     <div className={ready ? "" : "h-0 overflow-hidden"}>
-      <MonacoEditor height={height} value={value} language={aliases[normalized] ?? (normalized || "plaintext")} theme="vs-dark" onMount={mount} onChange={(content) => onChange?.(content ?? "")} loading={<span className="sr-only">Loading code editor</span>} options={{
+      <MonacoEditor height={height} value={value} language={aliases[normalized] ?? (normalized || "plaintext")} theme={preferences.theme} beforeMount={registerThemes} onMount={mount} onChange={(content) => onChange?.(content ?? "")} loading={<span className="sr-only">Loading code editor</span>} options={{
         readOnly, domReadOnly: readOnly, ariaLabel: "Code content", automaticLayout: true,
-        minimap: { enabled: false }, scrollBeyondLastLine: false, fontSize: 13,
-        lineNumbersMinChars: 3, folding: false, wordWrap: "on", tabSize: 2,
+        minimap: { enabled: preferences.minimap }, scrollBeyondLastLine: false, fontSize: preferences.fontSize,
+        lineNumbersMinChars: 3, folding: false, wordWrap: preferences.wordWrap ? "on" : "off", tabSize: preferences.tabSize,
         tabFocusMode: true, padding: { top: 12, bottom: 12 },
         scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8, alwaysConsumeMouseWheel: false },
       }} />
