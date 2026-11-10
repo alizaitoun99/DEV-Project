@@ -178,3 +178,5 @@
 
 - 2026-11-10: Completed the Files and Images upgrade pages in `af47cfb`. Both routes check the signed-in user's plan before querying the item lists. Free users see an upgrade page that links to Billing in Settings. Pro users retain access to the item lists.
 - All 304 unit tests, ESLint, TypeScript, and the production build passed. Authenticated HTTP checks verified both Free upgrade pages, the Billing destination, and Free Snippets access. The signed-out redirect passed. Browser layout and live Pro access remain unverified.
+
+- 2026-11-10: Updated the demo seed to use the Free plan with three collections and 10 items. The development cleanup deleted one non-demo user, and the live database check confirmed that the reseeded demo was the only remaining user.

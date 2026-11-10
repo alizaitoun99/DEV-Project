@@ -11,7 +11,7 @@ Create a seed script (`prisma/seed.ts`) to populate the database with sample dat
 - **Email:** demo@devistage.io
 - **Name:** John Doe
 - **Password:** 12345678 (hash with bcryptjs, 12 rounds)
-- **isPro:** true
+- **Plan:** Free
 - **emailVerified:** current date
 
 ### System Item Types
@@ -58,24 +58,7 @@ _Description: Infrastructure and deployment resources_
 - 1 command (deployment scripts)
 - 2 links (documentation URLs - use real URLs)
 
-#### Terminal Commands
+## Resetting the development demo
 
-_Description: Useful shell commands for everyday development_
-
-4 commands:
-
-- Git operations
-- Docker commands
-- Process management
-- Package manager utilities
-
-#### Design Resources
-
-_Description: UI/UX resources and references_
-
-4 links (use real URLs):
-
-- CSS/Tailwind references
-- Component libraries
-- Design systems
+`npm run db:seed` upserts the fixture. To replace existing demo items and collections with the three collections and 10 sample items above, run `npm run db:seed -- -- --reset-demo`. The reset keeps the demo account and queues cleanup of its existing uploaded files.
 - Icon libraries

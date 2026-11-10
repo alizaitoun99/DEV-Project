@@ -2,7 +2,11 @@ import "dotenv/config";
 
 import { hash } from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
-import type { ContentKind } from "../src/generated/prisma/client";
+import { assertNoBillingForBulkDeletion, BillingDeletionError } from "../src/lib/billing/account-deletion";
+import { enqueueAccountStorage } from "../src/lib/db/items";
+import { Prisma, type ContentKind } from "../src/generated/prisma/client";
+
+const DEMO_EMAIL = "demo@devistage.io";
 
 const SYSTEM_TYPES = [
   { slug: "snippet", icon: "Code", color: "#3b82f6", kind: "TEXT" },
@@ -104,26 +108,6 @@ jobs:
       { key: "actions-docs", title: "GitHub Actions documentation", type: "link", url: "https://docs.github.com/en/actions" },
     ],
   },
-  {
-    key: "terminal-commands", name: "Terminal Commands",
-    description: "Useful shell commands for everyday development",
-    items: [
-      { key: "git-log", title: "Inspect Git history", type: "command", content: "git log --oneline --graph --decorate --all" },
-      { key: "docker-status", title: "List running Docker containers", type: "command", content: "docker ps --format 'table {{.Names}}\\t{{.Status}}\\t{{.Ports}}'" },
-      { key: "processes", title: "Find processes listening on port 3000", type: "command", content: "lsof -nP -iTCP:3000 -sTCP:LISTEN" },
-      { key: "npm-outdated", title: "Check outdated npm packages", type: "command", content: "npm outdated" },
-    ],
-  },
-  {
-    key: "design-resources", name: "Design Resources",
-    description: "UI/UX resources and references",
-    items: [
-      { key: "tailwind", title: "Tailwind CSS reference", type: "link", url: "https://tailwindcss.com/docs" },
-      { key: "shadcn", title: "shadcn/ui components", type: "link", url: "https://ui.shadcn.com/" },
-      { key: "material", title: "Material Design system", type: "link", url: "https://m3.material.io/" },
-      { key: "lucide", title: "Lucide icon library", type: "link", url: "https://lucide.dev/icons/" },
-    ],
-  },
 ];
 
 async function main(): Promise<void> {
@@ -132,11 +116,21 @@ async function main(): Promise<void> {
   }
 
   const passwordHash = await hash("12345678", 12);
-  await prisma.$transaction(async (tx) => {
+  const counts = await prisma.$transaction(async (tx) => {
+    const existingDemo = await tx.user.findUnique({ where: { email: DEMO_EMAIL }, select: { id: true } });
+    if (existingDemo) {
+      await assertNoBillingForBulkDeletion(tx, existingDemo.id);
+      if (process.argv.includes("--reset-demo")) {
+        const owner = { userId: existingDemo.id };
+        await enqueueAccountStorage(tx, existingDemo.id);
+        await tx.item.deleteMany({ where: owner });
+        await tx.collection.deleteMany({ where: owner });
+      }
+    }
     const user = await tx.user.upsert({
-      where: { email: "demo@devistage.io" },
-      create: { name: "John Doe", email: "demo@devistage.io", passwordHash, plan: "PRO", emailVerified: new Date() },
-      update: { name: "John Doe", passwordHash, plan: "PRO", emailVerified: new Date() },
+      where: { email: DEMO_EMAIL },
+      create: { name: "John Doe", email: DEMO_EMAIL, passwordHash, plan: "FREE", emailVerified: new Date() },
+      update: { name: "John Doe", passwordHash, plan: "FREE", emailVerified: new Date() },
     });
     const typeIds = new Map<string, string>();
     for (const type of SYSTEM_TYPES) {
@@ -172,17 +166,21 @@ async function main(): Promise<void> {
         });
       }
     }
-    console.log("Demo seed complete:", {
+    return {
       systemTypes: typeIds.size,
       collections: await tx.collection.count({ where: { userId: user.id } }),
       items: await tx.item.count({ where: { userId: user.id } }),
-    });
+    };
   }, { timeout: 60000 });
+  console.log("Demo seed complete:", counts);
 }
 
 main()
-  .catch(() => {
-    console.error("Demo seed failed; transaction rolled back. Check database configuration and seed ownership conflicts.");
+  .catch((error: unknown) => {
+    const detail = error instanceof BillingDeletionError ? error.message
+      : error instanceof Prisma.PrismaClientKnownRequestError ? `Prisma error ${error.code}.`
+      : "Check database configuration and seed ownership conflicts.";
+    console.error("Demo seed failed; transaction rolled back.", detail);
     process.exitCode = 1;
   })
   .finally(async () => {

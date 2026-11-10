@@ -13,8 +13,6 @@ const EXPECTED_COLLECTIONS = [
   { name: "React Patterns", types: { snippet: 3 } },
   { name: "AI Workflows", types: { prompt: 3 } },
   { name: "DevOps", types: { snippet: 1, command: 1, link: 2 } },
-  { name: "Terminal Commands", types: { command: 4 } },
-  { name: "Design Resources", types: { link: 4 } },
 ];
 
 const EXPECTED_TYPES = [
@@ -65,7 +63,7 @@ async function checkDemoData(): Promise<void> {
     },
   });
   check(user !== null, "Demo user is missing. Run npm run db:seed first.");
-  check(user.name === "John Doe" && user.plan === "PRO" && user.emailVerified !== null, "Demo user profile does not match the seed spec.");
+  check(user.name === "John Doe" && user.plan === "FREE" && user.emailVerified !== null, "Demo user profile does not match the seed spec.");
   check(user.passwordHash !== null, "Demo user password hash is missing.");
   check(getRounds(user.passwordHash) === 12 && await compare("12345678", user.passwordHash), "Demo password or bcrypt cost does not match the seed spec.");
   console.log("Demo user (password verified; hash omitted):");
@@ -82,7 +80,7 @@ async function checkDemoData(): Promise<void> {
     const type = types.find((record) => record.slug === expected.slug);
     check(type !== undefined && type.name === expected.slug && type.icon === expected.icon && type.color === expected.color && type.kind === expected.kind, `System type ${expected.slug} does not match the seed spec.`);
   }
-  check(user.collections.length === 5 && user.items.length === 18, "Expected five demo collections and 18 demo items.");
+  check(user.collections.length === 3 && user.items.length === 10, "Expected three demo collections and 10 demo items.");
   console.log("Demo collections:");
   console.table(user.collections.map((collection) => ({ name: collection.name, description: collection.description, items: collection.items.length })));
   for (const expected of EXPECTED_COLLECTIONS) {
@@ -110,7 +108,7 @@ async function checkDemoData(): Promise<void> {
     }
   }
   check(user.items.filter((item) => item.type.slug === "snippet" && item.collections.some((membership) => user.collections.find((collection) => collection.id === membership.collectionId)?.name === "React Patterns")).every((item) => item.language === "typescript"), "React snippets must use TypeScript.");
-  console.log("Demo verification passed: credentials, seven types, five collections, 18 items, content, and ownership/memberships.");
+  console.log("Demo verification passed: credentials, free plan, seven types, three collections, 10 items, content, and ownership/memberships.");
 }
 
 async function main(): Promise<void> {
