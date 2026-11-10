@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: Homepage
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Build the public DevStash homepage at `/` with navigation, a chaos-to-order hero, a dashboard preview, Features, an AI preview, pricing, a closing CTA, and a footer. Stack the hero panels on mobile.
+- Match the updated prototype’s larger floating icons, gentler cursor response, static dashboard with a sample pinned snippet, lighter Features background, and Snippets blue accents.
+- Connect registration and sign-in CTAs to the existing routes and section links to their anchors. Keep the AI and pricing sections demonstrative, with monthly and yearly prices and billing copy that reflect the selected state.
+- Verify links, desktop and mobile layouts, anchor offsets, keyboard navigation, both pricing states, cursor response, and reduced motion. Run unit tests, lint, TypeScript, and the production build.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Use the [homepage spec](features/homepage-spec.md), [mockup spec](features/homepage-mockup-spec.md), and [updated prototype](../prototypes/homepage/index.html) as references.
+- Keep `src/app/page.tsx` and static sections as Server Components. Limit Client Components to browser interactions. Honor reduced motion and pause floating icons when offscreen or when the tab is hidden.
+- Reuse Tailwind, shadcn/ui, and the existing font and theme. Include semantic landmarks and headings, a skip link, visible focus, accessible pricing toggle states, and hidden decorative elements in the accessibility tree.
+- Align product and plan claims with the current offering. Checkout is outside this feature.
+- Implementation validation passed on `feature/homepage`. All 251 Vitest tests, ESLint, TypeScript, and the production build passed. Chrome verified layout widths from 320 to 1440 px, link destinations and anchor clearance, keyboard access, monthly and yearly pricing, pointer repulsion, offscreen pausing, and reduced motion.
 
 ## Testing infrastructure
 
