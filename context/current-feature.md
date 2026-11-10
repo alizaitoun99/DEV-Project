@@ -1,53 +1,16 @@
-# Current Feature: Stripe Integration
+# Current Feature
 
-## Stripe Integration Phase 1 — Core Infrastructure
+## Status
 
-### Status
+<!-- No active feature. -->
 
-In Progress
+## Goals
 
-### Goals
+<!-- Load the next feature specification. -->
 
-- Add the Stripe SDK and a lazy, server-only client. Document the environment settings, validate them when needed, and use a fixed, validated app origin for return URLs.
-- Map monthly and yearly billing to distinct server-configured Stripe prices. Both grant the same Pro access at USD $8/month or $72/year.
-- Reuse existing user billing fields and add a billing revision, uniquely keyed webhook receipts, and one durable current checkout attempt per owner. Persist idempotency keys, request parameters, and provider IDs for recovery.
-- Apply a reviewed Prisma migration that preserves existing users, Stripe mappings, and the Pro development seed. Keep new users Free by default and use the database plan for entitlements.
-- Add shared transaction-aware assertions for the Free limits of 50 owned items and 3 owned collections, and for Pro-only operations. Count each item once, scope queries to the owner, let Pro bypass Free counts, and return typed errors.
-- Cover lazy Stripe configuration and entitlement behavior with mocked Vitest tests. Verify migration preservation and status, then run tests, lint, TypeScript, and a production build without Stripe credentials.
+## Notes
 
-### Notes
-
-- Source: [Stripe Integration Phase 1 spec](features/stripe-phase-1-spec.md).
-- Implementation and validation passed. Closeout is pending.
-- Acquire the owner row lock before reading the plan or counting rows and hold it through any gated write in the same transaction. Phase 2 billing reconciliation must use the same lock.
-- Keep authentication sessions identity-only. Phase 2 wires the entitlement helpers into existing write paths.
-
-## Stripe Integration Phase 2 — Integration and UI
-
-### Status
-
-In Progress
-
-### Goals
-
-- Add authenticated, same-origin hosted Checkout and Customer Portal routes. Persist customer ownership, make checkout attempts retryable, and resolve earlier sessions before opening replacements.
-- Fence Checkout against self-service and administrative account deletion. Preserve ownership mappings until sessions and subscriptions are resolved, and make failures retryable.
-- Verify webhook signatures and reconcile from current Stripe state. Apply event receipts, subscription and plan updates, and checkout resolution atomically using the shared owner lock and billing revision. Add a preview-first repair command and delivery recovery runbook.
-- Enforce Free creation quotas and Pro-only uploads in server transactions. Surface actionable entitlement errors and preserve access to existing data, downloads, and quota recovery after downgrade.
-- Add Billing to protected Settings with upgrade and management actions, subscription status, and bounded refresh after Checkout. Route signed-in homepage pricing selections to Settings.
-- Validate with mocked Vitest tests, PostgreSQL concurrency checks, Stripe sandbox flows, and desktop and mobile UI checks. Run tests, lint, TypeScript, build, and migration status.
-
-### Notes
-
-- Source: [Stripe Integration Phase 2 spec](features/stripe-phase-2-spec.md).
-- Phase 2 builds on the uncommitted Phase 1 foundation carried forward from `feature/stripe-phase-1`.
-- Item and collection creation enforce Free quotas in their write transactions. Upload issuance and finalization enforce Pro access. Denied finalizations use the storage cleanup ledger. PostgreSQL verified competing last slots, quota recovery after deletion, and Pro bypass.
-- Hosted Checkout, Customer Portal, signed webhook reconciliation, guarded deletion, and the Billing settings panel are implemented. Sandbox tests verified both prices, repeated Checkout reuse, owner-scoped activation, Portal access, scheduled cancellation and reversal, terminal downgrade, and guarded deletion. The two development test accounts were removed after their sandbox subscriptions ended.
-- Use the database billing projection for access decisions. Start with cards and no trial.
-- Approved policies: past-due subscriptions lose Pro access immediately, ordinary edits are read-only only above quota, and deletion waits for terminal Stripe billing. Confirm the export policy before implementing an export gate.
-- Checkout can recover a lost Stripe customer creation response after the idempotency replay window. An attempt that never prepared a Checkout session can be retired under the owner lock and does not block deletion. A targeted Stripe sandbox check recovered the original customer, opened an unpaid Checkout session, and verified deletion of a separate customer-only fixture.
-- Payment failure and recovery, renewal, and the remaining delivery scenarios still need end-to-end verification.
-- Validation passed: 298 unit tests, profile regression, lint, TypeScript, production build with Stripe settings blank, development migration status, and desktop and mobile sandbox checks.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -208,3 +171,7 @@ In Progress
 
 - 2026-11-10: Completed Homepage Branding, Motion, and Account Navigation in `f433222`. The homepage reads the current session for Dashboard and My Profile links and workspace buttons. Signed-in users who open sign-in or registration are directed to the dashboard. Shared the sign-in logo with the homepage, added GitHub registration and a reduced-motion-aware hero entrance, and restored Features, Pricing, and AI powers scroll positions on browser Back from sign-in.
 - All 254 Vitest tests, ESLint, TypeScript, the production build, Prisma migration status, and staged whitespace checks passed. Chrome checks covered signed-in Dashboard and My Profile navigation, existing-session redirects, guest browser Back at 320px and 1440px, the GitHub registration button, and reduced motion. The full GitHub OAuth callback was not exercised. The production build required an outside-sandbox retry after a Windows filesystem error.
+
+- 2026-11-10: Closed out [Stripe Phase 1](features/stripe-phase-1-spec.md) and [Stripe Phase 2](features/stripe-phase-2-spec.md) in 52f8edb. Added the billing migration, hosted Checkout and Customer Portal, signed webhook reconciliation, Settings billing, entitlement checks, guarded deletion, and recovery for lost customer creation responses. The approved Phase 2 scope excludes subscription switching.
+- Stripe validation passed for 304 unit tests, the profile regression, lint, TypeScript, the production build with empty Stripe settings, and development migration status. PostgreSQL verified quota concurrency and recovery. Stripe sandbox checks verified both prices, session reuse, owner-scoped activation, cancellation and reversal, terminal downgrade, deletion safeguards, and lost customer recovery.
+- Deferred payment failure and recovery, renewal, and the remaining delivery and Checkout scenarios. Production migration and live billing setup remain pending. See the [Stripe integration plan](../docs/stripe-integration-plan.md).
