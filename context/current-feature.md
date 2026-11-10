@@ -2,20 +2,15 @@
 
 ## Status
 
-Homepage prototype polish on `feature/homepage-prototype-polish`.
+<!-- No active feature. -->
 
 ## Goals
 
-- [x] Soften the floating icons’ cursor response.
-- [x] Fill the hero mockup with a pinned snippet example.
-- [x] Enlarge the floating tiles and glyphs.
-- [x] Make the mockup section names easier to scan.
-- [x] Give Features a lighter full-width background.
-- [x] Use Snippets blue for branded text and primary buttons.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-The two icon-size requests share the same tile and glyph updates. The hero dashboard uses a pinned JavaScript snippet to show what a saved item looks like.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -168,3 +163,5 @@ The two icon-size requests share the same tile and glyph updates. The hero dashb
 
 - 2026-11-04: Completed [Homepage Mockup](features/homepage-mockup-spec.md) on `feature/homepage-mockup`, committed as `54743f8` and merged into `main`. Added the standalone `prototypes/homepage/` HTML/CSS/JavaScript prototype with a dark responsive layout, animated chaos-to-order hero, dashboard preview, feature cards, AI demo, monthly/yearly pricing toggle, closing CTA, and footer. Includes reduced-motion support, cursor repulsion, scroll reveals, and offscreen/background animation pauses. CTA links target the application authentication routes; pricing remains a demonstration. No dependencies, schema, or application routes changed.
 - Homepage validation passed: all 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, JavaScript syntax, CSS parsing, prototype smoke checks, staged whitespace checks, and migration status (four migrations, database up to date). Build and migration checks required outside-sandbox retries after Windows filesystem/connectivity restrictions. Browser visual, cursor, keyboard, and responsive verification remain unconfirmed because browser policy blocked local file URLs. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
+
+- 2026-11-10: Completed homepage prototype polish in `302da75`. Enlarged and slowed the hero icons, added a pinned snippet and clearer dashboard labels, separated Features with a lighter background, and switched branded accents and primary buttons to Snippets blue. Updated the [mockup spec](features/homepage-mockup-spec.md) and added the [app homepage spec](features/homepage-spec.md). All 251 unit tests, lint, TypeScript, the production build, and prototype smoke checks passed. Desktop and mobile visual verification remains pending because the browser preview failed to load.
