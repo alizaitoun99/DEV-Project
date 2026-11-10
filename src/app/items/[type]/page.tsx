@@ -1,11 +1,13 @@
 import { Pagination } from "@/components/Pagination";
 import { getPagination, parsePage, ITEMS_PER_PAGE, type PaginationSearchParams } from "@/lib/pagination";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ItemCard } from "@/components/dashboard/ItemCard";
 import { CreateItemDialog } from "@/components/items/CreateItemDialog";
 import { FileListRow } from "@/components/items/FileListRow";
+import { Button } from "@/components/ui/button";
 import type { ItemCreateInput } from "@/lib/item-validation";
 import { getCurrentUser } from "@/lib/current-user";
 import { getFilesByType, getItemsByType, getSystemItemTypes } from "@/lib/db/items";
@@ -33,6 +35,21 @@ export default async function ItemsPage({ params, searchParams }: ItemsPageProps
   const { type: route } = await params;
   const slug = Object.hasOwn(TYPE_ROUTES, route) ? TYPE_ROUTES[route] : undefined;
   if (!slug) notFound();
+
+  if (user.plan === "FREE" && (slug === "file" || slug === "image")) {
+    const title = slug === "file" ? "Files" : "Images";
+
+    return (
+      <section aria-labelledby="upgrade-title" className="mx-auto max-w-xl space-y-4 rounded-xl border bg-card p-6 sm:p-8">
+        <p className="text-sm font-medium text-primary">DevStash Pro</p>
+        <h1 id="upgrade-title" className="text-3xl font-semibold tracking-tight">{title} are a Pro feature</h1>
+        <p className="text-muted-foreground">Upgrade to upload and organize {route} in your workspace.</p>
+        <Button asChild size="lg">
+          <Link href="/settings#billing">Upgrade to Pro</Link>
+        </Button>
+      </section>
+    );
+  }
 
   const types = await getSystemItemTypes(user.id);
   const type = types.find((type) => type.slug === slug);
