@@ -6,7 +6,7 @@
   --border:#252631;
   --text:#eeedf5;
   --muted:#92939f;
-  --accent:#8875ff;
+  --accent:#8bbaff;
   --snippet:#3b82f6;
   --prompt:#f59e0b;
   --command:#06b6d4;
@@ -39,11 +39,11 @@ button,a {
   -webkit-tap-highlight-color:transparent
 }
 a:focus-visible,button:focus-visible {
-  outline:2px solid #b5a8ff;
+  outline:2px solid var(--accent);
   outline-offset:5px
 }
 ::selection {
-  background:#544099
+  background:#224c88
 }
 .container {
   width:min(1200px,calc(100% - 80px));
@@ -80,7 +80,7 @@ a:focus-visible,button:focus-visible {
   height:33px;
   margin-right:10px;
   border-radius:8px;
-  background:#8875ff;
+  background:var(--snippet);
   color:#0b0916;
   display:inline-grid;
   place-items:center;
@@ -110,18 +110,18 @@ a:focus-visible,button:focus-visible {
   justify-content:center;
   align-items:center;
   gap:24px;
-  border:1px solid #a799ff69;
+  border:1px solid #8bbaff69;
   border-radius:7px;
-  background:#8875ff;
+  background:var(--snippet);
   color:#0b081b;
   font-weight:700;
   font-size:13px;
   padding:14px 22px;
-  box-shadow:0 4px 20px #8875ff14;
+  box-shadow:0 4px 20px #3b82f614;
   transition:transform .2s,background .2s
 }
 .button:hover {
-  background:#a292ff;
+  background:#679fff;
   transform:translateY(-2px)
 }
 .button.small {
@@ -151,6 +151,7 @@ a:focus-visible,button:focus-visible {
 }
 .hero {
   padding-top:150px;
+  padding-bottom:clamp(36px,6vw,72px);
   text-align:center;
   position:relative
 }
@@ -161,7 +162,7 @@ a:focus-visible,button:focus-visible {
   left:10%;
   width:80%;
   height:500px;
-  background:radial-gradient(ellipse,#6150b31c,transparent 65%);
+  background:radial-gradient(ellipse,#3b82f61c,transparent 65%);
   pointer-events:none;
   z-index:-1
 }
@@ -169,13 +170,13 @@ a:focus-visible,button:focus-visible {
   display:inline-flex;
   align-items:center;
   gap:9px;
-  color:#b1a5ef;
+  color:var(--accent);
   font:500 10px 'Space Grotesk',sans-serif;
   letter-spacing:2px
 }
 .hero>.eyebrow {
-  border:1px solid #8570e12e;
-  background:#8875ff09;
+  border:1px solid #3b82f62e;
+  background:#3b82f609;
   padding:7px 12px;
   border-radius:30px;
   letter-spacing:1.7px
@@ -184,8 +185,8 @@ a:focus-visible,button:focus-visible {
   width:6px;
   height:6px;
   border-radius:50%;
-  background:#9a86ff;
-  box-shadow:0 0 12px #8875ff66
+  background:var(--accent);
+  box-shadow:0 0 12px #3b82f666
 }
 .hero h1 {
   font:600 clamp(42px,5.4vw,72px)/1.09 'Space Grotesk',sans-serif;
@@ -193,7 +194,7 @@ a:focus-visible,button:focus-visible {
   margin:26px 0 22px
 }
 h1>span {
-  background:linear-gradient(105deg,#a5a3ff,#b18af0 60%,#e0b0cb);
+  background:linear-gradient(105deg,var(--accent),var(--snippet));
   color:transparent;
   background-clip:text
 }
@@ -268,8 +269,8 @@ h1>span {
   position:absolute;
   left:0;
   top:0;
-  width:49px;
-  height:49px;
+  width:57px;
+  height:57px;
   border:1px solid #ffffff1c;
   border-radius:11px;
   display:flex;
@@ -277,20 +278,20 @@ h1>span {
   justify-content:center;
   background:#1b1c26;
   box-shadow:0 8px 20px #0005;
-  font-size:29px;
+  font-size:34px;
   will-change:transform
 }
 .floating-icon svg {
-  width:28px;
-  height:28px
+  width:33px;
+  height:33px
 }
 .notion {
   color:#eee
 }
 .notion b {
-  font:700 32px Georgia,serif;
+  font:700 36px Georgia,serif;
   border:2px solid #ddd;
-  line-height:29px;
+  line-height:33px;
   padding:0 3px
 }
 .slack {
@@ -338,7 +339,7 @@ h1>span {
   align-items:center;
   flex-direction:column;
   gap:5px;
-  color:#a591ed
+  color:var(--accent)
 }
 .transform-arrow>span {
   display:block;
@@ -351,7 +352,9 @@ h1>span {
   color:#787080
 }
 .dashboard {
-  height:330px;
+  min-height:330px;
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
   border:1px solid #60528b80;
   border-radius:10px;
@@ -373,7 +376,7 @@ h1>span {
 }
 .dashboard-body {
   display:flex;
-  height:calc(100% - 34px)
+  flex:1
 }
 .mock-sidebar {
   width:133px;
@@ -381,11 +384,12 @@ h1>span {
   border-right:1px solid #23222e;
   background:#0d0e15;
   padding:13px 10px;
-  position:relative
+  display:flex;
+  flex-direction:column
 }
 .mock-brand {
   font:12px 'Space Grotesk',sans-serif;
-  color:#bfb2f8;
+  color:var(--accent);
   margin-bottom:18px
 }
 .mock-nav {
@@ -401,8 +405,8 @@ h1>span {
   color:#a39eae
 }
 .mock-nav.active {
-  background:#8875ff18;
-  color:#ac9bf5
+  background:#3b82f618;
+  color:var(--accent)
 }
 .mock-nav small,.mock-nav kbd {
   margin-left:auto;
@@ -410,15 +414,14 @@ h1>span {
   color:#696473
 }
 .sidebar-label {
-  font-size:6px;
-  letter-spacing:1.2px;
-  color:#615e6d;
-  margin:18px 6px 6px
+  font-size:9px;
+  font-weight:600;
+  color:#a39eae;
+  margin:12px 6px 4px
 }
 .mock-user {
-  position:absolute;
-  bottom:12px;
-  left:12px;
+  margin-top:auto;
+  padding-top:10px;
   font-size:7px;
   color:#96909e
 }
@@ -454,18 +457,40 @@ h1>span {
 }
 .mock-add {
   font-size:7px;
-  background:#8875ff;
+  background:var(--snippet);
   color:#13101d;
   border-radius:3px;
   padding:4px 7px;
   white-space:nowrap
 }
 .mock-tabs {
-  font-size:8px;
-  color:#aaa4b6;
-  margin:20px 0 9px;
+  color:var(--text);
+  margin:12px 0 6px;
+  align-items:center;
   display:flex;
   justify-content:space-between
+}
+.mock-tabs h4 {
+  font-size:10px;
+  margin:0
+}
+.mock-pinned {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 7px;
+  padding:6px 8px;
+  border:1px solid #3b82f63b;
+  border-radius:5px;
+  background:#3b82f612;
+  font-size:9px
+}
+.mock-pinned>span,.mock-pinned code {
+  color:var(--accent)
+}
+.mock-pinned code {
+  font-size:8px;
+  white-space:nowrap
 }
 .mock-tabs>span {
   font-size:7px;
@@ -530,6 +555,10 @@ h1>span {
   color:#8c8699;
   margin:5px 0
 }
+.mock-card pre {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere
+}
 .mock-card i {
   color:#ac8add;
   font-style:normal
@@ -567,6 +596,10 @@ h1>span {
 }
 .section {
   padding-top:110px
+}
+#features {
+  background:#11141d;
+  padding-bottom:clamp(48px,7vw,88px)
 }
 .section-heading {
   text-align:center;
@@ -644,8 +677,8 @@ h2 span {
   padding-bottom:10px
 }
 .pro-badge {
-  color:#b09cf3;
-  border:1px solid #8875ff4d;
+  color:var(--accent);
+  border:1px solid #3b82f64d;
   border-radius:5px;
   padding:5px 9px;
   font-size:9px;
@@ -673,14 +706,14 @@ h2 span {
   content:'✓';
   position:absolute;
   left:0;
-  color:#9c8bdb
+  color:var(--accent)
 }
 .ai-copy .checklist {
   margin:25px 0 30px
 }
 .text-link {
   font-size:12px;
-  color:#b1a0ee
+  color:var(--accent)
 }
 .text-link span {
   margin-left:12px
@@ -704,7 +737,7 @@ h2 span {
   color:#c6bed5
 }
 .blue-text {
-  color:#9b86f1
+  color:var(--accent)
 }
 .editor pre {
   padding:20px 23px;
@@ -724,12 +757,12 @@ h2 span {
 }
 .ai-tags {
   border-top:1px solid #30283e;
-  background:linear-gradient(110deg,#8875ff0c,#8875ff03);
+  background:linear-gradient(110deg,#3b82f60c,#3b82f603);
   padding:15px 23px
 }
 .ai-tags>div {
   font-size:11px;
-  color:#ba9bf3
+  color:var(--accent)
 }
 .ai-tags b {
   font-weight:500;
@@ -746,9 +779,9 @@ h2 span {
   margin:10px 0 0
 }
 .ai-tags p>span {
-  border:1px solid #8875ff2e;
-  background:#8875ff0b;
-  color:#a89acb;
+  border:1px solid #3b82f62e;
+  background:#3b82f60b;
+  color:var(--accent);
   font:9px monospace;
   padding:3px 7px;
   border-radius:4px
@@ -777,11 +810,11 @@ h2 span {
   cursor:pointer
 }
 .billing-control button.selected {
-  background:#30293f;
-  color:#eee8ff
+  background:#1c355b;
+  color:#e8f1ff
 }
 .billing-control button>span {
-  color:#ad9ed9;
+  color:var(--accent);
   font-size:8px;
   margin-left:6px
 }
@@ -809,7 +842,7 @@ h2 span {
   margin:8px 0
 }
 .price-card h3>span {
-  color:#9c86f1;
+  color:var(--accent);
   font-size:20px
 }
 .price-card>p {
@@ -847,15 +880,15 @@ h2 span {
   margin-bottom:0
 }
 .pro-plan {
-  border-color:#8875ff8c;
-  background:linear-gradient(150deg,#1d172c,#111118 70%);
-  box-shadow:0 0 45px #8875ff0a
+  border-color:#3b82f68c;
+  background:linear-gradient(150deg,#151e31,#111118 70%);
+  box-shadow:0 0 45px #3b82f60a
 }
 .popular {
   position:absolute;
   right:20px;
   top:-12px;
-  background:#a08ae8;
+  background:var(--snippet);
   color:#191122;
   font-size:8px;
   letter-spacing:1px;
@@ -871,7 +904,7 @@ h2 span {
   margin-top:110px;
   padding:55px 25px 48px;
   text-align:center;
-  border:1px solid #8875ff26;
+  border:1px solid #3b82f626;
   border-radius:12px;
   background:radial-gradient(ellipse at top,#5540792b,transparent 75%),#101017;
   position:relative;
@@ -879,7 +912,7 @@ h2 span {
 }
 .closing-mark {
   font-size:32px;
-  color:#b49af4;
+  color:var(--accent);
   margin-bottom:14px
 }
 .closing h2 {
@@ -929,7 +962,7 @@ h2 span {
   margin:9px 0
 }
 .footer-links a:hover {
-  color:#c8b4ff
+  color:var(--accent)
 }
 .footer-bottom {
   display:flex;
@@ -972,8 +1005,11 @@ h2 span {
   .transformation {
     margin-top:75px
   }
-  .chaos-panel,.dashboard {
+  .chaos-panel {
     height:355px
+  }
+  .dashboard {
+    min-height:355px
   }
   .mock-main {
     padding:25px
@@ -1118,7 +1154,7 @@ h2 span {
     font-size:7px
   }
   .dashboard {
-    height:325px
+    min-height:325px
   }
   .mock-sidebar {
     width:111px

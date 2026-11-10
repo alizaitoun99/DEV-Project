@@ -2,15 +2,20 @@
 
 ## Status
 
-<!-- No active feature. -->
+Homepage prototype polish on `feature/homepage-prototype-polish`.
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- [x] Soften the floating icons’ cursor response.
+- [x] Fill the hero mockup with a pinned snippet example.
+- [x] Enlarge the floating tiles and glyphs.
+- [x] Make the mockup section names easier to scan.
+- [x] Give Features a lighter full-width background.
+- [x] Use Snippets blue for branded text and primary buttons.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+The two icon-size requests share the same tile and glyph updates. The hero dashboard uses a pinned JavaScript snippet to show what a saved item looks like.
 
 ## Testing infrastructure
 

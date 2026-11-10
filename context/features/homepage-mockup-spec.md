@@ -4,6 +4,8 @@ Create a marketing homepage for DevStash - a developer knowledge hub for code sn
 
 **Output:** `prototypes/homepage/` with `index.html`, `styles.css`, `script.js`
 
+See [Homepage Spec](homepage-spec.md) for the app implementation.
+
 ---
 
 ## Color Palette
@@ -17,6 +19,8 @@ Dark theme with these accent colors for item types:
 - File: `#64748b` (Slate)
 - Image: `#ec4899` (Pink)
 - URL: `#6366f1` (Indigo)
+
+Use Snippets blue for primary buttons and lighter blue shades for branded text and focus indicators.
 
 ---
 
@@ -35,7 +39,7 @@ A box labeled "Your knowledge today..." containing 8 floating icons representing
 
 - Float around randomly, bouncing off walls
 - Subtle rotation and scale pulsing
-- Move away from mouse cursor on hover
+- Use 57 px tiles with larger glyphs and gentle cursor repulsion. Cap travel at 24 px per second.
 
 ### Transform Arrow (Center)
 
@@ -45,7 +49,9 @@ A pulsing arrow pointing from chaos to order.
 
 A box labeled "...with DevStash" showing a simplified dashboard mockup:
 
-- Sidebar with nav items
+- Sidebar with navigation items and a visible Library label
+- Pinned section with a JavaScript snippet example
+- Recently saved heading above the item grid
 - Grid of item cards with colored top borders (using the item type colors)
 
 ---
@@ -56,7 +62,7 @@ A box labeled "...with DevStash" showing a simplified dashboard mockup:
 
 2. **Hero Text** - Above the visual: "Stop Losing Your Developer Knowledge" headline with gradient text, subheadline about scattered knowledge, CTA buttons
 
-3. **Features** - 6 cards in a grid: Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, Collections. Each card uses its item type accent color.
+3. **Features** - Use a slightly lighter full-width background to separate the six-card grid from the hero. Include Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, and Collections with item type accents.
 
 4. **AI Section** - Two columns: Left has "Pro Feature" badge and checklist of AI capabilities. Right shows a code editor mockup with "AI Generated Tags" demo.
 

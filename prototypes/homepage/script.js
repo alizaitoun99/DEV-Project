@@ -38,10 +38,12 @@
   }
 
   const panel = document.querySelector(".chaos-panel");
+  const maxSpeed = 24;
   const positions = [[0.14, 0.15], [0.64, 0.12], [0.42, 0.4], [0.79, 0.48],
     [0.09, 0.63], [0.58, 0.76], [0.31, 0.77], [0.84, 0.78]];
   let width = 0;
   let height = 0;
+  let iconRadius = 0;
   let previousTime = 0;
   let frame = 0;
   let inView = true;
@@ -58,8 +60,10 @@
   }
 
   function resize() {
-    width = Math.max(0, panel.clientWidth - 61);
-    height = Math.max(0, panel.clientHeight - 78);
+    const iconSize = icons[0].element.offsetWidth;
+    iconRadius = iconSize / 2;
+    width = Math.max(6, panel.clientWidth - iconSize - 6);
+    height = Math.max(6, panel.clientHeight - iconSize - 29);
     icons.forEach((icon, index) => {
       icon.x = 6 + positions[index][0] * width;
       icon.y = 6 + positions[index][1] * height;
@@ -71,18 +75,21 @@
     const delta = previousTime ? Math.min((time - previousTime) / 1000, 0.04) : 0;
     previousTime = time;
     icons.forEach((icon) => {
-      const dx = icon.x + 24 - pointer.x;
-      const dy = icon.y + 24 - pointer.y;
+      const dx = icon.x + iconRadius - pointer.x;
+      const dy = icon.y + iconRadius - pointer.y;
       const distance = Math.hypot(dx, dy);
       if (distance < 110 && distance > 0) {
-        const force = (1 - distance / 110) * 200 * delta;
+        const force = (1 - distance / 110) * 85 * delta;
         icon.vx += dx / distance * force;
         icon.vy += dy / distance * force;
       }
       icon.vx += Math.sin(time / 3000 + icon.phase) * delta * 3;
       icon.vy += Math.cos(time / 3500 + icon.phase) * delta * 3;
       const speed = Math.hypot(icon.vx, icon.vy);
-      if (speed > 45) { icon.vx *= 45 / speed; icon.vy *= 45 / speed; }
+      if (speed > maxSpeed) {
+        icon.vx *= maxSpeed / speed;
+        icon.vy *= maxSpeed / speed;
+      }
       icon.x += icon.vx * delta;
       icon.y += icon.vy * delta;
       if (icon.x < 6 || icon.x > width) icon.vx *= -1;
