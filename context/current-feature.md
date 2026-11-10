@@ -1,24 +1,16 @@
-# Current Feature: Homepage Branding, Motion, and Account Navigation
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Use the sign-in page’s DevStash logo and gradient as the shared brand mark for the homepage header and footer.
-- Add a GitHub registration option that uses the existing GitHub OAuth flow and opens the dashboard after successful authentication.
-- Make homepage animation visible during normal browsing and honor reduced-motion preferences.
-- Verify the homepage → Features, Pricing, or AI powers → Sign in → browser Back flows. Restore the previous homepage section on Back and give signed-in users a direct route to the dashboard.
-- Make homepage account links session-aware. Signed-out visitors see Sign in and Get started. Signed-in users see Dashboard and a My Profile icon with an accessible label.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- The sign-in logo in `src/components/auth/AuthCard.tsx` is the visual source of truth.
-- The homepage already includes an animated hero and section anchors for Features, Pricing, and AI powers. Reproduce the reported animation and back-navigation behavior for each section before deciding what needs to change.
-- Verify navigation as a guest and as a signed-in user, including direct visits to sign-in and registration, browser Back, and homepage links on desktop and mobile.
-- Account links and workspace buttons read the session on the server while the public homepage content remains prerendered. Sign-in and registration redirect existing accounts to the dashboard.
-- Homepage sign-in uses standard browser navigation. If Back restores a section hash but leaves the page at the top, the homepage scrolls to that section.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -176,3 +168,6 @@ In Progress
 
 - 2026-11-10: Completed the [public Homepage](features/homepage-spec.md) in `ff5ae6e`, merged into `main`, and deleted the local feature branch. Added the responsive chaos-to-order hero, sample dashboard, feature cards, AI and pricing previews, billing-period toggle, and links to registration and sign-in.
 - Validation passed for all 251 Vitest tests, ESLint, TypeScript, the production build, and Prisma migration status. Chrome checks at 320–1440 px covered link destinations, anchor clearance, keyboard access, both pricing states, cursor repulsion, offscreen pausing, and reduced motion. The browser run used process-only Auth.js trust for the loopback host.
+
+- 2026-11-10: Completed Homepage Branding, Motion, and Account Navigation in `f433222`. The homepage reads the current session for Dashboard and My Profile links and workspace buttons. Signed-in users who open sign-in or registration are directed to the dashboard. Shared the sign-in logo with the homepage, added GitHub registration and a reduced-motion-aware hero entrance, and restored Features, Pricing, and AI powers scroll positions on browser Back from sign-in.
+- All 254 Vitest tests, ESLint, TypeScript, the production build, Prisma migration status, and staged whitespace checks passed. Chrome checks covered signed-in Dashboard and My Profile navigation, existing-session redirects, guest browser Back at 320px and 1440px, the GitHub registration button, and reduced motion. The full GitHub OAuth callback was not exercised. The production build required an outside-sandbox retry after a Windows filesystem error.
