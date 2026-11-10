@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Layers } from "lucide-react";
+import { DevStashMark } from "@/components/DevStashMark";
 
 interface AuthCardProps {
   title: string;
@@ -11,8 +11,8 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
-        <Link href="/sign-in" className="mb-8 flex items-center justify-center gap-3 text-xl font-semibold">
-          <span className="rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 p-2"><Layers aria-hidden="true" className="size-6 text-white" /></span>
+        <Link href="/" aria-label="DevStash home" className="mb-8 flex items-center justify-center gap-3 text-xl font-semibold">
+          <DevStashMark />
           DevStash
         </Link>
         <section className="rounded-2xl border bg-card p-6 shadow-xl sm:p-8">

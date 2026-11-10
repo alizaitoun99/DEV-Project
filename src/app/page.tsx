@@ -1,13 +1,17 @@
 import {
   ArrowRight, ArrowUpRight, Check, Code2, Command, FileText, LayoutGrid,
-  Play, Search, Sparkles, Terminal,
+  Play, Search, Sparkles, Terminal, UserRound,
 } from "lucide-react";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
+import { Suspense } from "react";
+import { DevStashMark } from "@/components/DevStashMark";
 import { ChaosPanel } from "@/components/homepage/ChaosPanel";
 import { DashboardPreview } from "@/components/homepage/DashboardPreview";
 import { PricingComparison } from "@/components/homepage/PricingComparison";
+import { RestoreSectionScroll } from "@/components/homepage/RestoreSectionScroll";
 import { Button } from "@/components/ui/button";
+import { findCurrentUser } from "@/lib/current-user";
 import styles from "./homepage.module.css";
 
 const sections = [
@@ -46,11 +50,55 @@ const primary = "bg-[#3b82f6] font-bold text-[#080e1b] hover:bg-blue-400";
 function Brand() {
   return (
     <Link href="/" aria-label="DevStash home" className="inline-flex w-fit items-center gap-2 rounded text-lg font-bold tracking-tight">
-      <span className="grid size-7 place-items-center rounded-lg bg-blue-500/15 text-blue-300">
-        <Command aria-hidden="true" className="size-4" />
-      </span>
-      <span>devstash<span className="text-blue-400">.</span></span>
+      <DevStashMark />
+      <span>DevStash</span>
     </Link>
+  );
+}
+
+async function AccountLinks({ footer = false }: { footer?: boolean }) {
+  const user = await findCurrentUser();
+  if (footer) {
+    return user ? (
+      <>
+        <Link href="/dashboard" className="rounded hover:text-blue-200">Dashboard</Link>
+        <Link href="/profile" className="rounded hover:text-blue-200">My Profile</Link>
+      </>
+    ) : (
+      <>
+        <Link href="/register" className="rounded hover:text-blue-200">Get started</Link>
+        <a href="/sign-in" className="rounded hover:text-blue-200">Sign in</a>
+      </>
+    );
+  }
+
+  return user ? (
+    <>
+      <Button asChild className={primary}><Link href="/dashboard">Dashboard</Link></Button>
+      <Button asChild variant="outline" size="icon">
+        <Link href="/profile" aria-label="My Profile" title="My Profile"><UserRound aria-hidden="true" /></Link>
+      </Button>
+    </>
+  ) : (
+    <>
+      <a href="/sign-in" className="inline-flex items-center gap-1 rounded text-sm whitespace-nowrap text-slate-200 hover:text-blue-200">Sign in <ArrowUpRight aria-hidden="true" className="hidden size-3 lg:block" /></a>
+      <Button asChild className={primary}><Link href="/register">Get started <ArrowRight aria-hidden="true" className="hidden sm:block" /></Link></Button>
+    </>
+  );
+}
+
+async function WorkspaceButton({ label, className, variant }: {
+  label: string;
+  className: string;
+  variant?: "default" | "outline";
+}) {
+  const user = await findCurrentUser();
+  return (
+    <Button asChild className={className} variant={variant}>
+      <Link href={user ? "/dashboard" : "/register"}>
+        {user ? "Open dashboard" : label} <ArrowRight aria-hidden="true" />
+      </Link>
+    </Button>
   );
 }
 
@@ -64,16 +112,20 @@ async function Copyright() {
 function Hero() {
   return (
     <section className={`${container} pt-15 pb-13 text-center sm:pt-22`} aria-labelledby="homepage-title">
-      <p className={eyebrow}>YOUR SECOND BRAIN, BUILT FOR CODE</p>
-      <h1 id="homepage-title" className="mt-5 text-[clamp(2.5rem,7vw,5rem)] leading-[1.02] font-bold tracking-tight">
-        Stop losing your<br className="hidden sm:block" />{" "}
-        <span className="bg-gradient-to-r from-blue-200 via-blue-400 to-indigo-300 bg-clip-text text-transparent">developer knowledge.</span>
-      </h1>
-      <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-        That snippet. That prompt. That command you always forget. Give everything you know a place to call home.
-      </p>
+      <div className={styles.heroIntro}>
+        <p className={eyebrow}>YOUR SECOND BRAIN, BUILT FOR CODE</p>
+        <h1 id="homepage-title" className="mt-5 text-[clamp(2.5rem,7vw,5rem)] leading-[1.02] font-bold tracking-tight">
+          Stop losing your<br className="hidden sm:block" />{" "}
+          <span className="bg-gradient-to-r from-blue-200 via-blue-400 to-indigo-300 bg-clip-text text-transparent">developer knowledge.</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          That snippet. That prompt. That command you always forget. Give everything you know a place to call home.
+        </p>
+      </div>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <Button asChild className={`h-11 px-4 ${primary}`}><Link href="/register">Start your stash <ArrowRight aria-hidden="true" /></Link></Button>
+        <Suspense fallback={<span className="h-11 w-40" aria-hidden="true" />}>
+          <WorkspaceButton className={`h-11 px-4 ${primary}`} label="Start your stash" />
+        </Suspense>
         <Button asChild variant="outline" className="h-11 px-4"><a href="#preview"><Play aria-hidden="true" /> See how it works</a></Button>
       </div>
       <p className="mt-3 text-xs text-slate-400">No credit card required</p>
@@ -107,7 +159,7 @@ function Hero() {
 
 function Features() {
   return (
-    <section id="features" className="scroll-mt-24 border-y border-white/10 bg-[#10121d] py-16 sm:scroll-mt-15 sm:py-24">
+    <section id="features" className="scroll-mt-24 border-y border-white/10 bg-[#10121d] py-16 sm:scroll-mt-17 sm:py-24">
       <div className={container}>
         <div className="text-center">
           <p className={eyebrow}>A PLACE FOR EVERY “I’LL NEED THIS LATER”</p>
@@ -131,7 +183,7 @@ function Features() {
 
 function AiPreview() {
   return (
-    <section id="ai" className={`${container} grid scroll-mt-24 items-center gap-8 py-16 sm:scroll-mt-15 sm:py-24 lg:grid-cols-2`}>
+    <section id="ai" className={`${container} grid scroll-mt-24 items-center gap-8 py-16 sm:scroll-mt-17 sm:py-24 lg:grid-cols-2`}>
       <div>
         <p className={eyebrow}>PLANNED PRO FEATURE</p>
         <h2 className={sectionTitle}>Your stash.<br /><span className="text-blue-300">A little smarter.</span></h2>
@@ -172,7 +224,8 @@ function AiPreview() {
 
 export default function Home() {
   return (
-    <div className="min-h-dvh bg-[#090a10] pt-24 text-[#f3f5ff] sm:pt-15 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-blue-300">
+    <div className="min-h-dvh bg-[#090a10] pt-24 text-[#f3f5ff] sm:pt-17 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-blue-300">
+      <RestoreSectionScroll />
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded focus:bg-[#111827] focus:p-3">Skip to content</a>
       <header className={`${styles.navbar} fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#090a10]/95 backdrop-blur-md`}>
         <nav aria-label="Main navigation" className={`${container} grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-2 py-3 sm:flex sm:justify-between sm:gap-4`}>
@@ -181,22 +234,26 @@ export default function Home() {
             {sections.map(({ href, label }) => <a key={href} href={href} className="rounded hover:text-blue-200">{label}</a>)}
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/sign-in" className="inline-flex items-center gap-1 rounded text-sm whitespace-nowrap text-slate-200 hover:text-blue-200">Sign in <ArrowUpRight aria-hidden="true" className="hidden size-3 lg:block" /></Link>
-            <Button asChild className={primary}><Link href="/register">Get started <ArrowRight aria-hidden="true" className="hidden sm:block" /></Link></Button>
+            <Suspense fallback={<span className="h-9 w-36" aria-hidden="true" />}>
+              <AccountLinks />
+            </Suspense>
           </div>
         </nav>
       </header>
-      <main id="main" tabIndex={-1} className="scroll-mt-24 bg-[radial-gradient(ellipse_65%_28rem_at_50%_0%,#142346,transparent)] sm:scroll-mt-15">
+      <main id="main" tabIndex={-1} className="scroll-mt-24 bg-[radial-gradient(ellipse_65%_28rem_at_50%_0%,#142346,transparent)] sm:scroll-mt-17">
         <Hero />
         <Features />
         <AiPreview />
-        <section id="pricing" className={`${container} scroll-mt-24 pb-16 sm:scroll-mt-15 sm:pb-24`}>
+        <section id="pricing" className={`${container} scroll-mt-24 pb-16 sm:scroll-mt-17 sm:pb-24`}>
           <div className="text-center">
             <p className={eyebrow}>PRICING PREVIEW</p>
             <h2 className={sectionTitle}>Invest in your <span className="text-blue-300">future self.</span></h2>
             <p className="mt-4 text-slate-300">Compare the planned Free and Pro tiers. Paid plans aren’t available yet.</p>
           </div>
-          <PricingComparison />
+          <PricingComparison
+            freeAction={<Suspense fallback={<div className="h-10" />}><WorkspaceButton className="h-10 w-full" variant="outline" label="Start your stash" /></Suspense>}
+            proAction={<Suspense fallback={<div className="h-10" />}><WorkspaceButton className={`h-10 w-full ${primary}`} label="Create an account" /></Suspense>}
+          />
         </section>
         <section className={`${container} pb-16 sm:pb-24`}>
           <div className={`${styles.reveal} rounded-3xl border border-blue-400/25 bg-[radial-gradient(ellipse_at_top,#1b315e,#10121d_75%)] px-4 py-12 text-center sm:py-16`}>
@@ -204,7 +261,9 @@ export default function Home() {
             <p className={eyebrow}>LESS LOST. MORE BUILT.</p>
             <h2 className={sectionTitle}>Ready to organize<br />your knowledge?</h2>
             <p className="mt-4 text-slate-300">Your next great idea deserves a better home than an open tab.</p>
-            <Button asChild className={`mt-6 h-11 px-4 ${primary}`}><Link href="/register">Make room for what you know <ArrowRight aria-hidden="true" /></Link></Button>
+            <Suspense fallback={<div className="mt-6 h-11" />}>
+              <WorkspaceButton className={`mt-6 h-11 px-4 ${primary}`} label="Make room for what you know" />
+            </Suspense>
           </div>
         </section>
       </main>
@@ -217,8 +276,9 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-start gap-2">
             <p className="mb-1 font-bold text-slate-200">Your workspace</p>
-            <Link href="/register" className="rounded hover:text-blue-200">Get started</Link>
-            <Link href="/sign-in" className="rounded hover:text-blue-200">Sign in</Link>
+            <Suspense fallback={<div className="h-12" />}>
+              <AccountLinks footer />
+            </Suspense>
             <a href="#preview" className="rounded hover:text-blue-200">Take a look</a>
           </div>
         </div>

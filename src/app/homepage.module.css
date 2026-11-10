@@ -1,4 +1,8 @@
 @media (prefers-reduced-motion: no-preference) {
+  .heroIntro {
+    animation: reveal 600ms ease-out both;
+  }
+
   @supports (animation-timeline: view()) {
     .reveal {
       animation: reveal linear both;

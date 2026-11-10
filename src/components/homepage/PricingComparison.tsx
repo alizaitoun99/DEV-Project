@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
-import Link from "next/link";
+import { useState, type ReactNode } from "react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const plans = [
@@ -10,7 +9,7 @@ const plans = [
   { name: "Pro", label: "ROOM TO GROW", summary: "For a brain that never stops collecting.", features: ["Unlimited items and collections", "Everything in Free", "File and image uploads", "AI tagging, summaries, and code explanations", "AI prompt optimization"] },
 ];
 
-export function PricingComparison() {
+export function PricingComparison({ freeAction, proAction }: { freeAction: ReactNode; proAction: ReactNode }) {
   const [yearly, setYearly] = useState(false);
 
   return (
@@ -40,9 +39,7 @@ export function PricingComparison() {
                   {isPro ? (yearly ? "$6/month, billed yearly. Save $24 a year." : "$8/month, billed monthly.") : "No trial or credit card required."}
                 </p>
               </div>
-              <Button asChild variant={isPro ? "default" : "outline"} className={`h-10 w-full ${isPro ? "bg-[#3b82f6] text-[#080e1b] hover:bg-blue-400" : ""}`}>
-                <Link href="/register">{isPro ? "Create an account" : "Start your stash"} <ArrowRight aria-hidden="true" /></Link>
-              </Button>
+              {isPro ? proAction : freeAction}
               <ul className="mt-6 space-y-3 border-t border-white/10 pt-5 text-sm text-slate-300">
                 {features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2"><Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-blue-300" />{feature}</li>

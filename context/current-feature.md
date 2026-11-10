@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Homepage Branding, Motion, and Account Navigation
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Use the sign-in page’s DevStash logo and gradient as the shared brand mark for the homepage header and footer.
+- Add a GitHub registration option that uses the existing GitHub OAuth flow and opens the dashboard after successful authentication.
+- Make homepage animation visible during normal browsing and honor reduced-motion preferences.
+- Verify the homepage → Features, Pricing, or AI powers → Sign in → browser Back flows. Restore the previous homepage section on Back and give signed-in users a direct route to the dashboard.
+- Make homepage account links session-aware. Signed-out visitors see Sign in and Get started. Signed-in users see Dashboard and a My Profile icon with an accessible label.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- The sign-in logo in `src/components/auth/AuthCard.tsx` is the visual source of truth.
+- The homepage already includes an animated hero and section anchors for Features, Pricing, and AI powers. Reproduce the reported animation and back-navigation behavior for each section before deciding what needs to change.
+- Verify navigation as a guest and as a signed-in user, including direct visits to sign-in and registration, browser Back, and homepage links on desktop and mobile.
+- Account links and workspace buttons read the session on the server while the public homepage content remains prerendered. Sign-in and registration redirect existing accounts to the dashboard.
+- Homepage sign-in uses standard browser navigation. If Back restores a section hash but leaves the page at the top, the homepage scrolls to that section.
 
 ## Testing infrastructure
 

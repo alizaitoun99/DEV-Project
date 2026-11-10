@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { GitBranch } from "lucide-react";
 import { toast } from "sonner";
 import { registrationSchema } from "@/lib/auth-validation";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,16 @@ export function RegisterForm() {
     } catch { showError("Unable to create account. Check your connection and try again."); }
     finally { setPending(false); }
   }
+  async function registerWithGitHub() {
+    setPending(true);
+    setError("");
+    try {
+      await signIn("github", { redirectTo: "/dashboard" });
+    } catch {
+      showError("Unable to connect to GitHub. Please try again.");
+      setPending(false);
+    }
+  }
   return (
     <div className="space-y-5">
       {error && <p id="register-error" role="alert" className="text-sm text-destructive">{error}</p>}
@@ -73,6 +84,15 @@ export function RegisterForm() {
           <Button type="submit" className="h-11 w-full">{pending ? "Creating account…" : "Create account"}</Button>
         </fieldset>
       </form>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        or continue with
+        <span className="h-px flex-1 bg-border" />
+      </div>
+      <Button type="button" variant="outline" disabled={pending} onClick={registerWithGitHub} className="h-11 w-full">
+        <GitBranch aria-hidden="true" />
+        Register with GitHub
+      </Button>
       <p className="text-center text-sm text-muted-foreground">Already have an account? <Link href="/sign-in" className="text-primary underline underline-offset-4">Sign in</Link></p>
     </div>
   );
