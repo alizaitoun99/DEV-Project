@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const plans = [
@@ -9,7 +10,7 @@ const plans = [
   { name: "Pro", label: "ROOM TO GROW", summary: "For a brain that never stops collecting.", features: ["Unlimited items and collections", "Everything in Free", "File and image uploads", "AI tagging, summaries, and code explanations", "AI prompt optimization"] },
 ];
 
-export function PricingComparison({ freeAction, proAction }: { freeAction: ReactNode; proAction: ReactNode }) {
+export function PricingComparison({ freeAction, signedIn }: { freeAction: ReactNode; signedIn: boolean }) {
   const [yearly, setYearly] = useState(false);
 
   return (
@@ -39,7 +40,13 @@ export function PricingComparison({ freeAction, proAction }: { freeAction: React
                   {isPro ? (yearly ? "$6/month, billed yearly. Save $24 a year." : "$8/month, billed monthly.") : "No trial or credit card required."}
                 </p>
               </div>
-              {isPro ? proAction : freeAction}
+              {isPro ? (
+                <Button asChild className="h-10 w-full bg-[#3b82f6] font-bold text-[#080e1b] hover:bg-blue-400">
+                  <Link href={signedIn ? `/settings?interval=${yearly ? "yearly" : "monthly"}#billing` : "/register"}>
+                    {signedIn ? "View Pro in Settings" : "Create an account"}
+                  </Link>
+                </Button>
+              ) : freeAction}
               <ul className="mt-6 space-y-3 border-t border-white/10 pt-5 text-sm text-slate-300">
                 {features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2"><Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-blue-300" />{feature}</li>

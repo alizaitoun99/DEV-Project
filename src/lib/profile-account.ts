@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { credentialsSchema } from "@/lib/auth-validation";
 import { AuthRateLimitError, consumeAuthLimit } from "@/lib/auth-rate-limit";
 import { enqueueAccountStorage } from "@/lib/db/items";
+import { assertBillingDeletionUnchanged, BillingDeletionError, prepareBillingDeletion } from "@/lib/billing/account-deletion";
 
 interface AccountResult {
   success: boolean;
@@ -50,7 +51,9 @@ export async function deleteAccountForUser(userId: string, input: unknown): Prom
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true, email: true } });
     if (!user) return { success: false, error: "Account no longer exists." };
     if (user.passwordHash && !(await compare(parsed.data.password, user.passwordHash))) return { success: false, error: "Current password is incorrect." };
+    const billingRevision = await prepareBillingDeletion(userId);
     await prisma.$transaction(async (tx) => {
+      await assertBillingDeletionUnchanged(tx, userId, billingRevision);
       await tx.verificationToken.deleteMany({ where: { identifier: { in: [
         `password-reset:${userId}:${user.email}`, `email-verification:${userId}:${user.email}`,
       ] } } });
@@ -60,6 +63,6 @@ export async function deleteAccountForUser(userId: string, input: unknown): Prom
     });
     return { success: true };
   } catch (error) {
-    return { success: false, error: error instanceof AuthRateLimitError ? error.message : "Unable to delete account. Please try again." };
+    return { success: false, error: error instanceof AuthRateLimitError || error instanceof BillingDeletionError ? error.message : "Unable to delete account. Please try again." };
   }
 }

@@ -102,6 +102,13 @@ async function WorkspaceButton({ label, className, variant }: {
   );
 }
 
+async function Pricing() {
+  const user = await findCurrentUser();
+  return <PricingComparison signedIn={Boolean(user)}
+    freeAction={<WorkspaceButton className="h-10 w-full" variant="outline" label="Start your stash" />}
+  />;
+}
+
 async function Copyright() {
   "use cache";
   cacheLife("days");
@@ -246,14 +253,11 @@ export default function Home() {
         <AiPreview />
         <section id="pricing" className={`${container} scroll-mt-24 pb-16 sm:scroll-mt-17 sm:pb-24`}>
           <div className="text-center">
-            <p className={eyebrow}>PRICING PREVIEW</p>
+            <p className={eyebrow}>PRICING</p>
             <h2 className={sectionTitle}>Invest in your <span className="text-blue-300">future self.</span></h2>
-            <p className="mt-4 text-slate-300">Compare the planned Free and Pro tiers. Paid plans aren’t available yet.</p>
+            <p className="mt-4 text-slate-300">Compare Free and Pro for your developer stash.</p>
           </div>
-          <PricingComparison
-            freeAction={<Suspense fallback={<div className="h-10" />}><WorkspaceButton className="h-10 w-full" variant="outline" label="Start your stash" /></Suspense>}
-            proAction={<Suspense fallback={<div className="h-10" />}><WorkspaceButton className={`h-10 w-full ${primary}`} label="Create an account" /></Suspense>}
-          />
+          <Suspense fallback={<p className="mt-7 text-center text-slate-300">Loading plans…</p>}><Pricing /></Suspense>
         </section>
         <section className={`${container} pb-16 sm:pb-24`}>
           <div className={`${styles.reveal} rounded-3xl border border-blue-400/25 bg-[radial-gradient(ellipse_at_top,#1b315e,#10121d_75%)] px-4 py-12 text-center sm:py-16`}>

@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-const { create, auth, findMany } = vi.hoisted(() => ({ create: vi.fn(), auth: vi.fn(), findMany: vi.fn() }));
-vi.mock("@/lib/prisma", () => ({ prisma: { collection: { create, findMany } } }));
+const { create, auth, findMany, transaction, count } = vi.hoisted(() => ({ create: vi.fn(), auth: vi.fn(), findMany: vi.fn(), transaction: vi.fn(), count: vi.fn() }));
+vi.mock("@/lib/prisma", () => ({ prisma: { $transaction: transaction, collection: { findMany } } }));
 vi.mock("@/auth", () => ({ auth }));
 import { createCollection } from "./collections";
 import { POST, GET } from "@/app/api/collections/route";
@@ -10,6 +10,18 @@ beforeEach(() => {
   vi.resetAllMocks();
   auth.mockResolvedValue({ user: { id: "owner" } });
   create.mockResolvedValue({ id: "new", name: "Notes", description: null });
+  count.mockResolvedValue(2);
+  transaction.mockImplementation((callback) => callback({
+    $queryRaw: vi.fn().mockResolvedValue([{ plan: "FREE" }]), collection: { create, count },
+  }));
+});
+
+it("returns a stable error and skips the write at the Free quota", async () => {
+  count.mockResolvedValue(3);
+  const response = await POST(request({ name: "Notes" }));
+  expect(response.status).toBe(403);
+  expect(await response.json()).toMatchObject({ success: false, code: "COLLECTION_LIMIT_REACHED" });
+  expect(create).not.toHaveBeenCalled();
 });
 
 function request(body: unknown, origin = "http://localhost") {

@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { collectionCreateSchema } from "@/lib/collection-validation";
 import { createCollection, getCollectionOptions } from "@/lib/db/collections";
+import { EntitlementError } from "@/lib/billing/usage-limits";
 
 const headers = { "Cache-Control": "private, no-store" };
 
@@ -27,7 +28,10 @@ export async function POST(request: Request) {
     }
     const data = await createCollection(session.user.id, parsed.data);
     return Response.json({ success: true, data }, { status: 201, headers });
-  } catch {
+  } catch (error) {
+    if (error instanceof EntitlementError) {
+      return Response.json({ success: false, error: error.message, code: error.code }, { status: 403, headers });
+    }
     return Response.json({ success: false, error: "Unable to create collection. Please try again." }, { status: 500, headers });
   }
 }

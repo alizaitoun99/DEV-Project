@@ -5,7 +5,12 @@ const { auth, updateMany, deleteMany, revalidatePath } = vi.hoisted(() => ({
 }));
 vi.mock("@/auth", () => ({ auth }));
 vi.mock("next/cache", () => ({ revalidatePath }));
-vi.mock("@/lib/prisma", () => ({ prisma: { collection: { updateMany, deleteMany } } }));
+vi.mock("@/lib/prisma", () => ({ prisma: {
+  $transaction: (callback: (tx: unknown) => unknown) => callback({
+    $queryRaw: async () => [{ plan: "PRO" }], collection: { updateMany },
+  }),
+  collection: { deleteMany },
+} }));
 import { updateCollection, deleteCollection } from "./collections";
 
 beforeEach(() => {

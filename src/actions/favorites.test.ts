@@ -3,7 +3,9 @@ import { beforeEach, expect, it, vi } from "vitest";
 const { auth, itemUpdate, collectionUpdate, revalidatePath } = vi.hoisted(() => ({ auth: vi.fn(), itemUpdate: vi.fn(), collectionUpdate: vi.fn(), revalidatePath: vi.fn() }));
 vi.mock("@/auth", () => ({ auth }));
 vi.mock("next/cache", () => ({ revalidatePath }));
-vi.mock("@/lib/prisma", () => ({ prisma: { item: { updateMany: itemUpdate }, collection: { updateMany: collectionUpdate } } }));
+vi.mock("@/lib/prisma", () => ({ prisma: { $transaction: (callback: (tx: unknown) => unknown) => callback({
+  $queryRaw: async () => [{ plan: "PRO" }], item: { updateMany: itemUpdate }, collection: { updateMany: collectionUpdate },
+}) } }));
 import { setFavorite } from "./favorites";
 
 beforeEach(() => {

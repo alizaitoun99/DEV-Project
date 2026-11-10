@@ -5,6 +5,7 @@ vi.mock("@/auth", () => ({ auth }));
 vi.mock("@/lib/db/items", () => ({ createItem: persist }));
 import { createItem } from "./items";
 import { z } from "zod";
+import { EntitlementError } from "@/lib/billing/usage-limits";
 
 beforeEach(() => { auth.mockReset(); persist.mockReset(); auth.mockResolvedValue({ user: { id: "owner" } }); });
 const input = { type: "note", title: "  Example  ", tags: [" React "] };
@@ -34,6 +35,14 @@ describe("createItem action", () => {
   it("reports unavailable types", async () => {
     persist.mockResolvedValue(null);
     expect(await createItem(input)).toEqual({ success: false, error: "This item type is unavailable." });
+  });
+  it("returns actionable quota errors with a stable code", async () => {
+    persist.mockRejectedValue(new EntitlementError("ITEM_LIMIT_REACHED"));
+    expect(await createItem(input)).toMatchObject({
+      success: false,
+      code: "ITEM_LIMIT_REACHED",
+      error: expect.stringContaining("Delete an item"),
+    });
   });
   it("hides session and database failures", async () => {
     persist.mockRejectedValue(new Error("private database"));

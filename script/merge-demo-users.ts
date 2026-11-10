@@ -3,6 +3,7 @@ import "dotenv/config";
 import assert from "node:assert/strict";
 import { compare } from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
+import { assertNoBillingForBulkDeletion } from "../src/lib/billing/account-deletion";
 
 async function main(): Promise<void> {
   if (process.env.NODE_ENV === "production") throw new Error("Development accounts only.");
@@ -13,6 +14,7 @@ async function main(): Promise<void> {
     assert(target.passwordHash && await compare("12345678", target.passwordHash), "Unexpected demo password.");
     const source = await tx.user.findUnique({ where: { id: "user-john" } });
     if (source) {
+      await assertNoBillingForBulkDeletion(tx, source.id);
       assert.equal(source.email, "john@example.com");
       const [tags, types, accounts, sessions] = await Promise.all([
         tx.tag.count({ where: { userId: target.id } }),
@@ -21,8 +23,6 @@ async function main(): Promise<void> {
         tx.session.count({ where: { userId: source.id } }),
       ]);
       assert.equal(tags + types + accounts + sessions, 0, "Unexpected records require merge conflict review.");
-      assert.equal(source.stripeCustomerId, null);
-      assert.equal(source.stripeSubscriptionId, null);
       const before = await Promise.all([
         tx.item.count(), tx.collection.count(), tx.tag.count(),
         tx.itemCollection.count(), tx.itemTag.count(),

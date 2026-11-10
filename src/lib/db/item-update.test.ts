@@ -6,7 +6,9 @@ import { updateItem } from "./items";
 
 beforeEach(() => {
   findFirst.mockReset(); update.mockReset(); transaction.mockReset();
-  transaction.mockImplementation(async (callback) => callback({ item: { findFirst, update } }));
+  transaction.mockImplementation(async (callback) => callback({
+    $queryRaw: async () => [{ plan: "PRO" }], item: { findFirst, update },
+  }));
 });
 
 describe("item update transaction", () => {

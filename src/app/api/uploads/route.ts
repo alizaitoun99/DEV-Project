@@ -3,6 +3,7 @@ import { beginUpload, finishUpload, UploadError } from "@/lib/storage-uploads";
 import { abandonUploadRecord } from "@/lib/db/items";
 import { z } from "zod";
 import { AuthRateLimitError } from "@/lib/auth-rate-limit";
+import { EntitlementError } from "@/lib/billing/usage-limits";
 
 const headers = { "Cache-Control": "private, no-store" };
 const requestSchema = z.discriminatedUnion("action", [
@@ -24,6 +25,9 @@ export async function POST(request: Request) {
       await finishUpload(userId, input.id, input.item) : await abandonUploadRecord(userId, input.id);
     return Response.json({ data }, { headers });
   } catch (error) {
+    if (error instanceof EntitlementError) {
+      return Response.json({ error: error.message, code: error.code }, { status: 403, headers });
+    }
     const limited = error instanceof AuthRateLimitError;
     const message = error instanceof z.ZodError ? error.issues.map((issue) => issue.message).join(" ") :
       error instanceof UploadError || limited ? error.message : "Unable to process upload. Please try again.";

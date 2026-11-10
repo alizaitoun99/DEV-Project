@@ -41,6 +41,8 @@ model User {
   stripeSubscriptionId String?      @unique
   subscriptionStatus   String?
   currentPeriodEnd     DateTime?
+  billingRevision      Int          @default(0)
+  checkoutAttempt      StripeCheckoutAttempt?
   accounts             Account[]
   sessions             Session[]
   items                Item[]
@@ -49,6 +51,25 @@ model User {
   customTypes          ItemType[]
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
+}
+
+model StripeWebhookReceipt {
+  eventId     String   @id
+  processedAt DateTime @default(now())
+}
+
+model StripeCheckoutAttempt {
+  userId                  String   @id
+  priceId                 String
+  customerIdempotencyKey  String   @unique
+  sessionIdempotencyKey   String   @unique
+  customerParams          Json?
+  sessionParams           Json?
+  stripeCustomerId        String?
+  stripeCheckoutSessionId String?  @unique
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // Auth.js-compatible authentication models.

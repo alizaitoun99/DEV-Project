@@ -8,6 +8,7 @@ import { UploadError, type UploadIntent } from "@/lib/upload-validation";
 import type { StorageObject } from "@/generated/prisma/client";
 import { z } from "zod";
 import { linkUpdateSchema } from "@/lib/item-validation";
+import { assertCollectionEditingAllowed, assertItemCreationCapacity, assertItemEditingAllowed, assertProAccess, EntitlementError, lockBillingOwner } from "@/lib/billing/usage-limits";
 
 async function validateCollections(tx: Prisma.TransactionClient, userId: string, ids?: string[]) {
   if (ids === undefined) return undefined;
@@ -26,7 +27,7 @@ export async function lockStorageOwner(tx: Prisma.TransactionClient, userId: str
 
 export async function createUploadRecord(userId: string, bucket: string, input: UploadIntent) {
   return prisma.$transaction(async (tx) => {
-    await lockStorageOwner(tx, userId);
+    await assertProAccess(tx, userId);
     const outstanding = await tx.storageObject.count({ where: { userId, state: "pending" } });
     if (outstanding >= 20) throw new UploadError("Too many pending uploads. Try again after cleanup.");
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000 + 10 * 60 * 1000);
@@ -38,12 +39,13 @@ export async function createUploadRecord(userId: string, bucket: string, input: 
 
 export async function finalizeUploadRecord(userId: string, id: string, input: import("@/lib/item-validation").ItemUpdateInput, verify: (record: StorageObject) => Promise<string>) {
   return prisma.$transaction(async (tx) => {
-    await lockStorageOwner(tx, userId);
+    const { plan } = await lockBillingOwner(tx, userId);
     await tx.$queryRaw`SELECT id FROM "StorageObject" WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
     const record = await tx.storageObject.findFirst({ where: { id, userId } });
     if (!record) throw new UploadError("Upload not found.");
     if (record.state === "attached" && record.itemId) return { id: record.itemId };
     if (record.state !== "pending" || record.expiresAt <= new Date()) throw new UploadError("Upload expired. Select the file again.");
+    if (plan !== "PRO") throw new EntitlementError("PRO_REQUIRED");
     const mime = await verify(record);
     const type = await tx.itemType.findFirst({ where: { slug: record.type, kind: "FILE", isSystem: true, userId: null }, select: { id: true } });
     if (!type) throw new Error("Item type unavailable.");
@@ -124,7 +126,9 @@ export async function createItem(userId: string, input: import("@/lib/item-valid
       select: { id: true },
     });
     if (!type) return null;
+    const plan = await assertItemCreationCapacity(tx, userId);
     const collectionIds = await validateCollections(tx, userId, input.collectionIds);
+    if (plan === "FREE" && collectionIds?.length) await assertCollectionEditingAllowed(tx, userId);
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     return tx.item.create({
       data: {
@@ -284,10 +288,15 @@ export async function updateItem(userId: string, id: string, input: import("@/li
   return prisma.$transaction(async (tx) => {
     const existing = await tx.item.findFirst({ where: { id, userId }, select: { type: { select: { slug: true } } } });
     if (!existing) return null;
+    const plan = await assertItemEditingAllowed(tx, userId);
     const slug = existing.type.slug;
     // Derive required fields from the owned item, never a client-supplied type.
     if (slug === "link") input = linkUpdateSchema.parse(input);
     const collectionIds = await validateCollections(tx, userId, input.collectionIds);
+    if (plan === "FREE" && collectionIds?.length) {
+      const alreadyLinked = await tx.itemCollection.count({ where: { itemId: id, collectionId: { in: collectionIds } } });
+      if (alreadyLinked < collectionIds.length) await assertCollectionEditingAllowed(tx, userId);
+    }
     const tags = [...new Map(input.tags.map((name) => [name.toLowerCase(), name])).entries()];
     await tx.item.update({
       where: { id, userId },
@@ -310,6 +319,13 @@ export async function updateItem(userId: string, id: string, input: import("@/li
     });
     return getItemDetail(userId, id, tx);
   });
+}
+
+export async function removeItemFromCollection(userId: string, itemId: string, collectionId: string) {
+  const { count } = await prisma.itemCollection.deleteMany({
+    where: { itemId, collectionId, item: { userId }, collection: { userId } },
+  });
+  return count > 0;
 }
 
 export async function countItemsByCollection(userId: string, collectionId: string) {

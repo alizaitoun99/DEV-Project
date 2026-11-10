@@ -3,9 +3,11 @@
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { PinButton } from "@/components/PinButton";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { removeItemFromCollection } from "@/actions/items";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Copy, Pencil } from "lucide-react";
+import { Copy, Pencil, X } from "lucide-react";
 import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
@@ -83,13 +85,31 @@ export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
 interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; onDeleted: () => void; }
 
 function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const text = item.content ?? item.url;
   async function copy() {
     try {
       await navigator.clipboard.writeText(text ?? "");
       toast.success("Copied to clipboard");
     } catch { toast.error("Unable to copy. Please try again."); }
+  }
+  async function removeMembership(collectionId: string) {
+    setRemoving(true);
+    try {
+      const result = await removeItemFromCollection(item.id, collectionId);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      onSaved({ ...item, collections: item.collections.filter(({ collection }) => collection.id !== collectionId) });
+      router.refresh();
+    } catch {
+      toast.error("Unable to remove the item from this collection.");
+    } finally {
+      setRemoving(false);
+    }
   }
   if (editing) return <ItemEditForm item={item} onCancel={() => setEditing(false)} onSaved={(updated) => { onSaved(updated); setEditing(false); }} />;
   const safeUrl = item.url && /^https?:\/\//i.test(item.url) ? item.url : null;
@@ -109,7 +129,20 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
       {item.url && <section><h3 className="mb-3 text-sm text-muted-foreground">URL</h3>{safeUrl ? <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{item.url}</a> : <p className="text-sm">{item.url}</p>}</section>}
       {item.fileName && <section><h3 className="mb-3 text-sm text-muted-foreground">File</h3><p className="text-sm">{item.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{[item.fileMimeType, item.fileSize !== null ? `${item.fileSize} bytes` : null].filter(Boolean).join(" · ")}</p></section>}
       <section className="border-t pt-6"><h3 className="mb-3 text-sm text-muted-foreground">Tags</h3><div className="flex flex-wrap gap-2">{item.tags.length ? item.tags.map(({ tag }) => <span key={tag.name} className="rounded bg-muted px-2 py-1 text-xs">{tag.name}</span>) : <p className="text-sm">No tags</p>}</div></section>
-      <section><h3 className="mb-3 text-sm text-muted-foreground">Collections</h3><div className="flex flex-wrap gap-2">{item.collections.length ? item.collections.map(({ collection }) => <span key={collection.id} className="rounded border px-2 py-1 text-xs">{collection.name}</span>) : <p className="text-sm">No collections</p>}</div></section>
+      <section>
+        <h3 className="mb-3 text-sm text-muted-foreground">Collections</h3>
+        <div className="flex flex-wrap gap-2">
+          {item.collections.length ? item.collections.map(({ collection }) => (
+            <span key={collection.id} className="inline-flex items-center gap-1 rounded border pl-2 text-xs">
+              {collection.name}
+              <Button type="button" size="icon-sm" variant="ghost" disabled={removing}
+                aria-label={`Remove from ${collection.name}`} onClick={() => void removeMembership(collection.id)}>
+                <X aria-hidden="true" />
+              </Button>
+            </span>
+          )) : <p className="text-sm">No collections</p>}
+        </div>
+      </section>
       <section><h3 className="mb-3 text-sm text-muted-foreground">Details</h3><dl className="space-y-2 text-sm">{[["Created", item.createdAt], ["Updated", item.updatedAt]].map(([label, value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt className="text-muted-foreground">{label}</dt><dd><time dateTime={value}>{dateFormat.format(new Date(value))}</time></dd></div>)}</dl></section>
     </div>
   </>;

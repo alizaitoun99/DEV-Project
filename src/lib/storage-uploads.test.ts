@@ -5,6 +5,7 @@ vi.mock("@/lib/supabase-storage", () => ({ getSupabaseStorage: () => ({ bucket: 
 vi.mock("@/lib/auth-rate-limit", () => ({ consumeAuthLimit: m.limit }));
 vi.mock("@/lib/db/items", () => ({ createUploadRecord: m.create, finalizeUploadRecord: m.finalize, abandonUploadRecord: m.abandon, cleanupStorageRecords: m.cleanup }));
 import { beginUpload, finishUpload } from "./storage-uploads";
+import { EntitlementError } from "./billing/usage-limits";
 const input = { type: "file", fileName: "a.txt", size: 3, mime: "text/plain" };
 beforeEach(() => {
   vi.resetAllMocks();
@@ -50,6 +51,16 @@ it.each([
 it("retains cleanup when signing fails", async () => {
   m.signed.mockResolvedValue({ error: new Error("offline") });
   await expect(beginUpload("owner", input)).rejects.toThrow("prepare");
+  expect(m.abandon).toHaveBeenCalledWith("owner", "upload");
+});
+it("never signs a Free upload and queues cleanup if the account downgrades mid-upload", async () => {
+  const denied = new EntitlementError("PRO_REQUIRED");
+  m.create.mockRejectedValue(denied);
+  await expect(beginUpload("owner", input)).rejects.toBe(denied);
+  expect(m.signed).not.toHaveBeenCalled();
+
+  m.finalize.mockRejectedValue(denied);
+  await expect(finishUpload("owner", "upload", { title: "Title", tags: [] })).rejects.toBe(denied);
   expect(m.abandon).toHaveBeenCalledWith("owner", "upload");
 });
 it("marks failed finalization for cleanup even when immediate removal fails", async () => {

@@ -4,22 +4,29 @@ import { COLLECTIONS_PER_PAGE, DASHBOARD_COLLECTIONS_LIMIT } from "@/lib/paginat
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { collectionCreateSchema, type CollectionCreateInput } from "@/lib/collection-validation";
+import { assertCollectionCreationCapacity, assertCollectionEditingAllowed } from "@/lib/billing/usage-limits";
 
 export async function createCollection(userId: string, input: CollectionCreateInput) {
   const fields = collectionCreateSchema.parse(input);
-  return prisma.collection.create({
-    data: { userId, name: fields.name, description: fields.description || null },
-    select: { id: true, name: true, description: true },
+  return prisma.$transaction(async (tx) => {
+    await assertCollectionCreationCapacity(tx, userId);
+    return tx.collection.create({
+      data: { userId, name: fields.name, description: fields.description || null },
+      select: { id: true, name: true, description: true },
+    });
   });
 }
 
 export async function updateCollection(userId: string, id: string, input: CollectionCreateInput) {
   const fields = collectionCreateSchema.parse(input);
-  const result = await prisma.collection.updateMany({
-    where: { id, userId },
-    data: { name: fields.name, description: fields.description || null },
+  return prisma.$transaction(async (tx) => {
+    await assertCollectionEditingAllowed(tx, userId);
+    const result = await tx.collection.updateMany({
+      where: { id, userId },
+      data: { name: fields.name, description: fields.description || null },
+    });
+    return result.count > 0;
   });
-  return result.count > 0;
 }
 
 export async function deleteCollection(userId: string, id: string) {

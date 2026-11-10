@@ -10,7 +10,7 @@ beforeEach(() => {
   m.count.mockResolvedValue(2);
   m.create.mockResolvedValue({ id: "item" });
   m.findFirst.mockResolvedValue({ type: { slug: "note" } });
-  m.query.mockResolvedValue([{ id: "owner" }]);
+  m.query.mockResolvedValue([{ id: "owner", plan: "PRO" }]);
   m.storage.mockResolvedValue({ state: "pending", expiresAt: new Date(Date.now() + 60000), type: "file", key: "key", fileName: "a.txt", size: 3 });
   m.transaction.mockImplementation((callback) => callback({
     collection: { count: m.count }, itemType: { findFirst: vi.fn().mockResolvedValue({ id: "type" }) },

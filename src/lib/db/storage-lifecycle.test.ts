@@ -15,7 +15,7 @@ const metadata = { title: "Note", tags: ["React", "react"] };
 
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.query.mockResolvedValue([{ id: "owner" }]);
+  mocks.query.mockResolvedValue([{ id: "owner", plan: "PRO" }]);
   mocks.count.mockResolvedValue(0);
   mocks.findFirst.mockResolvedValue(record);
   mocks.type.mockResolvedValue({ id: "type" });
@@ -56,8 +56,18 @@ describe("upload persistence", () => {
     expect(mocks.item).not.toHaveBeenCalled();
   });
   it("makes finalization retries idempotent", async () => {
+    mocks.query.mockResolvedValueOnce([{ plan: "FREE" }]);
     mocks.findFirst.mockResolvedValue({ ...record, state: "attached", itemId: "item" });
     expect(await finalizeUploadRecord("owner", "upload", metadata, vi.fn())).toEqual({ id: "item" });
+    expect(mocks.item).not.toHaveBeenCalled();
+  });
+  it("denies Free upload creation and blocks finalization after downgrade", async () => {
+    mocks.query.mockResolvedValue([{ plan: "FREE" }]);
+    const verify = vi.fn();
+    await expect(createUploadRecord("owner", "private", input)).rejects.toMatchObject({ code: "PRO_REQUIRED" });
+    await expect(finalizeUploadRecord("owner", "upload", metadata, verify)).rejects.toMatchObject({ code: "PRO_REQUIRED" });
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(verify).not.toHaveBeenCalled();
     expect(mocks.item).not.toHaveBeenCalled();
   });
   it("does not attach rejected bytes or failed persistence", async () => {
