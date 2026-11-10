@@ -1,23 +1,16 @@
-# Current Feature: Homepage
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Build the public DevStash homepage at `/` with navigation, a chaos-to-order hero, a dashboard preview, Features, an AI preview, pricing, a closing CTA, and a footer. Stack the hero panels on mobile.
-- Match the updated prototype’s larger floating icons, gentler cursor response, static dashboard with a sample pinned snippet, lighter Features background, and Snippets blue accents.
-- Connect registration and sign-in CTAs to the existing routes and section links to their anchors. Keep the AI and pricing sections demonstrative, with monthly and yearly prices and billing copy that reflect the selected state.
-- Verify links, desktop and mobile layouts, anchor offsets, keyboard navigation, both pricing states, cursor response, and reduced motion. Run unit tests, lint, TypeScript, and the production build.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Use the [homepage spec](features/homepage-spec.md), [mockup spec](features/homepage-mockup-spec.md), and [updated prototype](../prototypes/homepage/index.html) as references.
-- Keep `src/app/page.tsx` and static sections as Server Components. Limit Client Components to browser interactions. Honor reduced motion and pause floating icons when offscreen or when the tab is hidden.
-- Reuse Tailwind, shadcn/ui, and the existing font and theme. Include semantic landmarks and headings, a skip link, visible focus, accessible pricing toggle states, and hidden decorative elements in the accessibility tree.
-- Align product and plan claims with the current offering. Checkout is outside this feature.
-- Implementation validation passed on `feature/homepage`. All 251 Vitest tests, ESLint, TypeScript, and the production build passed. Chrome verified layout widths from 320 to 1440 px, link destinations and anchor clearance, keyboard access, monthly and yearly pricing, pointer repulsion, offscreen pausing, and reduced motion.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -172,3 +165,6 @@ In Progress
 - Homepage validation passed: all 251 mocked Vitest tests, ESLint, standalone TypeScript, production build, JavaScript syntax, CSS parsing, prototype smoke checks, staged whitespace checks, and migration status (four migrations, database up to date). Build and migration checks required outside-sandbox retries after Windows filesystem/connectivity restrictions. Browser visual, cursor, keyboard, and responsive verification remain unconfirmed because browser policy blocked local file URLs. Unchanged auth/storage integration scripts were not rerun. Cleared the active tracker at the user's completion request and preserved unrelated local edits outside feature commits.
 
 - 2026-11-10: Completed homepage prototype polish in `302da75`. Enlarged and slowed the hero icons, added a pinned snippet and clearer dashboard labels, separated Features with a lighter background, and switched branded accents and primary buttons to Snippets blue. Updated the [mockup spec](features/homepage-mockup-spec.md) and added the [app homepage spec](features/homepage-spec.md). All 251 unit tests, lint, TypeScript, the production build, and prototype smoke checks passed. Desktop and mobile visual verification remains pending because the browser preview failed to load.
+
+- 2026-11-10: Completed the [public Homepage](features/homepage-spec.md) in `ff5ae6e`, merged into `main`, and deleted the local feature branch. Added the responsive chaos-to-order hero, sample dashboard, feature cards, AI and pricing previews, billing-period toggle, and links to registration and sign-in.
+- Validation passed for all 251 Vitest tests, ESLint, TypeScript, the production build, and Prisma migration status. Chrome checks at 320–1440 px covered link destinations, anchor clearance, keyboard access, both pricing states, cursor repulsion, offscreen pausing, and reduced motion. The browser run used process-only Auth.js trust for the loopback host.
