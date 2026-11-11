@@ -199,3 +199,5 @@
 - 2026-11-11: Completed Sidebar and authentication layout in `3a315d0`. The current route is highlighted in the desktop and mobile sidebars, item list names are plural and title case, and GitHub appears above the email form on Register and Sign in. Playwright verified the layout at 390 px and 1440 px. All 354 Vitest tests, ESLint, TypeScript, and the production build passed.
 
 - 2026-11-11: Completed Action Deduplication in `4e7c40a`. Shared AI request handling, owner-scoped item pin and favorite writes, trimmed resource ID validation, and item validation error formatting. All 354 Vitest tests, ESLint, standalone TypeScript, and the production build passed. The build required an outside-sandbox retry after a Windows filesystem permission error.
+
+- 2026-11-11: Updated the root GitHub README to explain DevStash, its audience and benefits, and where AI is used. Verified the Markdown diff.

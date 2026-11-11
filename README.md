@@ -1,42 +1,13 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevStash
 
-## Getting Started
+## What is DevStash?
 
-For Prisma 7 and Neon PostgreSQL configuration, migration commands, and connection verification, see [Database setup](prisma/README.md).
+DevStash is a personal knowledge hub for developers. It brings code snippets, terminal commands, AI prompts, notes, links, and attachments into one workspace.
 
-First, run the development server:
+## Who is it for?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+DevStash is for developers and learners who want to keep what they discover across projects and reuse it later. Collections and tags make related resources easier to find, while favorites and pins keep frequently used items close at hand.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where does AI help?
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Testing
-
-Run `npm test` for Server Action and utility unit tests, or `npm run test:watch` during development. Components are outside the unit testing scope. See [Testing](docs/testing.md) for conventions and separate regression scripts.
+DevStash uses OpenAI to suggest tags and draft descriptions while you create or edit an item. It can also explain saved snippets and commands and suggest revisions to saved prompts. You can review a proposed prompt revision before applying it.
