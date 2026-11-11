@@ -1,22 +1,16 @@
-# Current Feature: AI Explain Code
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add an authenticated `explainCode` Server Action with Pro entitlement checks, Zod validation, rate limiting, and unit tests.
-- Add a Sparkles Explain button beside Copy in the read-only item drawer for snippets and commands.
-- Show a Loader2 spinner during generation, then display Code and Explain tabs in the editor header. Render the explanation as Markdown in the editor's existing space.
-- Generate concise explanations of roughly 200–300 words covering what the code does and its key concepts.
-- Show Free users a Crown icon with the tooltip “AI features require Pro subscription.” Report entitlement, rate-limit, and AI service errors through toasts.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Spec: [AI Explain Code](features/ai-explain-spec.md). Follow existing AI patterns and use OpenAI `gpt-6-luna`. See the [AI integration plan](../docs/ai-integration-plan.md).
-- Pass `isPro` through the item drawer to the code editor. Explain is available only in the read view for snippets and commands.
-- Generate a fresh explanation on each Explain click. Keep the result in the UI without persisting it to the database.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -195,3 +189,6 @@ In Progress
 
 - 2026-11-11: Completed AI Description Generation in `322f24d` and fast-forwarded `main`. Pro users can generate editable, one- or two-sentence descriptions from the current draft in the create dialog or edit drawer for all seven built-in item types. Link generation uses the URL origin and path, and file and image generation uses attachment metadata. Generation shares the existing AI rate limit and preserves manual description edits made during a request.
 - All 330 Vitest tests, five rate-limit checks, ESLint, TypeScript, the production build, and development migration status passed. The build required an outside-sandbox retry after a Windows filesystem error. Browser checks verified Free gating at 390px and 1440px, live Pro generation and saving in mobile note creation and desktop note editing, and preservation of manual edits during generation. Mocked Server Action tests covered the other item types. Removed the disposable development account, test item, and scoped rate-limit records. The production-mode server logged the previously recorded sign-in prerender error, and sign-in completed.
+
+- 2026-11-11: Completed [AI Explain Code](features/ai-explain-spec.md) in `ae4c87d` and fast-forwarded `main`. Pro users can generate and copy Markdown explanations for saved snippets and commands in the item drawer. Generation uses GPT-6 Luna, checks item ownership and current Pro access, and shares the existing AI rate limit. Explanations are generated on demand and held in the drawer.
+- All 345 Vitest tests, five rate-limit regressions, ESLint, TypeScript, the production build, development migration status, and staged whitespace checks passed. The build required an outside-sandbox retry after a Windows filesystem error. Chrome verified the Free tooltip, drawer width, and edit-form exclusion at 390px and 1440px. The existing sign-in prerender warning recurred, and sign-in succeeded. Live Pro generation remains unverified after automatic approval review blocked creating a temporary Pro account in Neon.
