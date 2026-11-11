@@ -1,24 +1,16 @@
-# Current Feature: AI Auto-Tagging
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add a Pro-only **Suggest Tags** button with a Sparkles icon and ghost styling beside the tags input in the create-item dialog and item drawer edit mode.
-- Suggest 3–5 freeform tags from the item title and content. Show each suggestion as a badge with accept and reject controls, and add accepted suggestions to the item's tag list.
-- Implement the `generateAutoTags` Server Action with authentication, server-side Pro enforcement, Zod validation, and a limit of 20 requests per hour per user. Show entitlement, rate-limit, and AI service errors via toasts.
-- Add unit tests for the Server Action.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- [AI Auto-Tagging spec](features/ai-auto-tag-spec.md) and [AI integration plan](../docs/ai-integration-plan.md).
-- Reuse the OpenAI client and AI rate-limit configuration if present. Otherwise, add the shared client using the standard OpenAI SDK, an `AI_MODEL` constant set to `gpt-6-luna`, and the rate limit in the existing utility.
-- Use the Responses API with JSON object mode and parse `output_text`. Handle both a `tags` object and a bare array. Normalize suggestions to lowercase and truncate content to 2,000 characters before sending it.
-- Use the existing `OPENAI_API_KEY` environment setting and make Pro status available to the create and edit UI for button visibility.
-- The hourly limit uses the existing atomic PostgreSQL counters, with Pro access checked in the same transaction. Link, file, and image suggestions use the draft title and description.
-- Validation passed for 314 Vitest tests, five rate-limit regression checks, lint, TypeScript, and the production build. A synthetic GPT-6 Luna request returned four tags. Browser checks covered Free gating at 390px and 1440px, and live Pro generation, rejection, and persistence in mobile create and desktop edit. Removed the disposable development accounts and their scoped rate-limit counters.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -191,3 +183,6 @@ In Progress
 
 - 2026-11-11: Completed subscription badges and the upgrade flow in `6f5e07d`. Free and Pro badges appear in the dashboard sidebar and Settings Billing. Free users can open `/upgrade` from the dashboard header, compare plans, and choose $8 monthly or $72 yearly before Stripe Checkout. Settings and Profile use the dashboard shell.
 - All 304 unit tests, ESLint, TypeScript, and the production build passed. Signed-out redirects passed for Upgrade, Settings, and Profile. Signed-in layouts and Stripe Checkout remain unverified.
+
+- 2026-11-11: Completed [AI Auto-Tagging](features/ai-auto-tag-spec.md) in `d110e62`, fast-forwarded `main`, and deleted the local feature branch. Pro users can generate, accept, and reject tags in the create dialog and edit drawer. The Server Action uses GPT-6 Luna through the Responses API and checks the current plan and a 20-request hourly limit against PostgreSQL. No migration was needed.
+- All 314 Vitest tests, five rate-limit regression checks, ESLint, TypeScript, the production build, and development migration status passed. Browser checks covered Free gating at 390px and 1440px and live Pro generation, rejection, and persistence in mobile create and desktop edit. The disposable development accounts and their scoped rate-limit counters were removed. The production-mode server logged a `/sign-in` prerender error involving `crypto.getRandomValues()` during the run. Sign-in and the feature checks completed.
