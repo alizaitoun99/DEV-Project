@@ -5,7 +5,14 @@ import { isIP } from "node:net";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { normalizeEmail } from "@/lib/email";
-import { AuthRateLimitError } from "@/lib/auth-rate-limit";
+import { AuthRateLimitError, consumeAuthLimit } from "@/lib/auth-rate-limit";
+import type { Prisma } from "@/generated/prisma/client";
+
+const AI_LIMIT = { attempts: 20, seconds: 60 * 60 };
+
+export function enforceAiRateLimit(userId: string, tx: Prisma.TransactionClient) {
+  return consumeAuthLimit(`ai:user:${userId}`, AI_LIMIT.attempts, AI_LIMIT.seconds, tx);
+}
 
 export const AUTH_LIMITS = {
   signin: { attempts: 5, window: "15 m", identifier: true },

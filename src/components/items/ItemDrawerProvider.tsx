@@ -12,6 +12,7 @@ import { DeleteItemDialog } from "@/components/items/DeleteItemDialog";
 import { toast } from "sonner";
 import type { ItemDetail } from "@/lib/db/items";
 import { ItemEditForm } from "@/components/items/ItemEditForm";
+import { ItemPlanContext } from "@/components/items/ItemPlanContext";
 import { TypeIcon } from "@/components/dashboard/TypeIcon";
 import { CodeEditor } from "@/components/items/CodeEditor";
 import { MarkdownEditor } from "@/components/items/MarkdownEditor";
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 
 interface Selection { id: string; title: string; }
-interface ItemDrawerProviderProps { children: ReactNode; }
+interface ItemDrawerProviderProps { children: ReactNode; isPro: boolean; }
 const DrawerContext = createContext<((item: Selection, trigger: HTMLButtonElement) => void) | null>(null);
 export function useItemDrawer() {
   return useContext(DrawerContext);
@@ -31,7 +32,7 @@ export function ItemDrawerTrigger({ id, title }: Selection) {
   return <button type="button" aria-label={`View ${title}`} aria-haspopup="dialog" onClick={(event) => open?.({ id, title }, event.currentTarget)} className="absolute inset-0 z-10 cursor-pointer rounded-xl outline-none hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring" />;
 }
 
-export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
+export function ItemDrawerProvider({ children, isPro }: ItemDrawerProviderProps) {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [item, setItem] = useState<ItemDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +63,7 @@ export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
     setSelection(next);
   }
 
-  return <DrawerContext.Provider value={open}>
+  return <ItemPlanContext.Provider value={isPro}><DrawerContext.Provider value={open}>
     {children}
     <Sheet open={Boolean(selection)} onOpenChange={(open) => { if (!open) setSelection(null); }}>
       <SheetContent onCloseAutoFocus={(event) => { event.preventDefault(); trigger.current?.focus(); }}>
@@ -79,7 +80,7 @@ export function ItemDrawerProvider({ children }: ItemDrawerProviderProps) {
         {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} onSaved={setItem} onDeleted={() => { setSelection(null); setItem(null); }} />}
       </SheetContent>
     </Sheet>
-  </DrawerContext.Provider>;
+  </DrawerContext.Provider></ItemPlanContext.Provider>;
 }
 
 interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; onDeleted: () => void; }

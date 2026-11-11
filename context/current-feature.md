@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: AI Auto-Tagging
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add a Pro-only **Suggest Tags** button with a Sparkles icon and ghost styling beside the tags input in the create-item dialog and item drawer edit mode.
+- Suggest 3–5 freeform tags from the item title and content. Show each suggestion as a badge with accept and reject controls, and add accepted suggestions to the item's tag list.
+- Implement the `generateAutoTags` Server Action with authentication, server-side Pro enforcement, Zod validation, and a limit of 20 requests per hour per user. Show entitlement, rate-limit, and AI service errors via toasts.
+- Add unit tests for the Server Action.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- [AI Auto-Tagging spec](features/ai-auto-tag-spec.md) and [AI integration plan](../docs/ai-integration-plan.md).
+- Reuse the OpenAI client and AI rate-limit configuration if present. Otherwise, add the shared client using the standard OpenAI SDK, an `AI_MODEL` constant set to `gpt-6-luna`, and the rate limit in the existing utility.
+- Use the Responses API with JSON object mode and parse `output_text`. Handle both a `tags` object and a bare array. Normalize suggestions to lowercase and truncate content to 2,000 characters before sending it.
+- Use the existing `OPENAI_API_KEY` environment setting and make Pro status available to the create and edit UI for button visibility.
+- The hourly limit uses the existing atomic PostgreSQL counters, with Pro access checked in the same transaction. Link, file, and image suggestions use the draft title and description.
+- Validation passed for 314 Vitest tests, five rate-limit regression checks, lint, TypeScript, and the production build. A synthetic GPT-6 Luna request returned four tags. Browser checks covered Free gating at 390px and 1440px, and live Pro generation, rejection, and persistence in mobile create and desktop edit. Removed the disposable development accounts and their scoped rate-limit counters.
 
 ## Testing infrastructure
 

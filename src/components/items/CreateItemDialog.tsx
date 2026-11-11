@@ -14,6 +14,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, Dia
 import type { ItemCreateInput } from "@/lib/item-validation";
 import { FileUpload, sendFile, uploadRequest } from "@/components/items/FileUpload";
 import { uploadMime } from "@/lib/upload-validation";
+import { TagSuggestions } from "@/components/items/TagSuggestions";
 
 type CreateType = ItemCreateInput["type"] | "file" | "image";
 
@@ -110,6 +111,7 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
           {type === "file" || type === "image" ? <FileUpload type={type} file={file} onChange={setFile} disabled={pending} progress={progress} /> : type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : <MarkdownEditor key={type} value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}
           {["snippet", "command"].includes(type) && field("language", "Language")}
           {field("tags", "Tags (comma-separated)")}
+          {open && <TagSuggestions itemType={type} title={fields.title} content={type === "file" || type === "image" || type === "link" ? fields.description : fields.content || fields.description} tags={fields.tags} onAccept={(tag) => setFields((current) => ({ ...current, tags: [current.tags, tag].filter(Boolean).join(", ") }))} />}
           {open && <CollectionSelector value={collectionIds} onChange={setCollectionIds} disabled={pending} />}
         </fieldset>
         <div className="flex flex-wrap justify-end gap-3">

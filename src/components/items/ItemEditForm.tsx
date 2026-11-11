@@ -10,6 +10,7 @@ import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { CollectionSelector } from "@/components/items/CollectionSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TagSuggestions } from "@/components/items/TagSuggestions";
 
 interface ItemEditFormProps { item: ItemDetail; onCancel: () => void; onSaved: (item: ItemDetail) => void; }
 
@@ -56,6 +57,7 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
       {field("title", "Title")}{field("description", "Description", true)}
       {languageType ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : textType && <MarkdownEditor value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}{languageType && field("language", "Language")}
       {item.type.slug === "link" && field("url", "URL")}{field("tags", "Tags (comma-separated)")}
+      <TagSuggestions itemType={item.type.slug} title={fields.title} content={(textType && fields.content) || fields.description} tags={fields.tags} onAccept={(tag) => setFields((current) => ({ ...current, tags: [current.tags, tag].filter(Boolean).join(", ") }))} />
       <CollectionSelector value={collectionIds} onChange={setCollectionIds} disabled={pending} />
       <dl className="space-y-2 text-sm"><dt className="text-muted-foreground">Created</dt><dd>{new Date(item.createdAt).toLocaleString()}</dd><dt className="text-muted-foreground">Updated</dt><dd>{new Date(item.updatedAt).toLocaleString()}</dd></dl>
     </fieldset>

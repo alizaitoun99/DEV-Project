@@ -15,10 +15,7 @@ async function EmailVerificationReminder() {
   return <VerificationReminder verified={Boolean(user.emailVerified)} />;
 }
 
-async function UpgradeLink() {
-  const user = await getCurrentUser();
-  if (user.plan !== "FREE") return null;
-
+function UpgradeLink() {
   return (
     <Button asChild variant="ghost" className="min-h-11 text-muted-foreground">
       <Link href="/upgrade">Upgrade</Link>
@@ -30,12 +27,18 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+async function DashboardWorkspace({ children }: DashboardLayoutProps) {
+  const user = await getCurrentUser();
+  const isPro = user.plan === "PRO";
   return (
-    <ItemDrawerProvider><DashboardShell upgrade={<Suspense fallback={null}><UpgradeLink /></Suspense>} search={<Suspense fallback={<button disabled className="h-11 w-full rounded-md bg-muted/50 px-3 text-left text-sm text-muted-foreground">Loading search…</button>}><GlobalSearch /></Suspense>} sidebar={
+    <ItemDrawerProvider isPro={isPro}><DashboardShell upgrade={isPro ? null : <UpgradeLink />} search={<Suspense fallback={<button disabled className="h-11 w-full rounded-md bg-muted/50 px-3 text-left text-sm text-muted-foreground">Loading search…</button>}><GlobalSearch /></Suspense>} sidebar={
       <Suspense fallback={<div role="status" className="h-full animate-pulse bg-sidebar p-5 text-sm text-muted-foreground">Loading sidebar…</div>}>
         <DashboardSidebar />
       </Suspense>
     }><Suspense fallback={null}><EmailVerificationReminder /></Suspense>{children}</DashboardShell></ItemDrawerProvider>
   );
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  return <Suspense fallback={null}><DashboardWorkspace>{children}</DashboardWorkspace></Suspense>;
 }
