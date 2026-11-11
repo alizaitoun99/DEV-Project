@@ -77,15 +77,15 @@ export function ItemDrawerProvider({ children, isPro }: ItemDrawerProviderProps)
             </div>
           </div>
         </header>
-        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} onSaved={setItem} onDeleted={() => { setSelection(null); setItem(null); }} />}
+        {error ? <div role="alert" className="space-y-4 p-6"><p>{error}</p><Button variant="outline" onClick={() => { setError(null); setAttempt((value) => value + 1); }}>Try again</Button></div> : !item ? <div role="status" className="space-y-6 p-6"><span className="sr-only">Loading item details</span>{["h-10", "h-20", "h-48", "h-16"].map((height) => <div key={height} className={`${height} animate-pulse rounded-lg bg-muted motion-reduce:animate-none`} />)}</div> : <ItemDetails key={item.id} item={item} isPro={isPro} onSaved={setItem} onDeleted={() => { setSelection(null); setItem(null); }} />}
       </SheetContent>
     </Sheet>
   </DrawerContext.Provider></ItemPlanContext.Provider>;
 }
 
-interface ItemDetailsProps { item: ItemDetail; onSaved: (item: ItemDetail) => void; onDeleted: () => void; }
+interface ItemDetailsProps { item: ItemDetail; isPro: boolean; onSaved: (item: ItemDetail) => void; onDeleted: () => void; }
 
-function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
+function ItemDetails({ item, isPro, onSaved, onDeleted }: ItemDetailsProps) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -126,7 +126,7 @@ function ItemDetails({ item, onSaved, onDeleted }: ItemDetailsProps) {
     <div className="min-h-0 flex-1 space-y-7 overflow-y-auto p-6 [overflow-wrap:anywhere]">
       <section><h3 className="mb-3 text-sm text-muted-foreground">Description</h3><p className="whitespace-pre-wrap text-sm">{item.description || "No description"}</p></section>
       {item.type.slug === "image" && item.fileName && (["image/png", "image/jpeg", "image/gif", "image/webp"].includes(item.fileMimeType ?? "") ? <Image unoptimized src={`/api/items/${encodeURIComponent(item.id)}/download?preview=1`} width={1000} height={750} alt={item.title} className="max-h-80 w-full rounded-lg object-contain" /> : <p className="rounded-lg border p-4 text-sm text-muted-foreground">Preview unavailable for this format. Download the original above.</p>)}
-      {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3>{["snippet", "command"].includes(item.type.slug) ? <CodeEditor value={item.content} language={item.language ?? ""} readOnly /> : ["note", "prompt"].includes(item.type.slug) ? <MarkdownEditor value={item.content} readOnly /> : <pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre>}</section>}
+      {item.content !== null && <section><h3 className="mb-3 text-sm text-muted-foreground">Content</h3>{["snippet", "command"].includes(item.type.slug) ? <CodeEditor value={item.content} language={item.language ?? ""} readOnly explain={{ itemId: item.id, isPro }} /> : ["note", "prompt"].includes(item.type.slug) ? <MarkdownEditor value={item.content} readOnly /> : <pre className="max-w-full overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>{item.content}</code></pre>}</section>}
       {item.url && <section><h3 className="mb-3 text-sm text-muted-foreground">URL</h3>{safeUrl ? <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{item.url}</a> : <p className="text-sm">{item.url}</p>}</section>}
       {item.fileName && <section><h3 className="mb-3 text-sm text-muted-foreground">File</h3><p className="text-sm">{item.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{[item.fileMimeType, item.fileSize !== null ? `${item.fileSize} bytes` : null].filter(Boolean).join(" · ")}</p></section>}
       <section className="border-t pt-6"><h3 className="mb-3 text-sm text-muted-foreground">Tags</h3><div className="flex flex-wrap gap-2">{item.tags.length ? item.tags.map(({ tag }) => <span key={tag.name} className="rounded bg-muted px-2 py-1 text-xs">{tag.name}</span>) : <p className="text-sm">No tags</p>}</div></section>

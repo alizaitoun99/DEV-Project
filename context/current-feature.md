@@ -1,16 +1,22 @@
-# Current Feature
+# Current Feature: AI Explain Code
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add an authenticated `explainCode` Server Action with Pro entitlement checks, Zod validation, rate limiting, and unit tests.
+- Add a Sparkles Explain button beside Copy in the read-only item drawer for snippets and commands.
+- Show a Loader2 spinner during generation, then display Code and Explain tabs in the editor header. Render the explanation as Markdown in the editor's existing space.
+- Generate concise explanations of roughly 200–300 words covering what the code does and its key concepts.
+- Show Free users a Crown icon with the tooltip “AI features require Pro subscription.” Report entitlement, rate-limit, and AI service errors through toasts.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Spec: [AI Explain Code](features/ai-explain-spec.md). Follow existing AI patterns and use OpenAI `gpt-6-luna`. See the [AI integration plan](../docs/ai-integration-plan.md).
+- Pass `isPro` through the item drawer to the code editor. Explain is available only in the read view for snippets and commands.
+- Generate a fresh explanation on each Explain click. Keep the result in the UI without persisting it to the database.
 
 ## Testing infrastructure
 

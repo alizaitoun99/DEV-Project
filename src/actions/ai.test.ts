@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateAutoTags, generateItemDescription } from "./ai";
+import { explainCode, generateAutoTags, generateItemDescription } from "./ai";
 import { AuthRateLimitError } from "@/lib/auth-rate-limit";
 import { EntitlementError } from "@/lib/billing/usage-limits";
 
@@ -8,12 +8,16 @@ const mocks = vi.hoisted(() => ({
   assertProAccess: vi.fn(),
   enforceAiRateLimit: vi.fn(),
   create: vi.fn(),
+  findItem: vi.fn(),
   tx: {},
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/prisma", () => ({
-  prisma: { $transaction: (run: (tx: typeof mocks.tx) => unknown) => run(mocks.tx) },
+  prisma: {
+    item: { findFirst: mocks.findItem },
+    $transaction: (run: (tx: typeof mocks.tx) => unknown) => run(mocks.tx),
+  },
 }));
 vi.mock("@/lib/billing/usage-limits", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/billing/usage-limits")>(),
@@ -24,6 +28,82 @@ vi.mock("@/lib/openai", () => ({
   AI_MODEL: "gpt-6-luna",
   getOpenAI: () => ({ responses: { create: mocks.create } }),
 }));
+
+describe("explainCode", () => {
+  const content = "  printf '%s\\n' hello\n";
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.auth.mockResolvedValue({ user: { id: "owner" } });
+    mocks.findItem.mockResolvedValue({ content, language: "sh", type: { slug: "command" } });
+    mocks.create.mockResolvedValue({ status: "completed", output_text: "  Prints **hello**.  " });
+  });
+
+  it("requires authentication before reading the item", async () => {
+    mocks.auth.mockResolvedValue(null);
+    await expect(explainCode("item")).resolves.toMatchObject({ success: false, error: expect.stringMatching(/sign in/i) });
+    expect(mocks.findItem).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it.each([" ", "x".repeat(201), { id: "item", content: "fake" }])("rejects an invalid item ID", async (id) => {
+    await expect(explainCode(id)).resolves.toMatchObject({ success: false });
+    expect(mocks.findItem).not.toHaveBeenCalled();
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+  });
+
+  it.each(["command", "snippet"])("explains saved %s content after owner, entitlement, and quota checks", async (slug) => {
+    mocks.findItem.mockResolvedValue({ content, language: "sh", type: { slug } });
+    await expect(explainCode("item")).resolves.toEqual({ success: true, data: "Prints **hello**." });
+    expect(mocks.findItem).toHaveBeenCalledWith({
+      where: { id: "item", userId: "owner", type: { isSystem: true, slug: { in: ["snippet", "command"] } } },
+      select: { content: true, language: true, type: { select: { slug: true } } },
+    });
+    expect(mocks.assertProAccess).toHaveBeenCalledWith(mocks.tx, "owner");
+    expect(mocks.enforceAiRateLimit).toHaveBeenCalledWith("owner", mocks.tx);
+    expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+      model: "gpt-6-luna",
+      input: `Item JSON:\n${JSON.stringify({ type: slug, language: "sh", content })}`,
+      store: false,
+      max_output_tokens: 768,
+    }));
+  });
+
+  it.each([null, { content: " " }, { content: "x".repeat(20001) }])("skips quota and generation for unavailable or oversized content", async (item) => {
+    mocks.findItem.mockResolvedValue(item);
+    await expect(explainCode("item")).resolves.toMatchObject({ success: false });
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("blocks Free users before reserving quota", async () => {
+    mocks.assertProAccess.mockRejectedValue(new EntitlementError("PRO_REQUIRED"));
+    await expect(explainCode("item")).resolves.toMatchObject({ success: false, error: expect.stringContaining("Pro") });
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("stops before calling OpenAI when the user is rate limited", async () => {
+    mocks.enforceAiRateLimit.mockRejectedValue(new AuthRateLimitError(60));
+    await expect(explainCode("item")).resolves.toMatchObject({ success: false, error: expect.stringContaining("Too many attempts") });
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it.each([["incomplete", "Partial explanation"], ["completed", " "], ["completed", "x".repeat(4001)]])(
+    "rejects incomplete or invalid provider output (%s)",
+    async (status, output_text) => {
+      mocks.create.mockResolvedValue({ status, output_text });
+      await expect(explainCode("item")).resolves.toMatchObject({ success: false });
+    },
+  );
+
+  it("hides provider details from the user", async () => {
+    mocks.create.mockRejectedValue(new Error("private provider details"));
+    await expect(explainCode("item")).resolves.toEqual({
+      success: false, error: "Unable to explain code right now. Please try again.",
+    });
+  });
+});
 
 describe("generateAutoTags", () => {
   beforeEach(() => {
