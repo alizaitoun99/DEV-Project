@@ -8,9 +8,11 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UserAvatar } from "@/components/auth/UserAvatar";
+import { PlanBadge } from "@/components/billing/PlanBadge";
+import type { Plan } from "@/generated/prisma/enums";
 
 interface UserMenuProps {
-  user: { name: string | null; email: string | null; image: string | null; plan: string };
+  user: { name: string | null; email: string | null; image: string | null; plan: Plan };
 }
 
 export function UserMenu({ user }: UserMenuProps) {
@@ -37,14 +39,19 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <div className="shrink-0 border-t p-3">
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger disabled={pending} aria-label="Open account menu" className="flex min-h-14 w-full items-center gap-3 rounded-lg p-1 text-left outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50">
+        <DropdownMenu.Trigger disabled={pending} aria-label={`Open account menu (${user.plan === "PRO" ? "Pro" : "Free"} plan)`} className="flex min-h-14 w-full items-center gap-3 rounded-lg p-1 text-left outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50">
           <UserAvatar name={user.name} image={user.image} />
-          <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{user.name ?? "Your account"}</span><span className="block truncate text-xs text-muted-foreground">{user.email}</span></span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-1.5">
+              <span className="truncate text-sm font-medium">{user.name ?? "Your account"}</span>
+              <PlanBadge plan={user.plan} />
+            </span>
+            <span className="block truncate text-xs text-muted-foreground">{user.email}</span>
+          </span>
           <ChevronsUpDown aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top" align="start" sideOffset={8} className="z-[60] w-60 max-w-[calc(100vw-2rem)] rounded-lg border bg-popover p-1 text-popover-foreground shadow-xl">
-            <DropdownMenu.Label className="px-3 py-2 text-xs text-muted-foreground">{user.plan} plan</DropdownMenu.Label>
             <DropdownMenu.Item asChild><Link href="/profile" className={itemClass}><UserRound aria-hidden="true" className="size-4" />Profile</Link></DropdownMenu.Item>
             <DropdownMenu.Item asChild><Link href="/settings" className={itemClass}><Settings aria-hidden="true" className="size-4" />Settings</Link></DropdownMenu.Item>
             <DropdownMenu.Separator className="my-1 h-px bg-border" />

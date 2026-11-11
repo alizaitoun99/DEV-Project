@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 interface DashboardHeaderProps {
   sidebarToggle: React.ReactNode;
   search: React.ReactNode;
+  upgrade: React.ReactNode;
 }
 
-export function DashboardHeader({ sidebarToggle, search }: DashboardHeaderProps) {
+export function DashboardHeader({ sidebarToggle, search, upgrade }: DashboardHeaderProps) {
   return (
     <header className="flex flex-wrap items-center gap-3 border-b px-4 py-3 lg:flex-nowrap sm:px-6">
       {sidebarToggle}
@@ -17,6 +18,7 @@ export function DashboardHeader({ sidebarToggle, search }: DashboardHeaderProps)
         {search}
       </div>
       <div className="flex flex-wrap gap-3 sm:ml-auto">
+        {upgrade}
         <Button asChild variant="ghost" size="icon" className="size-11">
           <Link href="/favorites" aria-label="Favorites"><Star aria-hidden="true" /></Link>
         </Button>

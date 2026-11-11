@@ -4,10 +4,11 @@ import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { freeFeatures, proFeatures } from "@/components/billing/plan-features";
 
 const plans = [
-  { name: "Free", label: "THE ESSENTIALS", summary: "A home for your everyday knowledge.", features: ["50 items", "3 collections", "Snippets, prompts, commands, notes, and links", "Instant search across your stash"] },
-  { name: "Pro", label: "ROOM TO GROW", summary: "For a brain that never stops collecting.", features: ["Unlimited items and collections", "Everything in Free", "File and image uploads", "AI tagging, summaries, and code explanations", "AI prompt optimization"] },
+  { name: "Free", label: "THE ESSENTIALS", summary: "A home for your everyday knowledge.", features: freeFeatures },
+  { name: "Pro", label: "ROOM TO GROW", summary: "For a brain that never stops collecting.", features: proFeatures },
 ];
 
 export function PricingComparison({ freeAction, signedIn }: { freeAction: ReactNode; signedIn: boolean }) {
@@ -42,8 +43,8 @@ export function PricingComparison({ freeAction, signedIn }: { freeAction: ReactN
               </div>
               {isPro ? (
                 <Button asChild className="h-10 w-full bg-[#3b82f6] font-bold text-[#080e1b] hover:bg-blue-400">
-                  <Link href={signedIn ? `/settings?interval=${yearly ? "yearly" : "monthly"}#billing` : "/register"}>
-                    {signedIn ? "View Pro in Settings" : "Create an account"}
+                  <Link href={signedIn ? `/upgrade?interval=${yearly ? "yearly" : "monthly"}` : "/register"}>
+                    {signedIn ? "View Pro plans" : "Create an account"}
                   </Link>
                 </Button>
               ) : freeAction}

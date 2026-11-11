@@ -10,9 +10,10 @@ interface DashboardShellProps {
   children: React.ReactNode;
   sidebar: React.ReactNode;
   search: React.ReactNode;
+  upgrade: React.ReactNode;
 }
 
-export function DashboardShell({ children, sidebar, search }: DashboardShellProps) {
+export function DashboardShell({ children, sidebar, search, upgrade }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -29,7 +30,7 @@ export function DashboardShell({ children, sidebar, search }: DashboardShellProp
         {sidebar}
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <DashboardHeader search={search} sidebarToggle={
+        <DashboardHeader search={search} upgrade={upgrade} sidebarToggle={
           <>
             <Button variant="ghost" size="icon" className="hidden size-11 md:inline-flex" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} aria-controls="desktop-sidebar" onClick={() => setCollapsed(!collapsed)}>
               <PanelLeft aria-hidden="true" />

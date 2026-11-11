@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { ProfileActions } from "@/components/auth/ProfileActions";
@@ -7,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { EditorPreferencesSettings } from "@/components/items/EditorPreferencesSettings";
 import { BillingPanel } from "@/components/billing/BillingPanel";
 import { billingCancellationDate, checkoutReturnStatus } from "@/lib/billing/settings";
-import { isCheckoutAvailable } from "@/lib/billing/stripe";
 
 export const metadata = { title: "Settings | DevStash" };
 
@@ -27,7 +25,6 @@ async function Settings({ searchParams }: PageProps<"/settings">) {
 
   return (
     <div className="w-full max-w-3xl space-y-6">
-      <Link href="/dashboard" className="text-sm text-primary underline underline-offset-4">Back to dashboard</Link>
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Settings</h1>
         <p className="text-sm text-muted-foreground">Manage your editor preferences, account, and security.</p>
@@ -40,7 +37,6 @@ async function Settings({ searchParams }: PageProps<"/settings">) {
           status ? `Subscription status: ${status.replaceAll("_", " ")}` : null}
         cancelDate={cancelDate}
         checkoutStatus={checkoutStatus}
-        canCheckout={isCheckoutAvailable()}
         canManage={Boolean(details.stripeCustomerId)}
       />
       <EditorPreferencesSettings />
@@ -51,10 +47,10 @@ async function Settings({ searchParams }: PageProps<"/settings">) {
 
 export default function SettingsPage(props: PageProps<"/settings">) {
   return (
-    <main className="flex min-h-dvh justify-center px-4 py-10 sm:py-14">
+    <div className="flex justify-center">
       <Suspense fallback={<p role="status">Loading settings…</p>}>
         <Settings {...props} />
       </Suspense>
-    </main>
+    </div>
   );
 }

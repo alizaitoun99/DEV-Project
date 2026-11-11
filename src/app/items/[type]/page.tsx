@@ -45,7 +45,7 @@ export default async function ItemsPage({ params, searchParams }: ItemsPageProps
         <h1 id="upgrade-title" className="text-3xl font-semibold tracking-tight">{title} are a Pro feature</h1>
         <p className="text-muted-foreground">Upgrade to upload and organize {route} in your workspace.</p>
         <Button asChild size="lg">
-          <Link href="/settings#billing">Upgrade to Pro</Link>
+          <Link href="/upgrade">Upgrade to Pro</Link>
         </Button>
       </section>
     );

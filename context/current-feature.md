@@ -1,16 +1,21 @@
-# Current Feature
+# Current Feature — Subscription plans and upgrade flow
 
 ## Status
 
-<!-- No active feature. -->
+In progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Show the signed-in user's plan next to their name in the dashboard sidebar.
+- Show the same plan badge under Billing at `/settings#billing`, with Free in gray and Pro in blue.
+- Give Free users a ghost Upgrade button in the workspace header and a dedicated `/upgrade` page with monthly and yearly checkout options.
+- Show the workspace sidebar on Settings and Profile.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Both badges display the saved plan using the shared `PlanBadge` component.
+- The upgrade page shares the homepage feature lists and sends the selected interval through the existing checkout endpoint.
+- Validation passed: 304 unit tests, ESLint, TypeScript, and the production build. Signed-out requests redirect to sign-in for Upgrade, Settings, and Profile. Signed-in layouts and Stripe checkout remain unverified.
 
 ## Testing infrastructure
 

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -20,7 +19,6 @@ async function Profile() {
     }),
   ]);
   return <div className="w-full max-w-3xl space-y-6">
-    <Link href="/dashboard" className="text-sm text-primary underline underline-offset-4">Back to dashboard</Link>
     <section className="space-y-6 rounded-2xl border bg-card p-6 sm:p-8">
       <div className="flex items-center gap-4"><UserAvatar name={user.name ?? user.email} image={user.image} /><h1 className="text-2xl font-semibold">Your profile</h1></div>
       <dl className="grid gap-5 sm:grid-cols-2">
@@ -40,5 +38,5 @@ async function Profile() {
 }
 
 export default function ProfilePage() {
-  return <main className="flex min-h-dvh justify-center px-4 py-10 sm:py-14"><Suspense fallback={<p role="status">Loading profile…</p>}><Profile /></Suspense></main>;
+  return <div className="flex justify-center"><Suspense fallback={<p role="status">Loading profile…</p>}><Profile /></Suspense></div>;
 }

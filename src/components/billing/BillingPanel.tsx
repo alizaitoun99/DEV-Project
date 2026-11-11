@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PlanBadge } from "@/components/billing/PlanBadge";
 import { Button } from "@/components/ui/button";
+import { useBillingRedirect } from "@/components/billing/useBillingRedirect";
+import type { Plan } from "@/generated/prisma/enums";
 
 type Interval = "monthly" | "yearly";
 export type CheckoutStatus = "canceled" | "pending" | "confirmed" | "failed";
@@ -15,21 +19,18 @@ const checkoutMessages: Record<CheckoutStatus, string> = {
 };
 
 interface BillingPanelProps {
-  plan: "FREE" | "PRO";
+  plan: Plan;
   interval: Interval;
   status: string | null;
   cancelDate: string | null;
   checkoutStatus?: CheckoutStatus;
-  canCheckout: boolean;
   canManage: boolean;
 }
 
-export function BillingPanel({ plan, interval, status, cancelDate, checkoutStatus, canCheckout, canManage }: BillingPanelProps) {
+export function BillingPanel({ plan, interval, status, cancelDate, checkoutStatus, canManage }: BillingPanelProps) {
   const router = useRouter();
-  const [selected, setSelected] = useState(interval);
   const [refreshes, setRefreshes] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const { busy, error, openBilling } = useBillingRedirect();
 
   useEffect(() => {
     if (checkoutStatus !== "pending" || refreshes >= 5) return;
@@ -40,54 +41,21 @@ export function BillingPanel({ plan, interval, status, cancelDate, checkoutStatu
     return () => window.clearTimeout(timer);
   }, [checkoutStatus, refreshes, router]);
 
-  async function openBilling(action: "checkout" | "portal") {
-    setBusy(true);
-    setError("");
-    try {
-      const submit = (kind: "checkout" | "portal") => fetch(`/api/billing/${kind}`, {
-        method: "POST",
-        ...(kind === "checkout" ? { headers: { "Content-Type": "application/json" }, body: JSON.stringify({ interval: selected }) } : {}),
-      });
-      let response = await submit(action);
-      let data = await response.json();
-      if (response.ok && data.manage === true) {
-        response = await submit("portal");
-        data = await response.json();
-      }
-      if (!response.ok || typeof data.url !== "string") {
-        setError(data.error || "Billing is temporarily unavailable.");
-        return;
-      }
-      window.location.assign(data.url);
-    } catch {
-      setError("Billing is temporarily unavailable. Please try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <section id="billing" aria-labelledby="billing-title" className="space-y-4 rounded-lg border p-5">
       <div className="space-y-1">
         <h2 id="billing-title" className="text-lg font-semibold">Billing</h2>
-        <p>Current plan <strong>{plan === "PRO" ? "Pro" : "Free"}</strong></p>
+        <p className="flex items-center gap-2">Current plan <PlanBadge plan={plan} /></p>
         {status && <p className="text-sm text-muted-foreground">{status}</p>}
         {cancelDate && <p className="text-sm text-muted-foreground">Pro access ends {cancelDate}.</p>}
       </div>
       {checkoutStatus && <p role="status">{checkoutMessages[checkoutStatus]}</p>}
       {checkoutStatus === "pending" && <Button type="button" variant="outline" onClick={() => router.refresh()}>Check again</Button>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      {plan === "FREE" && canCheckout && checkoutStatus !== "pending" && (
-        <fieldset disabled={busy} className="space-y-3">
-          <legend className="text-sm font-medium">Choose a Pro billing interval</legend>
-          <div className="flex flex-wrap gap-3">
-            <label className="flex items-center gap-2"><input type="radio" name="billing-interval" checked={selected === "monthly"} onChange={() => setSelected("monthly")} /> $8/month</label>
-            <label className="flex items-center gap-2"><input type="radio" name="billing-interval" checked={selected === "yearly"} onChange={() => setSelected("yearly")} /> $72/year</label>
-          </div>
-          <Button type="button" onClick={() => void openBilling("checkout")}>Continue to Checkout</Button>
-        </fieldset>
+      {plan === "FREE" && checkoutStatus !== "pending" && (
+        <Button asChild><Link href={interval === "yearly" ? "/upgrade?interval=yearly" : "/upgrade"}>View upgrade options</Link></Button>
       )}
-      {canManage && <Button type="button" variant="outline" disabled={busy} onClick={() => void openBilling("portal")}>Manage billing</Button>}
+      {canManage && <Button type="button" variant="outline" disabled={busy} onClick={() => void openBilling({ action: "portal" })}>Manage billing</Button>}
     </section>
   );
 }
