@@ -1,6 +1,6 @@
 "use server";
 
-import { z } from "zod";
+import { resourceIdSchema } from "@/lib/resource-id";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { collectionCreateSchema } from "@/lib/collection-validation";
@@ -8,13 +8,12 @@ import { updateCollection as persist, deleteCollection as remove } from "@/lib/d
 import { EntitlementError, type EntitlementErrorCode } from "@/lib/billing/usage-limits";
 
 type Result = { success: true } | { success: false; error: string; code?: EntitlementErrorCode };
-const idSchema = z.string().trim().min(1).max(200);
 
 export async function updateCollection(collectionId: unknown, input: unknown): Promise<Result> {
   try {
     const session = await auth();
     if (!session?.user.id) return { success: false, error: "Please sign in again." };
-    const id = idSchema.safeParse(collectionId);
+    const id = resourceIdSchema.safeParse(collectionId);
     if (!id.success) return { success: false, error: "Invalid collection ID." };
     const fields = collectionCreateSchema.safeParse(input);
     if (!fields.success) return { success: false, error: fields.error.issues.map((issue) => issue.message).join("\n") };
@@ -31,7 +30,7 @@ export async function deleteCollection(collectionId: unknown): Promise<Result> {
   try {
     const session = await auth();
     if (!session?.user.id) return { success: false, error: "Please sign in again." };
-    const id = idSchema.safeParse(collectionId);
+    const id = resourceIdSchema.safeParse(collectionId);
     if (!id.success) return { success: false, error: "Invalid collection ID." };
     if (!await remove(session.user.id, id.data)) return { success: false, error: "Collection not found." };
     revalidatePath("/", "layout");

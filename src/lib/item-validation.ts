@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resourceIdSchema } from "@/lib/resource-id";
 
 const requiredUrlSchema = z.string({ error: "URL is required for links." }).trim().min(1, "URL is required for links.").url("Enter a valid URL.").refine((value) => /^https?:\/\//i.test(value), "Use an HTTP or HTTPS URL.");
 
@@ -8,7 +9,7 @@ export const itemUpdateSchema = z.object({
   content: z.string().max(500000).nullable().optional(),
   language: z.string().trim().max(100).nullable().optional(),
   url: requiredUrlSchema.nullable().optional(),
-  collectionIds: z.array(z.string().trim().min(1).max(200)).max(100).transform((ids) => [...new Set(ids)]).optional(),
+  collectionIds: z.array(resourceIdSchema).max(100).transform((ids) => [...new Set(ids)]).optional(),
   tags: z.array(z.string().trim().min(1).max(100)).max(50),
 });
 

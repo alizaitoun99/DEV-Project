@@ -2,15 +2,15 @@
 
 ## Status
 
-<!-- No active feature. -->
+Action Deduplication
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+Extract the shared AI response request, owner-scoped item flag write, resource ID schema, and item validation error formatting. Preserve action inputs, results, authorization, and cache behavior.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+Implementation and validation passed on feature/action-deduplication. All 354 Vitest tests, ESLint, standalone TypeScript, and the production build passed. The build required an outside-sandbox retry after a Windows EPERM error. Changes are pending commit.
 
 ## Testing infrastructure
 

@@ -10,6 +10,17 @@ import { z } from "zod";
 import { linkUpdateSchema } from "@/lib/item-validation";
 import { assertCollectionEditingAllowed, assertItemCreationCapacity, assertItemEditingAllowed, assertProAccess, EntitlementError, lockBillingOwner } from "@/lib/billing/usage-limits";
 
+export function updateItemFlags(
+  userId: string,
+  id: string,
+  data: { isPinned: boolean } | { isFavorite: boolean },
+) {
+  return prisma.$transaction(async (tx) => {
+    await assertItemEditingAllowed(tx, userId);
+    return tx.item.updateMany({ where: { id, userId }, data });
+  });
+}
+
 async function validateCollections(tx: Prisma.TransactionClient, userId: string, ids?: string[]) {
   if (ids === undefined) return undefined;
   const collectionIds = [...new Set(ids)];
