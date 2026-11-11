@@ -1,18 +1,16 @@
-# Current Feature — Sidebar and authentication layout
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Highlight the current page in the desktop and mobile sidebar.
-- Place GitHub above the email form on Register and Sign in.
-- Use plural, title-case names for item lists and their sidebar links.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Playwright verified route highlighting on desktop and mobile, plural item headings, and GitHub placement above the email form at 390 px and 1440 px.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -197,3 +195,5 @@ In Progress
 
 - 2026-11-11: Completed AI Prompt Optimization in `0752f5f`, fast-forwarded `main`, and deleted the local feature branch. Pro users can review saved prompts through **Optimize** in the Prompt drawer. They can preview and apply a proposed revision or keep the original. Applying a revision checks that the original text still matches the saved prompt.
 - All 354 Vitest tests, five rate-limit regressions, ESLint, TypeScript, the production build, development migration status, and staged whitespace checks passed. Chrome verified the Free tooltip, layout, and edit-mode exclusion at 390px and 1440px. Mocked Server Action tests covered Pro generation and saving. The live Pro flow remains unverified.
+
+- 2026-11-11: Completed Sidebar and authentication layout in `3a315d0`. The current route is highlighted in the desktop and mobile sidebars, item list names are plural and title case, and GitHub appears above the email form on Register and Sign in. Playwright verified the layout at 390 px and 1440 px. All 354 Vitest tests, ESLint, TypeScript, and the production build passed.
