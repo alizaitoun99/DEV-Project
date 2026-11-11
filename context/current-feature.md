@@ -1,20 +1,16 @@
-# Current Feature: AI Prompt Optimization
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add an **Optimize** button to the header of the item drawer for saved Prompt items, following the Explain button pattern for snippets and commands.
-- Review the current prompt against the problem it describes. Suggest a revised prompt only when it improves clarity or effectiveness while preserving the original intent and constraints. Show feedback when no changes are needed.
-- Preview the revised prompt and ask the user whether to use it. Replace the saved prompt text only after the user explicitly accepts the revision.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Follow the existing Pro AI access, item ownership, and shared rate-limit patterns used by Explain.
-- Optimize reviews up to 20,000 characters. The preview shows the proposed text before saving, and the save checks that the original text still matches the database.
-- Validation passed for 354 Vitest tests, five rate-limit regressions, ESLint, TypeScript, and the production build. Chrome verified the Free tooltip, layout, and edit-mode exclusion at 390px and 1440px against the development database. Pro generation and saving were covered by mocked Server Action tests. The live Pro flow remains unverified.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -196,3 +192,6 @@ In Progress
 
 - 2026-11-11: Completed [AI Explain Code](features/ai-explain-spec.md) in `ae4c87d` and fast-forwarded `main`. Pro users can generate and copy Markdown explanations for saved snippets and commands in the item drawer. Generation uses GPT-6 Luna, checks item ownership and current Pro access, and shares the existing AI rate limit. Explanations are generated on demand and held in the drawer.
 - All 345 Vitest tests, five rate-limit regressions, ESLint, TypeScript, the production build, development migration status, and staged whitespace checks passed. The build required an outside-sandbox retry after a Windows filesystem error. Chrome verified the Free tooltip, drawer width, and edit-form exclusion at 390px and 1440px. The existing sign-in prerender warning recurred, and sign-in succeeded. Live Pro generation remains unverified after automatic approval review blocked creating a temporary Pro account in Neon.
+
+- 2026-11-11: Completed AI Prompt Optimization in `0752f5f`, fast-forwarded `main`, and deleted the local feature branch. Pro users can review saved prompts through **Optimize** in the Prompt drawer. They can preview and apply a proposed revision or keep the original. Applying a revision checks that the original text still matches the saved prompt.
+- All 354 Vitest tests, five rate-limit regressions, ESLint, TypeScript, the production build, development migration status, and staged whitespace checks passed. Chrome verified the Free tooltip, layout, and edit-mode exclusion at 390px and 1440px. Mocked Server Action tests covered Pro generation and saving. The live Pro flow remains unverified.
