@@ -11,6 +11,7 @@ import { CollectionSelector } from "@/components/items/CollectionSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TagSuggestions } from "@/components/items/TagSuggestions";
+import { ItemDescriptionField } from "@/components/items/ItemDescriptionField";
 
 interface ItemEditFormProps { item: ItemDetail; onCancel: () => void; onSaved: (item: ItemDetail) => void; }
 
@@ -46,15 +47,26 @@ export function ItemEditForm({ item, onCancel, onSaved }: ItemEditFormProps) {
     } catch { setError("Unable to save item. Please try again."); toast.error("Unable to save item. Please try again."); }
     finally { saving.current = false; setPending(false); }
   }
-  function field(name: keyof typeof fields, label: string, multiline = false) {
-    const className = "w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
-    return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span>{multiline ? <textarea className={className} rows={name === "content" ? 12 : 3} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} /> : <Input autoFocus={name === "title"} required={name === "title" || name === "url"} type={name === "url" ? "url" : "text"} pattern={name === "url" ? "[hH][tT][tT][pP][sS]?://.*" : undefined} value={fields[name]} disabled={pending} onChange={(event) => setFields({ ...fields, [name]: event.target.value })} />}</label>;
+  function field(name: "title" | "url" | "language" | "tags", label: string) {
+    return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span><Input autoFocus={name === "title"} required={name === "title" || name === "url"} type={name === "url" ? "url" : "text"} pattern={name === "url" ? "[hH][tT][tT][pP][sS]?://.*" : undefined} value={fields[name]} disabled={pending} onChange={(event) => {
+      const value = event.target.value;
+      setFields((current) => ({ ...current, [name]: value }));
+    }} /></label>;
   }
   return <form action={save} className="flex min-h-0 flex-1 flex-col">
     <div className="flex gap-2 border-b p-4"><Button type="submit" disabled={pending || !fields.title.trim()}>{pending ? "Saving…" : "Save"}</Button><Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Cancel</Button></div>
     <fieldset disabled={pending} className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
       {error && <p role="alert" className="whitespace-pre-wrap text-sm text-destructive">{error}</p>}
-      {field("title", "Title")}{field("description", "Description", true)}
+      {field("title", "Title")}
+      <ItemDescriptionField value={fields.description}
+        onChange={(description) => setFields((current) => ({ ...current, description }))}
+        context={{
+          type: item.type.slug, title: fields.title, tags: fields.tags,
+          content: textType ? fields.content : undefined,
+          language: languageType ? fields.language : undefined,
+          url: item.type.slug === "link" ? fields.url : undefined,
+          fileName: item.fileName ?? undefined, fileMimeType: item.fileMimeType ?? undefined,
+        }} />
       {languageType ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : textType && <MarkdownEditor value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}{languageType && field("language", "Language")}
       {item.type.slug === "link" && field("url", "URL")}{field("tags", "Tags (comma-separated)")}
       <TagSuggestions itemType={item.type.slug} title={fields.title} content={(textType && fields.content) || fields.description} tags={fields.tags} onAccept={(tag) => setFields((current) => ({ ...current, tags: [current.tags, tag].filter(Boolean).join(", ") }))} />

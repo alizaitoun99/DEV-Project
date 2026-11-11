@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: AI Description Generation
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add an accessible icon button beside the Description field in the item creation dialog and edit drawer.
+- Generate a description from the current form values, including unsaved changes. Use whichever relevant details are available, such as title, content, language, URL, tags, or file and image metadata.
+- Support all seven built-in item types: snippets, commands, prompts, notes, links, files, and images. Allow generation from partial drafts when they contain enough information to summarize.
+- Return one or two concise, factual sentences in plain text. Start directly with the item's purpose or subject and avoid generic openings, headings, and unsupported details.
+- Fill the Description field with the result and let the user edit it before saving. Preserve the existing description if generation fails or the user edits it while a request is pending.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Follow the existing Pro-only AI pattern for button visibility, server-side entitlement checks, and rate limiting. Reuse the OpenAI integration used by tag suggestions.
+- Treat the URL as context and use file or image metadata when available. Fetching linked pages or analyzing attachment contents is outside this scope.
+- Validation passed for 330 Vitest tests, five rate-limit regressions, ESLint, TypeScript, and the production build. The build required an outside-sandbox retry after Windows denied access to generated output.
+- Production-mode browser checks against development data verified Free gating at 390px and 1440px, live Pro generation and persistence for mobile note creation and desktop editing, and protection for manual edits during generation. The disposable Pro account, test item, and scoped rate-limit records were removed. Other item types were covered by mocked Server Action tests.
 
 ## Testing infrastructure
 

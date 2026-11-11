@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateAutoTags } from "./ai";
+import { generateAutoTags, generateItemDescription } from "./ai";
 import { AuthRateLimitError } from "@/lib/auth-rate-limit";
 import { EntitlementError } from "@/lib/billing/usage-limits";
 
@@ -95,5 +95,78 @@ describe("generateAutoTags", () => {
     await expect(generateAutoTags({ title: "Next.js" })).resolves.toEqual({
       success: false, error: "Unable to suggest tags right now. Please try again.",
     });
+  });
+});
+
+describe("generateItemDescription", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.auth.mockResolvedValue({ user: { id: "owner" } });
+    mocks.create.mockResolvedValue({
+      status: "completed",
+      output_text: '{"description":"  Configures server-side rendering. Use it for dynamic pages.  "}',
+    });
+  });
+
+  it.each([
+    { type: "snippet", content: "export const dynamic = 'force-dynamic';", language: "TypeScript" },
+    { type: "command", content: "npm run build" },
+    { type: "prompt", content: "Summarize the release notes" },
+    { type: "note", tags: "React, SSR" },
+    { type: "link", url: "https://example.com/guide" },
+    { type: "file", fileName: "guide.pdf", fileMimeType: "application/pdf" },
+    { type: "image", fileName: "layout.png", fileMimeType: "image/png" },
+    { type: "note", title: "SSR guide" },
+  ])("uses the available draft details for $type", async (input) => {
+    await expect(generateItemDescription(input)).resolves.toEqual({
+      success: true, data: "Configures server-side rendering. Use it for dynamic pages.",
+    });
+    expect(mocks.assertProAccess).toHaveBeenCalledWith(mocks.tx, "owner");
+    expect(mocks.enforceAiRateLimit).toHaveBeenCalledWith("owner", mocks.tx);
+    expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+      input: `Item JSON:\n${JSON.stringify(input)}`, store: false,
+    }));
+  });
+
+  it("bounds draft text and removes URL credentials, query and fragment", async () => {
+    await generateItemDescription({ type: "note", content: "a".repeat(3000), description: "b".repeat(3000) });
+    await generateItemDescription({ type: "link", url: "https://user:pass@example.com/guide?token=secret#private" });
+    expect(mocks.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      input: `Item JSON:\n${JSON.stringify({ type: "note", content: "a".repeat(2000), description: "b".repeat(2000) })}`,
+    }));
+    expect(mocks.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      input: 'Item JSON:\n{"type":"link","url":"https://example.com/guide"}',
+    }));
+  });
+
+  it.each([{ type: "note", title: " " }, { type: "unknown", title: "SSR" }])("rejects an unusable draft", async (input) => {
+    await expect(generateItemDescription(input)).resolves.toMatchObject({ success: false });
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("requires sign-in, Pro access, and available quota before contacting the provider", async () => {
+    const input = { type: "note", title: "SSR" };
+    mocks.auth.mockResolvedValueOnce(null);
+    await expect(generateItemDescription(input)).resolves.toMatchObject({ success: false, error: expect.stringMatching(/sign in/i) });
+    expect(mocks.assertProAccess).not.toHaveBeenCalled();
+
+    mocks.assertProAccess.mockRejectedValueOnce(new EntitlementError("PRO_REQUIRED"));
+    await expect(generateItemDescription(input)).resolves.toMatchObject({ success: false, error: expect.stringContaining("Pro") });
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+
+    mocks.enforceAiRateLimit.mockRejectedValueOnce(new AuthRateLimitError(60));
+    await expect(generateItemDescription(input)).resolves.toMatchObject({ success: false, error: expect.stringContaining("Too many attempts") });
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["completed", '{"description":""}'],
+    ["completed", '{"description":"One sentence. Another sentence. A third sentence."}'],
+    ["completed", "not JSON"],
+    ["incomplete", '{"description":"Configures server-side rendering."}'],
+  ])("rejects unusable provider output (%s, %s)", async (status, output_text) => {
+    mocks.create.mockResolvedValue({ status, output_text });
+    await expect(generateItemDescription({ type: "note", title: "SSR" })).resolves.toMatchObject({ success: false });
   });
 });

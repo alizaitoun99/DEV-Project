@@ -15,6 +15,7 @@ import type { ItemCreateInput } from "@/lib/item-validation";
 import { FileUpload, sendFile, uploadRequest } from "@/components/items/FileUpload";
 import { uploadMime } from "@/lib/upload-validation";
 import { TagSuggestions } from "@/components/items/TagSuggestions";
+import { ItemDescriptionField } from "@/components/items/ItemDescriptionField";
 
 type CreateType = ItemCreateInput["type"] | "file" | "image";
 
@@ -36,6 +37,8 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const saving = useRef(false);
+  const attachment = type === "file" || type === "image";
+  const languageType = type === "snippet" || type === "command";
 
   function changeOpen(value: boolean) {
     if (saving.current) return;
@@ -88,10 +91,12 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
     } finally { saving.current = false; setPending(false); }
   }
 
-  function field(name: keyof typeof fields, label: string, multiline = false) {
-    const shared = { value: fields[name], onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setFields({ ...fields, [name]: event.target.value }) };
+  function field(name: "title" | "url" | "language" | "tags", label: string) {
     return <label className="block space-y-2"><span className="text-sm font-medium">{label}</span>
-      {multiline ? <textarea {...shared} rows={name === "content" ? 8 : 3} maxLength={name === "content" ? 500000 : 10000} className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" /> : <Input {...shared} required={name === "title" || name === "url"} type={name === "url" ? "url" : "text"} maxLength={name === "title" ? 500 : name === "language" ? 100 : undefined} />}
+      <Input value={fields[name]} onChange={(event) => {
+        const value = event.target.value;
+        setFields((current) => ({ ...current, [name]: value }));
+      }} required={name === "title" || name === "url"} type={name === "url" ? "url" : "text"} maxLength={name === "title" ? 500 : name === "language" ? 100 : undefined} />
     </label>;
   }
 
@@ -107,7 +112,16 @@ export function CreateItemDialog({ defaultType = "snippet", triggerLabel = "New 
             <option value="snippet">Snippet</option><option value="prompt">Prompt</option><option value="command">Command</option><option value="note">Note</option><option value="link">Link</option>
             <option value="file">File</option><option value="image">Image</option>
           </select></label>
-          {field("title", "Title (required)")}{field("description", "Description", true)}
+          {field("title", "Title (required)")}
+          {open && <ItemDescriptionField key={type} value={fields.description}
+            onChange={(description) => setFields((current) => ({ ...current, description }))}
+            context={{
+              type, title: fields.title, tags: fields.tags,
+              content: !attachment && type !== "link" ? fields.content : undefined,
+              language: languageType ? fields.language : undefined,
+              url: type === "link" ? fields.url : undefined,
+              fileName: file?.name, fileMimeType: file?.type,
+            }} />}
           {type === "file" || type === "image" ? <FileUpload type={type} file={file} onChange={setFile} disabled={pending} progress={progress} /> : type === "link" ? field("url", "URL (required)") : ["snippet", "command"].includes(type) ? <CodeEditor value={fields.content} language={fields.language} readOnly={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} /> : <MarkdownEditor key={type} value={fields.content} disabled={pending} onChange={(content) => setFields((current) => ({ ...current, content }))} />}
           {["snippet", "command"].includes(type) && field("language", "Language")}
           {field("tags", "Tags (comma-separated)")}
