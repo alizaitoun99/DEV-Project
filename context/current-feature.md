@@ -1,23 +1,16 @@
-# Current Feature: AI Description Generation
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Add an accessible icon button beside the Description field in the item creation dialog and edit drawer.
-- Generate a description from the current form values, including unsaved changes. Use whichever relevant details are available, such as title, content, language, URL, tags, or file and image metadata.
-- Support all seven built-in item types: snippets, commands, prompts, notes, links, files, and images. Allow generation from partial drafts when they contain enough information to summarize.
-- Return one or two concise, factual sentences in plain text. Start directly with the item's purpose or subject and avoid generic openings, headings, and unsupported details.
-- Fill the Description field with the result and let the user edit it before saving. Preserve the existing description if generation fails or the user edits it while a request is pending.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Follow the existing Pro-only AI pattern for button visibility, server-side entitlement checks, and rate limiting. Reuse the OpenAI integration used by tag suggestions.
-- Treat the URL as context and use file or image metadata when available. Fetching linked pages or analyzing attachment contents is outside this scope.
-- Validation passed for 330 Vitest tests, five rate-limit regressions, ESLint, TypeScript, and the production build. The build required an outside-sandbox retry after Windows denied access to generated output.
-- Production-mode browser checks against development data verified Free gating at 390px and 1440px, live Pro generation and persistence for mobile note creation and desktop editing, and protection for manual edits during generation. The disposable Pro account, test item, and scoped rate-limit records were removed. Other item types were covered by mocked Server Action tests.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -193,3 +186,6 @@ In Progress
 
 - 2026-11-11: Completed [AI Auto-Tagging](features/ai-auto-tag-spec.md) in `d110e62`, fast-forwarded `main`, and deleted the local feature branch. Pro users can generate, accept, and reject tags in the create dialog and edit drawer. The Server Action uses GPT-6 Luna through the Responses API and checks the current plan and a 20-request hourly limit against PostgreSQL. No migration was needed.
 - All 314 Vitest tests, five rate-limit regression checks, ESLint, TypeScript, the production build, and development migration status passed. Browser checks covered Free gating at 390px and 1440px and live Pro generation, rejection, and persistence in mobile create and desktop edit. The disposable development accounts and their scoped rate-limit counters were removed. The production-mode server logged a `/sign-in` prerender error involving `crypto.getRandomValues()` during the run. Sign-in and the feature checks completed.
+
+- 2026-11-11: Completed AI Description Generation in `322f24d` and fast-forwarded `main`. Pro users can generate editable, one- or two-sentence descriptions from the current draft in the create dialog or edit drawer for all seven built-in item types. Link generation uses the URL origin and path, and file and image generation uses attachment metadata. Generation shares the existing AI rate limit and preserves manual description edits made during a request.
+- All 330 Vitest tests, five rate-limit checks, ESLint, TypeScript, the production build, and development migration status passed. The build required an outside-sandbox retry after a Windows filesystem error. Browser checks verified Free gating at 390px and 1440px, live Pro generation and saving in mobile note creation and desktop note editing, and preservation of manual edits during generation. Mocked Server Action tests covered the other item types. Removed the disposable development account, test item, and scoped rate-limit records. The production-mode server logged the previously recorded sign-in prerender error, and sign-in completed.
