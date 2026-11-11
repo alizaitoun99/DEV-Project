@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { explainCode, generateAutoTags, generateItemDescription } from "./ai";
+import { applyPromptRevision, explainCode, generateAutoTags, generateItemDescription, optimizePrompt } from "./ai";
 import { AuthRateLimitError } from "@/lib/auth-rate-limit";
 import { EntitlementError } from "@/lib/billing/usage-limits";
 
@@ -9,10 +9,12 @@ const mocks = vi.hoisted(() => ({
   enforceAiRateLimit: vi.fn(),
   create: vi.fn(),
   findItem: vi.fn(),
-  tx: {},
+  getItemDetail: vi.fn(),
+  tx: { item: { updateMany: vi.fn() } },
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
+vi.mock("@/lib/db/items", () => ({ getItemDetail: mocks.getItemDetail }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     item: { findFirst: mocks.findItem },
@@ -28,6 +30,78 @@ vi.mock("@/lib/openai", () => ({
   AI_MODEL: "gpt-6-luna",
   getOpenAI: () => ({ responses: { create: mocks.create } }),
 }));
+
+describe("prompt optimization", () => {
+  const source = { itemId: "item", original: " Summarize these notes.\n" };
+  const revision = "Summarize the supplied notes in three concise bullets.";
+  const promptWhere = { id: "item", userId: "owner", type: { slug: "prompt", isSystem: true } };
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.auth.mockResolvedValue({ user: { id: "owner" } });
+    mocks.findItem.mockResolvedValue({ content: source.original });
+    mocks.create.mockResolvedValue({ status: "completed", output_text: JSON.stringify({ revision }) });
+  });
+
+  it("reviews only the matching saved prompt without writing to it", async () => {
+    await expect(optimizePrompt(source)).resolves.toEqual({ success: true, data: revision });
+    expect(mocks.findItem).toHaveBeenCalledWith({ where: promptWhere, select: { content: true } });
+    expect(mocks.assertProAccess).toHaveBeenCalledWith(mocks.tx, "owner");
+    expect(mocks.enforceAiRateLimit).toHaveBeenCalledWith("owner", mocks.tx);
+    expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+      input: expect.stringContaining(JSON.stringify({ content: source.original })),
+      store: false,
+    }));
+    expect(mocks.tx.item.updateMany).not.toHaveBeenCalled();
+  });
+
+  it.each([null, source.original.trim()])("returns no suggestion for %j", async (revision) => {
+    mocks.create.mockResolvedValue({ status: "completed", output_text: JSON.stringify({ revision }) });
+    await expect(optimizePrompt(source)).resolves.toEqual({ success: true, data: null });
+  });
+
+  it.each([null, { content: "Changed" }])("does not send an unavailable or changed prompt to OpenAI", async (item) => {
+    mocks.findItem.mockResolvedValue(item);
+    await expect(optimizePrompt(source)).resolves.toMatchObject({ success: false });
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid provider response", async () => {
+    mocks.create.mockResolvedValue({ status: "completed", output_text: '{"revision":""}' });
+    await expect(optimizePrompt(source)).resolves.toMatchObject({ success: false });
+  });
+
+  it("requires Pro before generating or saving", async () => {
+    mocks.assertProAccess.mockRejectedValue(new EntitlementError("PRO_REQUIRED"));
+    await expect(optimizePrompt(source)).resolves.toMatchObject({ success: false });
+    await expect(applyPromptRevision({ ...source, revision })).resolves.toMatchObject({ success: false });
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(mocks.tx.item.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("applies only the revision and returns the updated details without another AI request", async () => {
+    const item = { id: "item", content: revision };
+    mocks.tx.item.updateMany.mockResolvedValue({ count: 1 });
+    mocks.getItemDetail.mockResolvedValue(item);
+    await expect(applyPromptRevision({ ...source, revision })).resolves.toEqual({ success: true, data: item });
+    expect(mocks.tx.item.updateMany).toHaveBeenCalledWith({
+      where: { ...promptWhere, content: source.original },
+      data: { content: revision },
+    });
+    expect(mocks.getItemDetail).toHaveBeenCalledWith("owner", "item", mocks.tx);
+    expect(mocks.enforceAiRateLimit).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("reports a stale revision when the conditional update matches no rows", async () => {
+    mocks.tx.item.updateMany.mockResolvedValue({ count: 0 });
+    await expect(applyPromptRevision({ ...source, revision })).resolves.toMatchObject({
+      success: false, error: expect.stringMatching(/changed/),
+    });
+    expect(mocks.getItemDetail).not.toHaveBeenCalled();
+  });
+});
 
 describe("explainCode", () => {
   const content = "  printf '%s\\n' hello\n";

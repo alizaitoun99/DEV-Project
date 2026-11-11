@@ -1,16 +1,20 @@
-# Current Feature
+# Current Feature: AI Prompt Optimization
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Add an **Optimize** button to the header of the item drawer for saved Prompt items, following the Explain button pattern for snippets and commands.
+- Review the current prompt against the problem it describes. Suggest a revised prompt only when it improves clarity or effectiveness while preserving the original intent and constraints. Show feedback when no changes are needed.
+- Preview the revised prompt and ask the user whether to use it. Replace the saved prompt text only after the user explicitly accepts the revision.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Follow the existing Pro AI access, item ownership, and shared rate-limit patterns used by Explain.
+- Optimize reviews up to 20,000 characters. The preview shows the proposed text before saving, and the save checks that the original text still matches the database.
+- Validation passed for 354 Vitest tests, five rate-limit regressions, ESLint, TypeScript, and the production build. Chrome verified the Free tooltip, layout, and edit-mode exclusion at 390px and 1440px against the development database. Pro generation and saving were covered by mocked Server Action tests. The live Pro flow remains unverified.
 
 ## Testing infrastructure
 

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Copy } from "lucide-react";
 import { Tabs } from "radix-ui";
 import Markdown from "react-markdown";
@@ -12,9 +13,10 @@ interface MarkdownEditorProps {
   readOnly?: boolean;
   disabled?: boolean;
   onChange?: (value: string) => void;
+  headerAction?: ReactNode;
 }
 
-export function MarkdownEditor({ value, readOnly = false, disabled = false, onChange }: MarkdownEditorProps) {
+export function MarkdownEditor({ value, readOnly = false, disabled = false, onChange, headerAction }: MarkdownEditorProps) {
   async function copy() {
     try { await navigator.clipboard.writeText(value); toast.success("Copied to clipboard"); }
     catch { toast.error("Unable to copy. Please try again."); }
@@ -28,7 +30,10 @@ export function MarkdownEditor({ value, readOnly = false, disabled = false, onCh
         {!readOnly && <Tabs.Trigger type="button" value="write" className={tabClass}>Write</Tabs.Trigger>}
         <Tabs.Trigger type="button" value="preview" className={tabClass}>Preview</Tabs.Trigger>
       </Tabs.List>
-      <Button type="button" variant="ghost" size="icon" className="size-8 shrink-0 hover:bg-zinc-800 hover:text-white" aria-label="Copy Markdown" disabled={disabled || !value} onClick={copy}><Copy className="size-4" /></Button>
+      <div className="flex shrink-0 items-center gap-1">
+        <Button type="button" variant="ghost" size="icon" className="size-8 shrink-0 hover:bg-zinc-800 hover:text-white" aria-label="Copy Markdown" disabled={disabled || !value} onClick={copy}><Copy className="size-4" /></Button>
+        {headerAction}
+      </div>
     </div>
     {!readOnly && <Tabs.Content value="write" className="focus-visible:outline-none">
       <textarea aria-label="Markdown content" value={value} disabled={disabled} maxLength={500000} onChange={(event) => onChange?.(event.target.value)} className="block max-h-[352px] min-h-32 w-full resize-none overflow-y-auto bg-transparent p-4 font-mono text-sm [field-sizing:content] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-50" />
