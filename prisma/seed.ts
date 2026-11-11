@@ -6,7 +6,7 @@ import { assertNoBillingForBulkDeletion, BillingDeletionError } from "../src/lib
 import { enqueueAccountStorage } from "../src/lib/db/items";
 import { Prisma, type ContentKind } from "../src/generated/prisma/client";
 
-const DEMO_EMAIL = "demo@devistage.io";
+const DEMO_EMAIL = "demo@devstash.io";
 
 const SYSTEM_TYPES = [
   { slug: "snippet", icon: "Code", color: "#3b82f6", kind: "TEXT" },
@@ -110,13 +110,31 @@ jobs:
   },
 ];
 
+async function resetDevelopmentData(tx: Prisma.TransactionClient) {
+  const users = await tx.user.findMany({ select: { id: true }, orderBy: { id: "asc" } });
+  for (const { id } of users) {
+    await assertNoBillingForBulkDeletion(tx, id);
+    await enqueueAccountStorage(tx, id);
+  }
+
+  // Item types cannot be removed while items still reference them.
+  await tx.item.deleteMany();
+  await tx.user.deleteMany();
+  await tx.itemType.deleteMany();
+  await tx.verificationToken.deleteMany();
+  await tx.authRateLimit.deleteMany();
+  await tx.stripeWebhookReceipt.deleteMany();
+}
+
 async function main(): Promise<void> {
   if (process.env.NODE_ENV === "production") {
     throw new Error("Demo seeding is for development only.");
   }
 
   const passwordHash = await hash("12345678", 12);
+  const resetDatabase = process.argv.includes("--reset-database");
   const counts = await prisma.$transaction(async (tx) => {
+    if (resetDatabase) await resetDevelopmentData(tx);
     const existingDemo = await tx.user.findUnique({ where: { email: DEMO_EMAIL }, select: { id: true } });
     if (existingDemo) {
       await assertNoBillingForBulkDeletion(tx, existingDemo.id);
@@ -171,7 +189,7 @@ async function main(): Promise<void> {
       collections: await tx.collection.count({ where: { userId: user.id } }),
       items: await tx.item.count({ where: { userId: user.id } }),
     };
-  }, { timeout: 60000 });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable, timeout: 60000 });
   console.log("Demo seed complete:", counts);
 }
 

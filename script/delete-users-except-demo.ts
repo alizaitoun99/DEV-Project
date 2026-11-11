@@ -5,7 +5,7 @@ import { prisma } from "../src/lib/prisma";
 import { enqueueAccountStorage } from "../src/lib/db/items";
 import { assertNoBillingForBulkDeletion } from "../src/lib/billing/account-deletion";
 
-const DEMO_EMAIL = "demo@devistage.io";
+const DEMO_EMAIL = "demo@devstash.io";
 const execute = process.argv.includes("--execute");
 
 function snapshot(value: unknown): string {

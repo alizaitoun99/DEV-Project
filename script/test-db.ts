@@ -43,7 +43,7 @@ async function checkTables(): Promise<void> {
 
 async function checkDemoData(): Promise<void> {
   const user = await prisma.user.findUnique({
-    where: { email: "demo@devistage.io" },
+    where: { email: "demo@devstash.io" },
     select: {
       id: true, name: true, email: true, plan: true, emailVerified: true, passwordHash: true,
       collections: {
