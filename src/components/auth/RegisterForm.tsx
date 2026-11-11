@@ -78,21 +78,21 @@ export function RegisterForm() {
   return (
     <div className="space-y-5">
       {error && <p id="register-error" role="alert" className="text-sm text-destructive">{error}</p>}
+      <Button type="button" variant="outline" disabled={pending} onClick={registerWithGitHub} className="h-11 w-full">
+        <GitBranch aria-hidden="true" />
+        Register with GitHub
+      </Button>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        or continue with email
+        <span className="h-px flex-1 bg-border" />
+      </div>
       <form onSubmit={submit} aria-describedby={error ? "register-error" : undefined}>
         <fieldset disabled={pending} className="space-y-4">
           {fields.map((field) => <div key={field.name} className="space-y-2"><label htmlFor={field.name} className="text-sm font-medium">{field.label}</label><Input {...field} id={field.name} required minLength={field.type === "password" ? 8 : undefined} aria-describedby={field.name === "password" ? "password-help" : undefined} className="h-11" />{field.name === "password" && <p id="password-help" className="text-xs text-muted-foreground">At least 8 characters, up to 72 bytes.</p>}</div>)}
           <Button type="submit" className="h-11 w-full">{pending ? "Creating account…" : "Create account"}</Button>
         </fieldset>
       </form>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        or continue with
-        <span className="h-px flex-1 bg-border" />
-      </div>
-      <Button type="button" variant="outline" disabled={pending} onClick={registerWithGitHub} className="h-11 w-full">
-        <GitBranch aria-hidden="true" />
-        Register with GitHub
-      </Button>
       <p className="text-center text-sm text-muted-foreground">Already have an account? <Link href="/sign-in" className="text-primary underline underline-offset-4">Sign in</Link></p>
     </div>
   );

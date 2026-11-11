@@ -93,6 +93,21 @@ export function SignInForm() {
           {displayedError}
         </p>
       )}
+      <Button
+        type="button"
+        variant="outline"
+        disabled={pending}
+        onClick={() => void github()}
+        className="h-11 w-full"
+      >
+        <GitBranch aria-hidden="true" />
+        Sign in with GitHub
+      </Button>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        or continue with email
+        <span className="h-px flex-1 bg-border" />
+      </div>
       <form
         onSubmit={submit}
         aria-describedby={displayedError ? "signin-error" : undefined}
@@ -141,21 +156,6 @@ export function SignInForm() {
           </div>
         </fieldset>
       </form>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        or continue with
-        <span className="h-px flex-1 bg-border" />
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        disabled={pending}
-        onClick={() => void github()}
-        className="h-11 w-full"
-      >
-        <GitBranch aria-hidden="true" />
-        Sign in with GitHub
-      </Button>
       <p className="text-center text-sm text-muted-foreground">
         New to DevStash?{" "}
         <Link

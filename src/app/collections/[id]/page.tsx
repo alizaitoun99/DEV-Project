@@ -1,3 +1,4 @@
+import { TYPE_LABELS } from "@/lib/item-type-labels";
 import { Pagination } from "@/components/Pagination";
 import { getPagination, parsePage, ITEMS_PER_PAGE, type PaginationSearchParams } from "@/lib/pagination";
 import type { Metadata } from "next";
@@ -17,11 +18,6 @@ interface CollectionPageProps {
 }
 
 export const metadata: Metadata = { title: "Collection | DevStash" };
-
-const TYPE_LABELS: Record<string, string> = {
-  snippet: "Snippets", prompt: "Prompts", command: "Commands", note: "Notes",
-  file: "Files", image: "Images", link: "Links",
-};
 
 export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
   await connection();

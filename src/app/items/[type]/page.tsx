@@ -1,3 +1,4 @@
+import { TYPE_LABELS } from "@/lib/item-type-labels";
 import { Pagination } from "@/components/Pagination";
 import { getPagination, parsePage, ITEMS_PER_PAGE, type PaginationSearchParams } from "@/lib/pagination";
 import type { Metadata } from "next";
@@ -37,7 +38,7 @@ export default async function ItemsPage({ params, searchParams }: ItemsPageProps
   if (!slug) notFound();
 
   if (user.plan === "FREE" && (slug === "file" || slug === "image")) {
-    const title = slug === "file" ? "Files" : "Images";
+    const title = TYPE_LABELS[slug];
 
     return (
       <section aria-labelledby="upgrade-title" className="mx-auto max-w-xl space-y-4 rounded-xl border bg-card p-6 sm:p-8">
@@ -64,7 +65,7 @@ export default async function ItemsPage({ params, searchParams }: ItemsPageProps
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">{type.name}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">{TYPE_LABELS[slug]}</h1>
           <p className="mt-2 text-muted-foreground">{count} {count === 1 ? "item" : "items"}</p>
         </div>
         <CreateItemDialog defaultType={slug} triggerLabel={`Add ${slug}`} />

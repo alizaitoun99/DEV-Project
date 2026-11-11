@@ -1,16 +1,18 @@
-# Current Feature
+# Current Feature — Sidebar and authentication layout
 
 ## Status
 
-<!-- No active feature. -->
+In Progress
 
 ## Goals
 
-<!-- Load the next feature specification. -->
+- Highlight the current page in the desktop and mobile sidebar.
+- Place GitHub above the email form on Register and Sign in.
+- Use plural, title-case names for item lists and their sidebar links.
 
 ## Notes
 
-<!-- Feature context and implementation notes. -->
+- Playwright verified route highlighting on desktop and mobile, plural item headings, and GitHub placement above the email form at 390 px and 1440 px.
 
 ## Testing infrastructure
 

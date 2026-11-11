@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { SidebarLink } from "@/components/dashboard/SidebarLink";
+import { TYPE_LABELS } from "@/lib/item-type-labels";
 import { UserMenu } from "@/components/auth/UserMenu";
 import {
   Circle, Code, File, ImageIcon, Layers, LinkIcon,
@@ -29,11 +30,11 @@ interface CollectionLinksProps {
 
 function CollectionLinks({ collections, favorites = false }: CollectionLinksProps) {
   return collections.map((collection) => (
-    <Link key={collection.id} href={`/collections/${collection.id}`} prefetch={false} className={linkClassName}>
+    <SidebarLink key={collection.id} href={`/collections/${collection.id}`} prefetch={false} className={linkClassName}>
       {!favorites && <Circle aria-hidden="true" className={`size-3 shrink-0 fill-current ${collection.types?.length ? getTypeStyle(collection.types[0].slug).color : "text-muted-foreground"}`} />}
       <span className="truncate">{collection.name}</span>
       {favorites && <Star aria-label="Favorite" className="ml-auto size-4 shrink-0 fill-yellow-400 text-yellow-400" />}
-    </Link>
+    </SidebarLink>
   ));
 }
 
@@ -48,12 +49,12 @@ export async function DashboardSidebar() {
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
-      <Link href="/dashboard" className="flex h-[69px] shrink-0 items-center gap-3 border-b px-5 font-semibold outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sidebar-ring">
+      <SidebarLink href="/dashboard" className="flex h-[69px] shrink-0 items-center gap-3 border-b px-5 font-semibold outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sidebar-ring">
         <span className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600">
           <Layers aria-hidden="true" className="size-5 text-white" />
         </span>
         <span className="text-xl tracking-tight">DevStash</span>
-      </Link>
+      </SidebarLink>
       <nav aria-label="Dashboard navigation" className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-4">
         <section aria-label="Types" className="px-3 pb-4">
           <h2 className="px-3 pb-2 text-xs font-medium text-muted-foreground">Types</h2>
@@ -61,11 +62,11 @@ export async function DashboardSidebar() {
             const style = TYPE_STYLES[type.slug as keyof typeof TYPE_STYLES] ?? { ...TYPE_STYLES.file, route: encodeURIComponent(type.slug) };
             const Icon = style.icon;
             return (
-              <Link key={type.id} href={`/items/${style.route}`} prefetch={false} className={linkClassName}>
+              <SidebarLink key={type.id} href={`/items/${style.route}`} prefetch={false} className={linkClassName}>
                 <Icon aria-hidden="true" className={`size-4 shrink-0 ${style.color}`} />
-                <span>{type.name}</span>
+                <span>{TYPE_LABELS[type.slug] ?? type.name}</span>
                 <span className="ml-auto text-xs tabular-nums text-muted-foreground">{type._count.items}</span>
-              </Link>
+              </SidebarLink>
             );
           })}
         </section>
@@ -79,7 +80,7 @@ export async function DashboardSidebar() {
             <h3 className="px-3 pb-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">Recent collections</h3>
             <CollectionLinks collections={recentCollections} />
           </div>
-          <Link href="/collections" prefetch={false} className={linkClassName}>View all collections <span aria-hidden="true" className="ml-auto">→</span></Link>
+          <SidebarLink href="/collections" prefetch={false} className={linkClassName}>View all collections <span aria-hidden="true" className="ml-auto">→</span></SidebarLink>
         </section>
       </nav>
       <UserMenu user={user} />
