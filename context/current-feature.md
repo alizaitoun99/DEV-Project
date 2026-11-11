@@ -1,21 +1,16 @@
-# Current Feature — Subscription plans and upgrade flow
+# Current Feature
 
 ## Status
 
-In progress
+<!-- No active feature. -->
 
 ## Goals
 
-- Show the signed-in user's plan next to their name in the dashboard sidebar.
-- Show the same plan badge under Billing at `/settings#billing`, with Free in gray and Pro in blue.
-- Give Free users a ghost Upgrade button in the workspace header and a dedicated `/upgrade` page with monthly and yearly checkout options.
-- Show the workspace sidebar on Settings and Profile.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-- Both badges display the saved plan using the shared `PlanBadge` component.
-- The upgrade page shares the homepage feature lists and sends the selected interval through the existing checkout endpoint.
-- Validation passed: 304 unit tests, ESLint, TypeScript, and the production build. Signed-out requests redirect to sign-in for Upgrade, Settings, and Profile. Signed-in layouts and Stripe checkout remain unverified.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -185,3 +180,6 @@ In progress
 - All 304 unit tests, ESLint, TypeScript, and the production build passed. Authenticated HTTP checks verified both Free upgrade pages, the Billing destination, and Free Snippets access. The signed-out redirect passed. Browser layout and live Pro access remain unverified.
 
 - 2026-11-10: Updated the demo seed to use the Free plan with three collections and 10 items. The development cleanup deleted one non-demo user, and the live database check confirmed that the reseeded demo was the only remaining user.
+
+- 2026-11-11: Completed subscription badges and the upgrade flow in `6f5e07d`. Free and Pro badges appear in the dashboard sidebar and Settings Billing. Free users can open `/upgrade` from the dashboard header, compare plans, and choose $8 monthly or $72 yearly before Stripe Checkout. Settings and Profile use the dashboard shell.
+- All 304 unit tests, ESLint, TypeScript, and the production build passed. Signed-out redirects passed for Upgrade, Settings, and Profile. Signed-in layouts and Stripe Checkout remain unverified.
