@@ -2,15 +2,15 @@
 
 ## Status
 
-Action Deduplication
+<!-- No active feature. -->
 
 ## Goals
 
-Extract the shared AI response request, owner-scoped item flag write, resource ID schema, and item validation error formatting. Preserve action inputs, results, authorization, and cache behavior.
+<!-- Load the next feature specification. -->
 
 ## Notes
 
-Implementation and validation passed on feature/action-deduplication. All 354 Vitest tests, ESLint, standalone TypeScript, and the production build passed. The build required an outside-sandbox retry after a Windows EPERM error. Changes are pending commit.
+<!-- Feature context and implementation notes. -->
 
 ## Testing infrastructure
 
@@ -197,3 +197,5 @@ Implementation and validation passed on feature/action-deduplication. All 354 Vi
 - All 354 Vitest tests, five rate-limit regressions, ESLint, TypeScript, the production build, development migration status, and staged whitespace checks passed. Chrome verified the Free tooltip, layout, and edit-mode exclusion at 390px and 1440px. Mocked Server Action tests covered Pro generation and saving. The live Pro flow remains unverified.
 
 - 2026-11-11: Completed Sidebar and authentication layout in `3a315d0`. The current route is highlighted in the desktop and mobile sidebars, item list names are plural and title case, and GitHub appears above the email form on Register and Sign in. Playwright verified the layout at 390 px and 1440 px. All 354 Vitest tests, ESLint, TypeScript, and the production build passed.
+
+- 2026-11-11: Completed Action Deduplication in `4e7c40a`. Shared AI request handling, owner-scoped item pin and favorite writes, trimmed resource ID validation, and item validation error formatting. All 354 Vitest tests, ESLint, standalone TypeScript, and the production build passed. The build required an outside-sandbox retry after a Windows filesystem permission error.
